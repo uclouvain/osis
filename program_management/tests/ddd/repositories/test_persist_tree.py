@@ -29,8 +29,12 @@ from unittest import mock
 from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
+from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
@@ -163,11 +167,35 @@ class TestPersistPrerequisites(TestCase):
     def test_should_call_persist_prerequisites_on_all_children_when_link_deleted(
             self,
             mock_delete_group_element_year,
-            mock_persist_prerequisite):
-        root_version = EducationGroupVersionFactory()
-        link_1 = GroupElementYearFactory(parent_element__group_year=root_version.root_group)
-        link_2_1 = GroupElementYearChildLeafFactory(parent_element=link_1.child_element)
-        link_2_2 = GroupElementYearChildLeafFactory(parent_element=link_1.child_element)
+            mock_persist_prerequisite
+    ):
+        year = 2020
+        root_version = EducationGroupVersionFactory(
+            offer__academic_year__year=year,
+            root_group__academic_year__year=year,
+        )
+        link_1 = GroupElementYearFactory(
+            parent_element__group_year=root_version.root_group,
+            child_element__group_year__academic_year__year=year,
+        )
+        link_2_1 = GroupElementYearChildLeafFactory(
+            parent_element=link_1.child_element,
+            child_element__learning_unit_year__academic_year__year=year,
+        )
+        link_2_2 = GroupElementYearChildLeafFactory(
+            parent_element=link_1.child_element,
+            child_element__learning_unit_year__academic_year__year=year,
+        )
+        PrerequisiteItemFactory(
+            prerequisite=PrerequisiteFactory(
+                learning_unit_year=link_2_1.child_element.learning_unit_year,
+                education_group_year=root_version.offer,
+                education_group_version=root_version,
+            ),
+            learning_unit=link_2_2.child_element.learning_unit_year.learning_unit,
+            group_number=1,
+            position=1
+        )
 
         tree = load_tree.load(link_1.parent_element.id)
         root_node_child = tree.root_node.children_as_nodes[0]
@@ -175,7 +203,12 @@ class TestPersistPrerequisites(TestCase):
 
         persist_tree.persist(tree)
         number_learning_unit_removed = 2
-        self.assertEqual(
+        self.assertNotEqual(
             mock_persist_prerequisite.call_count,
             number_learning_unit_removed
+        )
+        number_learning_unit_with_prerequisite_removed = 1
+        self.assertEqual(
+            mock_persist_prerequisite.call_count,
+            number_learning_unit_with_prerequisite_removed
         )
