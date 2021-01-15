@@ -36,10 +36,10 @@ from base.models.enums import learning_component_year_type, learning_unit_year_s
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
+from base.models.enums.learning_container_year_types import EXTERNAL
 
 
 class AttributionJsonTest(TestCase):
@@ -48,10 +48,9 @@ class AttributionJsonTest(TestCase):
         cls.academic_year = AcademicYearFactory(current=True)
 
         # Creation Container / UE and components related
-        cls.l_container = LearningContainerYearFactory(
+        cls.l_container = LearningContainerYearInChargeFactory(
             academic_year=cls.academic_year,
-            acronym="LBIR1210",
-            in_charge=True
+            acronym="LBIR1210"
         )
         cls.learning_unit_yr = LearningUnitYearWithComponentFactory(
             academic_year=cls.academic_year,
