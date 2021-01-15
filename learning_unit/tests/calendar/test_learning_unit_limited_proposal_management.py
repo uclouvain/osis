@@ -56,8 +56,8 @@ class TestLearningUnitLimitedProposalManagementCalendarEnsureConsistencyUntilNPl
                 "reference": academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
                 "data_year": self.current_academic_year.pk,
                 # The first time that we can edit an 2020's object is in 2018 (=2020-2)
-                "start_date": datetime.date(2018, 9, 15),
-                "end_date": datetime.date(2020, 9, 14),
+                "start_date": datetime.date(self.current_academic_year.year - 2, 9, 15),
+                "end_date": datetime.date(self.current_academic_year.year, 9, 14),
             }
         )
 
