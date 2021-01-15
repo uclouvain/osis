@@ -145,10 +145,7 @@ class NodeFactory:
             year=parent_node.year,
             teaching_campus=parent_node.teaching_campus,
             management_entity_acronym=parent_node.management_entity_acronym,
-            group_title_fr="{child_title} {parent_abbreviated_title}".format(
-                child_title=generated_child_title,
-                parent_abbreviated_title=parent_node.title
-            ),
+            group_title_fr=generated_child_title,
             start_year=parent_node.year,
         )
         child._has_changed = True
@@ -541,6 +538,7 @@ class NodeLearningUnitYear(Node):
     proposal_type = attr.ib(type=ProposalType, default=None)
     learning_unit_type = attr.ib(type=LearningContainerYearType, default=None)
     other_remark = attr.ib(type=str, default=None)
+    other_remark_english = attr.ib(type=str, default=None)
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)

@@ -25,12 +25,44 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearCommonFactory, \
     EducationGroupYearCommonBachelorFactory, EducationGroupYearCommonAgregationFactory, \
     EducationGroupYearCommonMasterFactory, EducationGroupYearCommonSpecializedMasterFactory
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from education_group.views.configuration.common_list import CommonListFilterSerializer
+from education_group.views.configuration.common_list import CommonListFilterSerializer, CommonListFilter
+
+
+class TestCommonListFilter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce(number_past=2, number_future=5)
+
+    def test_ensure_academic_year_initial_value_case_no_education_group_switch_calendar_opened(self):
+        filter = CommonListFilter()
+        self.assertIsNone(filter.form['academic_year'].initial)
+
+    def test_ensure_academic_year_initial_value_case_one_education_group_switch_calendar_opened(self):
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_SWITCH,
+            data_year=self.academic_years[2]
+        )
+
+        filter = CommonListFilter()
+        self.assertEqual(filter.form['academic_year'].initial, self.academic_years[2])
+
+    def test_ensure_academic_year_initial_value_case_multiple_education_group_switch_calendar_opened(self):
+        for academic_year in self.academic_years[:2]:
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.EDUCATION_GROUP_SWITCH,
+                data_year=academic_year
+            )
+
+        filter = CommonListFilter()
+        self.assertEqual(filter.form['academic_year'].initial, self.academic_years[0])
 
 
 class TestCommonListView(TestCase):
