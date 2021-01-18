@@ -178,6 +178,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'subtype',
             'code',
             'remark',
+            'remark_en',
             'lecturing_volume',
             'practical_exercise_volume',
             'with_prerequisite',
