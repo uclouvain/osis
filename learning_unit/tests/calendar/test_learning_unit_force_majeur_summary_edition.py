@@ -53,8 +53,8 @@ class TestLearningUnitForceMajeurSummaryEditionCalendarEnsureConsistencyUntilNPl
                 "title": "Edition fiches descriptives (cas de force majeure)",
                 "reference": academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year, 6, 15),
-                "end_date": datetime.date(self.current_academic_year.year, 6, 20),
+                "start_date": datetime.date(self.current_academic_year.year + 1, 6, 15),
+                "end_date": datetime.date(self.current_academic_year.year + 1, 6, 20),
             }
         )
 

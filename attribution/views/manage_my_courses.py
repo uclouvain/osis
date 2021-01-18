@@ -102,7 +102,11 @@ def list_my_attributions_summary_editable(request):
             target_year=main_summary_edition_academic_event.authorized_target_year
         )
 
-    academic_year = AcademicYear.objects.get(year=main_summary_edition_academic_event.authorized_target_year)
+    if not main_summary_edition_academic_event.is_open_now() and force_majeure_academic_event.is_open_now():
+        year_displayed = force_majeure_academic_event.authorized_target_year
+    else:
+        year_displayed = main_summary_edition_academic_event.authorized_target_year
+    academic_year = AcademicYear.objects.get(year=year_displayed)
     learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
         academic_year=academic_year,
         attribution__tutor=tutor,

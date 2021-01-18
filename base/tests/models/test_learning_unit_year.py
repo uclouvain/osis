@@ -42,7 +42,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.entity import EntityFactory
