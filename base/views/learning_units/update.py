@@ -54,7 +54,12 @@ from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
-
+from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
+from program_management.ddd.domain import exception
+from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
+from program_management.ddd.service.read import search_program_trees_using_node_service
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 @login_required
 @waffle_flag("learning_unit_update")
@@ -218,15 +223,13 @@ def is_not_past(form):
 def _find_training_using_ue(learning_unit_year: LearningUnitYear) -> List['str']:
     node_identity = NodeIdentity(code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year)
     direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
-    full_acronyms = []
+    node_pks = []
     formations_using_ue = []
 
     for direct_link in direct_parents:
-        print('for')
         for indirect_parent in direct_link.get('indirect_parents'):
-            print('for')
-            if indirect_parent.get('node').full_acronym() not in full_acronyms:
-                full_acronyms.append(indirect_parent.get('node').full_acronym())
+            if indirect_parent.get('node').pk not in node_pks:
+                node_pks.append(indirect_parent.get('node').pk)
                 formations_using_ue.append("{} - {}".format(indirect_parent.get('node').full_acronym(),
                                                             indirect_parent.get('node').full_title()))
     return formations_using_ue

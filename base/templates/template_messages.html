@@ -42,16 +42,14 @@
             </ul>
         </div>
     {% endif %}
-    {% as_messages_update_warning as messages_update_warning %}
+
     {% if messages_update_warning %}
         <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
-            <b>{% trans 'Pay attention! This learning unit is used in more than one formation' %}</b>
+            <b>{{ messages_update_warning.title }}</b>
             <br>
             <ul>
-                {% for message in messages %}
-                    {% if message.tags == '' %}
-                        <li>{% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}</li>
-                    {% endif %}
+                {% for message in messages_update_warning.messages %}
+                    <li>{{ message }}</li>
                 {% endfor %}
             </ul>
         </div>
