@@ -30,6 +30,10 @@ from learning_unit.tasks import check_academic_calendar
 class TestCheckAcademicCalendar(TestCase):
 
     @mock.patch("learning_unit.tasks.check_academic_calendar."
+                "LearningUnitSummaryEditionCalendar.ensure_consistency_until_n_plus_6")
+    @mock.patch("learning_unit.tasks.check_academic_calendar."
+                "LearningUnitForceMajeurSummaryEditionCalendar.ensure_consistency_until_n_plus_6")
+    @mock.patch("learning_unit.tasks.check_academic_calendar."
                 "LearningUnitExtendedProposalManagementCalendar.ensure_consistency_until_n_plus_6")
     @mock.patch("learning_unit.tasks.check_academic_calendar."
                 "LearningUnitLimitedProposalManagementCalendar.ensure_consistency_until_n_plus_6")
