@@ -41,7 +41,6 @@ from base.models import entity_calendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.models.tutor import Tutor
 from base.views import teaching_material
 from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
@@ -61,19 +60,17 @@ def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
 
     summary_edition_calendar = LearningUnitSummaryEditionCalendar()
-    summary_edition_target_years_opened = summary_edition_calendar.get_target_years_opened()
-    if summary_edition_target_years_opened:
-        academic_year_targeted = AcademicYear.objects.get(year=summary_edition_target_years_opened[0])
+    summary_edition_academic_events = summary_edition_calendar.get_opened_academic_events()
+    if summary_edition_academic_events:
+        main_summary_edition_academic_event = summary_edition_academic_events[0]
     else:
-        previous_academic_event = summary_edition_calendar.get_previous_academic_event()
-        academic_year_targeted = AcademicYear.objects.get(year=previous_academic_event.authorized_target_year)
-
+        main_summary_edition_academic_event = summary_edition_calendar.get_previous_academic_event()
         messages.add_message(
             request,
             messages.INFO,
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
-                "data_year": display_as_academic_year(previous_academic_event.authorized_target_year),
-                "end_date": previous_academic_event.end_date.strftime('%d/%m/%Y'),
+                "data_year": display_as_academic_year(main_summary_edition_academic_event.authorized_target_year),
+                "end_date": main_summary_edition_academic_event.end_date.strftime('%d/%m/%Y'),
             }
         )
         next_academic_event = summary_edition_calendar.get_next_academic_event()
@@ -102,28 +99,33 @@ def list_my_attributions_summary_editable(request):
         )
     else:
         force_majeure_academic_event = force_majeur_summary_edition_calendar.get_academic_event(
-            target_year=academic_year_targeted.year
+            target_year=main_summary_edition_academic_event.authorized_target_year
         )
 
-    learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
-        academic_year=academic_year_targeted,
-        tutor=tutor
-    )
+    if not main_summary_edition_academic_event.is_open_now() and force_majeure_academic_event.is_open_now():
+        year_displayed = force_majeure_academic_event.authorized_target_year
+    else:
+        year_displayed = main_summary_edition_academic_event.authorized_target_year
+    academic_year = AcademicYear.objects.get(year=year_displayed)
+    learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
+        academic_year=academic_year,
+        attribution__tutor=tutor,
+    ).distinct().order_by('academic_year__year', 'acronym')
+
     entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=academic_year_targeted,
+        ac_year=academic_year,
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     )
-
     errors = (CanUserEditEducationalInformation(
-        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
+        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years_qs)
     errors_force_majeure = (CanUserEditEducationalInformationForceMajeure(
-        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
+        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years_qs)
 
     context = {
-        'learning_unit_years_with_errors': list(zip(learning_unit_years, errors, errors_force_majeure)),
+        'learning_unit_years_with_errors': list(zip(learning_unit_years_qs, errors, errors_force_majeure)),
         'entity_calendars': entity_calendars,
         'event_perm_desc_fiche_open': bool(summary_edition_calendar.get_target_years_opened()),
-        'event_perm_force_majeure_open': bool(bool(force_majeur_summary_edition_calendar.get_target_years_opened())),
+        'event_perm_force_majeure_open': bool(force_majeur_summary_edition_calendar.get_target_years_opened()),
         'event_perm_force_majeure_start_date': force_majeure_academic_event.start_date if force_majeure_academic_event
         else None,
         'event_perm_force_majeure_end_date': force_majeure_academic_event.end_date if force_majeure_academic_event
