@@ -14,6 +14,10 @@ def change_education_group_preparation_calendar(apps, shema_editor):
     now = timezone.now()
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
+        AcademicCalendar.objects.filter(
+            academic_year__year__gte=2021, reference=academic_calendar_type.EDUCATION_GROUP_EDITION
+        ).delete()
+
         qs = AcademicYear.objects.filter(year__gte=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
