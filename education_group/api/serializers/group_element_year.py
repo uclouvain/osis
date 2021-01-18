@@ -172,6 +172,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     subtype = serializers.CharField(source='child.learning_unit_type.name', read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
+    remark_en = serializers.CharField(source='child.other_remark_english', read_only=True)
     lecturing_volume = serializers.DecimalField(
         source='child.volume_total_lecturing',
         max_digits=6,
