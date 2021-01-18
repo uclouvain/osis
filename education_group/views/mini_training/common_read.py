@@ -206,6 +206,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "can_publish":
                 self._has_a_publish_perm() and
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url()
         }
 
     def _has_a_publish_perm(self):
@@ -336,6 +337,12 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     def have_admission_condition_tab(self):
         return self.current_version.is_standard_version and \
             self.get_group().type.name in MiniTrainingType.with_admission_condition()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())
 
 
 def _get_view_name_from_tab(tab: Tab):

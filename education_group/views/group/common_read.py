@@ -128,6 +128,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "can_publish":
                 self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year()) and
                 self.have_general_information_tab(),
+            "publish_url": self.get_publish_url()
         }
 
     @functools.lru_cache()
@@ -212,6 +213,12 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def have_general_information_tab(self):
         return self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.get_group().year,
+            self.get_group().code
+        ]) + "?path={}".format(self.get_path())
 
 
 def _get_view_name_from_tab(tab: Tab):
