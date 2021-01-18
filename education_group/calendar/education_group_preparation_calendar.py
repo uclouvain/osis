@@ -45,8 +45,8 @@ class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
                 data_year=ac_year,
                 defaults={
                     "title": "Préparation des formations",
-                    "start_date": datetime.date(ac_year.year - 1, 8, 15),
-                    "end_date": datetime.date(ac_year.year - 1, 11, 20),
+                    "start_date": datetime.date(ac_year.year - 1, 7, 1),
+                    "end_date": datetime.date(ac_year.year, 6, 1),
                     "academic_year": ac_year  # To remove after refactoring
                 }
             )
