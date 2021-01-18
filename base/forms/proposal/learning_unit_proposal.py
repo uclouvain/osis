@@ -157,13 +157,13 @@ class ProposalLearningUnitFilter(FilterSet):
     def __init_academic_year_field(self):
         target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
 
-        if self.person.is_faculty_manager:
+        if self.person and self.person.is_faculty_manager:
             target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
 
         self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
             year__in=target_years_opened
         )
-        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first()
+        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first().next()
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         most_recent_acronym = EntityVersion.objects.filter(

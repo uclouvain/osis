@@ -35,12 +35,13 @@ from base.models import proposal_learning_unit
 from base.models.academic_year import AcademicYear
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
-    learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
+    learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes, academic_calendar_type
 from base.models.enums.entity_type import SCHOOL
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars, \
+    OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -380,10 +381,34 @@ def build_initial_data(learning_unit_year, entity):
 class TestProposalLearningUnitFilter(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = AcademicYearFactory.produce(None, 2, 5)
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        cls.academic_years = AcademicYearFactory.produce(create_current_academic_year().year, 2, 5)
+        for ac in cls.academic_years:
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+                data_year=ac,
+                start_date=datetime.datetime(ac.year - 6, 9, 15),
+                end_date=datetime.datetime(ac.year + 1, 9, 14)
+            )
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+                data_year=ac,
+                start_date=datetime.datetime(ac.year - 2, 9, 15),
+                end_date=datetime.datetime(ac.year, 9, 14)
+            )
+        cls.central_manager = CentralManagerFactory().person
+        cls.faculty_manager = FacultyManagerFactory().person
 
-    def test_initial_value_with_entity_subordinated(self):
+    def test_initial_value_with_entity_subordinated_central_manager(self):
+        self.client.force_login(self.central_manager.user)
+        proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
+        self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        self.assertEqual(
+            proposal_filter.form.fields['academic_year'].initial,
+            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+        )
+
+    def test_initial_value_with_entity_subordinated_faculty_manager(self):
+        self.client.force_login(self.faculty_manager.user)
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
         self.assertEqual(
