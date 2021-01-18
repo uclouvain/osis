@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -203,7 +203,14 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
+            "can_publish":
+                self._has_a_publish_perm() and
+                (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
         }
+
+    def _has_a_publish_perm(self):
+        return self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()) or \
+               self.request.user.has_perm("base.change_pedagogyinformation", self.get_education_group_version().offer)
 
     def get_permission_object(self):
         return self.get_education_group_version().root_group
