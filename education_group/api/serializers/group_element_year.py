@@ -124,7 +124,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
     partial_title_en = serializers.CharField(source='child.offer_partial_title_en', read_only=True)
     min_constraint = serializers.IntegerField(source='child.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
-    constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
+    constraint_type = serializers.CharField(source='child.constraint_type.name', read_only=True)
     version_name = serializers.SerializerMethodField()
 
     @staticmethod
