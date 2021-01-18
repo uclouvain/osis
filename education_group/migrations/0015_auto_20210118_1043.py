@@ -25,8 +25,8 @@ def change_education_group_preparation_calendar(apps, shema_editor):
                 data_year=ac_year,
                 defaults={
                     "title": "Préparation des formations",
-                    "start_date": datetime.date(ac_year.year - 1, 1, 7),
-                    "end_date": datetime.date(ac_year.year, 1, 6),
+                    "start_date": datetime.date(ac_year.year - 1, 7, 1),
+                    "end_date": datetime.date(ac_year.year, 6, 1),
                     "academic_year": ac_year
                 }
             )
