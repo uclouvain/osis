@@ -375,3 +375,25 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+
+
+class UpdateMiniTrainingTransitionVersionForm(UpdateMiniTrainingVersionForm):
+
+    def __init__(self, mini_training_version_identity: 'ProgramTreeVersionIdentity', **kwargs):
+        super().__init__(mini_training_version_identity, **kwargs)
+        self.initial['version_name'] = 'Transition'
+
+    def save(self):
+        self.cleaned_data.pop('version_name')
+        return super().save()
+
+
+class UpdateTrainingTransitionVersionForm(UpdateTrainingVersionForm):
+
+    def __init__(self, training_version_identity: 'ProgramTreeVersionIdentity', **kwargs):
+        super().__init__(training_version_identity, **kwargs)
+        self.initial['version_name'] = 'Transition'
+
+    def save(self):
+        self.cleaned_data.pop('version_name')
+        return super().save()

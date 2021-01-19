@@ -56,7 +56,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "mini_training_version_obj": self.get_program_tree_version_obj(),
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
+            "acronym_suffix": "{}]".format(
+                " - Transition" if self.get_program_tree_version_obj().is_specific_transition else ""
+            )
         }
         return render(request, self.template_name, context)
 
@@ -89,7 +92,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
+                    "acronym": identity.version_label(),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -111,7 +114,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
-    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+    @staticmethod
+    def get_url_program_version(version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
         return reverse(
             "element_identification",
@@ -168,14 +172,20 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     @cached_property
     def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
         mini_training_version_identity = self.get_program_tree_version_obj().entity_id
-        return version.UpdateMiniTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
-            year=self.kwargs['year'],
-            mini_training_version_identity=mini_training_version_identity,
-            mini_training_type=self.get_mini_training_obj().type,
-            initial=self._get_mini_training_version_form_initial_values()
-        )
+        form_parameters = self._get_form_parameters(mini_training_version_identity)
+        if mini_training_version_identity.is_standard_transition():
+            return version.UpdateMiniTrainingTransitionVersionForm(**form_parameters)
+        return version.UpdateMiniTrainingVersionForm(**form_parameters)
+
+    def _get_form_parameters(self, mini_training_version_identity):
+        return {
+            'data': self.request.POST or None,
+            'user': self.request.user,
+            'year': self.kwargs['year'],
+            'mini_training_version_identity': mini_training_version_identity,
+            'mini_training_type': self.get_mini_training_obj().type,
+            'initial': self._get_mini_training_version_form_initial_values()
+        }
 
     @functools.lru_cache()
     def get_mini_training_obj(self) -> 'MiniTraining':
@@ -218,7 +228,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             academic_year__year=self.kwargs['year']
         )
 
-    def get_tabs(self) -> List:
+    @staticmethod
+    def get_tabs() -> List:
         return [
             {
                 "text": _("Identification"),
@@ -228,7 +239,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             },
         ]
 
-    def _get_default_error_messages(self) -> str:
+    @staticmethod
+    def _get_default_error_messages() -> str:
         return _("Error(s) in form: The modifications are not saved")
 
     def _get_mini_training_version_form_initial_values(self) -> Dict:

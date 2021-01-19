@@ -45,8 +45,21 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
     is_transition = attr.ib(type=bool)
 
-    def is_standard(self):
+    def is_standard(self) -> bool:
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
+
+    def is_standard_transition(self) -> bool:
+        return (self.version_name == STANDARD or self.version_name is None) and self.is_transition
+
+    def is_specific_transition(self) -> bool:
+        return self.version_name and self.is_transition
+
+    def version_label(self) -> str:
+        if self.is_specific_transition():
+            return '{} - Transition'.format(self.version_name)
+        elif self.is_transition:
+            return 'Transition'
+        return self.version_name
 
 
 class ProgramTreeVersionBuilder:
@@ -200,6 +213,10 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def is_transition(self) -> bool:
         return self.entity_id.is_transition
+
+    @property
+    def is_specific_transition(self) -> bool:
+        return self.is_transition and not self.is_standard
 
     @version_name.default
     def _version_name(self) -> str:
