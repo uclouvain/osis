@@ -124,7 +124,7 @@ urlpatterns = [
         ),
         path(
             'create_education_group_transition_version/',
-            create_program_tree_version.CreateProgramTreeSpecificVersion.as_view(),
+            create_program_tree_version.CreateProgramTreeTransitionVersion.as_view(),
             name="create_education_group_transition_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),

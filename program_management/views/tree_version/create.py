@@ -165,7 +165,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
 
 
 class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
-    template_name = "tree_version/create_specific_version_inner.html"
+    template_name = "tree_version/create_transition_version_inner.html"
     form_class = TransitionVersionForm
 
     @cached_property
