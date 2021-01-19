@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -394,6 +394,7 @@ def create_xls(user, found_learning_units, filters):
 
 
 def create_xls_attributions(user, found_learning_units, filters):
+    print('ici')
     titles = learning_unit_titles_part1() + learning_unit_titles_part2() + [str(_('Tutor')),
                                                                             "{} ({})".format(str(_('Tutor')),
                                                                                              str(_('email'))),
