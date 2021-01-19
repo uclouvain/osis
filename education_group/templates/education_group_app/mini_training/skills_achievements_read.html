@@ -26,15 +26,11 @@
 
 
 {% block top_action_bar %}
-    {% if can_publish %}
-        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
-    {% endif %}
+    {% include  "education_group_app/blocks/refresh_publication_button.html" %}
 {% endblock %}
 
 {% block bottom_action_bar %}
-    {% if can_publish %}
-        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
-    {% endif %}
+    {% include  "education_group_app/blocks/refresh_publication_button.html" %}
 {% endblock %}
 
 
