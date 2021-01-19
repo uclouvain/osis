@@ -264,7 +264,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ) + "?path={}".format(self.path)
 
     def get_create_transition_version_url(self):
-        if self.is_root_node:
+        if self.is_root_node and not self.program_tree_version_identity.is_transition:
             return reverse(
                 'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
