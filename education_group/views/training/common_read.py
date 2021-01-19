@@ -183,7 +183,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
-            "create_version_url": self.get_create_version_url(),
+            "create_specific_version_url": self.get_create_specific_version_url(),
+            "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
@@ -255,10 +256,17 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_delete_permanently_tree_version_permission_name(self):
         return "program_management.delete_permanently_training_version"
 
-    def get_create_version_url(self):
+    def get_create_specific_version_url(self):
         if self.is_root_node and self.program_tree_version_identity.is_standard():
             return reverse(
-                'create_education_group_version',
+                'create_education_group_specific_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.path)
+
+    def get_create_transition_version_url(self):
+        if self.is_root_node:
+            return reverse(
+                'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.path)
 

@@ -200,7 +200,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
-            "create_version_url": self.get_create_version_url(),
+            "create_specific_version_url": self.get_create_specific_version_url(),
+            "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
         }
@@ -246,10 +247,17 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             return "base.change_minitraining"
         return "program_management.change_minitraining_version"
 
-    def get_create_version_url(self):
+    def get_create_specific_version_url(self):
         if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
-                'create_education_group_version',
+                'create_education_group_specific_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
+
+    def get_create_transition_version_url(self):
+        if self.is_root_node():
+            return reverse(
+                'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
 

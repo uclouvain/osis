@@ -85,10 +85,16 @@
                     {% a_tag_modal_has_perm delete_permanently_tree_version_url _('Delete tree version permanently') delete_permanently_tree_version_permission_name user group_year %}
                 </li>
             {% endif %}
-            {% if create_version_url %}
+            {% if create_specific_version_url %}
                 <li class="divider"></li>
                 <li>
-                    {% a_tag_modal_has_perm create_version_url _('Create specific version') create_version_permission_name user education_group_version.root_group %}
+                    {% a_tag_modal_has_perm create_specific_version_url _('Create specific version') create_version_permission_name user education_group_version.root_group %}
+                </li>
+            {% endif %}
+            {% if create_transition_version_url %}
+                <li class="divider"></li>
+                <li>
+                    {% a_tag_modal_has_perm create_transition_version_url _('Create transition version') create_version_permission_name user education_group_version.root_group %}
                 </li>
             {% endif %}
             <li class="divider"></li>

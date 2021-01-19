@@ -118,9 +118,14 @@ urlpatterns = [
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
         path('content/', ContentRedirectView.as_view(), name='element_content'),
         path(
-            'create_education_group_version/',
-            create_program_tree_version.CreateProgramTreeVersion.as_view(),
-            name="create_education_group_version"
+            'create_education_group_specific_version/',
+            create_program_tree_version.CreateProgramTreeSpecificVersion.as_view(),
+            name="create_education_group_specific_version"
+        ),
+        path(
+            'create_education_group_transition_version/',
+            create_program_tree_version.CreateProgramTreeSpecificVersion.as_view(),
+            name="create_education_group_transition_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
         path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),

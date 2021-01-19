@@ -70,7 +70,7 @@ class TestGetCreateProgramTreeVersion(TestCase):
         )
         ElementFactory(group_year=cls.training_version.root_group)
         cls.create_training_version_url = reverse(
-            "create_education_group_version",
+            "create_education_group_specific_version",
             kwargs={
                 "year": cls.training_version.root_group.academic_year.year,
                 "code": cls.training_version.root_group.partial_acronym
@@ -93,7 +93,7 @@ class TestGetCreateProgramTreeVersion(TestCase):
         )
         ElementFactory(group_year=cls.mini_training_version.root_group)
         cls.create_mini_training_version_url = reverse(
-            "create_education_group_version",
+            "create_education_group_specific_version",
             kwargs={
                 "year": cls.mini_training_version.root_group.academic_year.year,
                 "code": cls.mini_training_version.root_group.partial_acronym
