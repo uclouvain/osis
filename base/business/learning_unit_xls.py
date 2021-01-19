@@ -393,7 +393,7 @@ def create_xls(user, found_learning_units, filters):
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def create_xls_attributions(user, found_learning_units, filters):    
+def create_xls_attributions(user, found_learning_units, filters):
     titles = learning_unit_titles_part1() + learning_unit_titles_part2() + [str(_('Tutor')),
                                                                             "{} ({})".format(str(_('Tutor')),
                                                                                              str(_('email'))),
