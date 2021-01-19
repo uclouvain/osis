@@ -39,7 +39,7 @@ class EducationGroupTitleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, version):
-        return _get_offer_title_from_lang(version, self.context['language'])
+        return _get_offer_title_from_lang(version, self.context.get('language', settings.LANGUAGE_CODE_FR))
 
 
 class EducationGroupTitleAllLanguagesSerializer(EducationGroupTitleSerializer):
