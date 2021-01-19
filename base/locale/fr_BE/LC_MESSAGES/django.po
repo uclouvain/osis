@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 08:58+0100\n"
+"POT-Creation-Date: 2021-01-15 14:02+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1838,6 +1838,9 @@ msgstr "Partenariats"
 
 msgid "Password"
 msgstr "Mot de passe"
+
+msgid "Pay attention! This learning unit is used in more than one formation"
+msgstr "Attention cette unité d'enseignement fait partie de plusieurs formations:"
 
 msgid "Pending"
 msgstr "En attente"
