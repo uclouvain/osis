@@ -761,7 +761,7 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
-            tree.detach_node(path_to_detach, mock.Mock())
+            tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
 
     @patch.object(DetachNodeValidatorList, 'validate')
     def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
@@ -772,7 +772,7 @@ class TestDetachNode(SimpleTestCase):
         path_to_detach = build_path(link.parent, link.child)
 
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
-            tree.detach_node(path_to_detach, mock.Mock())
+            tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
 
         self.assertListEqual(
             exception_context.exception.messages,
