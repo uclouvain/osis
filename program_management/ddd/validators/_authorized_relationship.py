@@ -260,3 +260,26 @@ class MinimumChildrenTypeAuthorizedValidator(business_validator.BusinessValidato
         )
         minimum_children_authorized = authorized_relationship.min_count_authorized if authorized_relationship else 0
         return number_children < minimum_children_authorized
+
+
+class ChildTypeValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', parent_node: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.parent_node = parent_node
+
+    def validate(self, *args, **kwargs):
+        children_not_authorized = self.get_children_not_authorized()
+        if children_not_authorized:
+            raise ChildTypeNotAuthorizedException(self.parent_node, children_not_authorized)
+
+    def get_children_not_authorized(self):
+        children_nodes = self.parent_node.children_as_nodes_with_respect_to_reference_link
+        return [children_node for children_node in children_nodes if self._is_an_invalid_child(children_node)]
+
+    def _is_an_invalid_child(self, node: 'Node') -> bool:
+        authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
+            self.parent_node.node_type,
+            node.node_type
+        )
+        return authorized_relationship is None
