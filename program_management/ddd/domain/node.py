@@ -25,10 +25,8 @@
 ##############################################################################
 import collections
 import copy
-import functools
 from _decimal import Decimal
-from collections import OrderedDict
-from typing import List, Set, Dict, Optional, Iterator, Tuple, Generator
+from typing import List, Set, Optional, Iterator, Tuple, Generator
 
 import attr
 
@@ -139,10 +137,7 @@ class NodeFactory:
             year=parent_node.year,
             teaching_campus=parent_node.teaching_campus,
             management_entity_acronym=parent_node.management_entity_acronym,
-            group_title_fr="{child_title} {parent_abbreviated_title}".format(
-                child_title=generated_child_title,
-                parent_abbreviated_title=parent_node.title
-            ),
+            group_title_fr=generated_child_title,
             start_year=parent_node.year,
         )
         child._has_changed = True
@@ -267,6 +262,9 @@ class Node(interface.Entity):
 
     def is_common_core(self) -> bool:
         return self.node_type == GroupType.COMMON_CORE
+
+    def is_bachelor(self) -> bool:
+        return self.node_type == TrainingType.BACHELOR
 
     def is_indirect_parent(self) -> bool:
         return self.is_training() or self.is_minor_or_deepening()

@@ -325,24 +325,24 @@ class CannotDetachRootException(BusinessException):
 
 
 class CannotDetachLearningUnitsWhoArePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units are prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
             "learning_units": ", ".join([n.code for n in nodes]),
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
         }
         super().__init__(message)
 
 
 class CannotDetachLearningUnitsWhoHavePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units have prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
             "learning_units": ", ".join([n.code for n in nodes])
         }
         super().__init__(message)
@@ -359,3 +359,21 @@ class CannotDetachOptionsException(BusinessException):
             "finality_acronym": finality
         }
         super().__init__(message)
+
+
+class InvalidVersionNameException(BusinessException):
+    def __init__(self):
+        message = _("Invalid name version")
+        super().__init__(message)
+
+
+class VersionNameAlreadyExist(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} already exists").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class VersionNameExistedException(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} existed").format(version_name)
+        super().__init__(message, **kwargs)

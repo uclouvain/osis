@@ -22,6 +22,8 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import re
+from typing import List
+
 from program_management.ddd.business_types import *
 from django.utils.translation import gettext_lazy as _
 
@@ -41,13 +43,20 @@ class PrerequisiteItemsValidator(BusinessValidator):
         self.prerequisite_string = prerequisite_string
         self.node = node
         self.program_tree = program_tree
-        self.codes_permitted = self.program_tree.get_codes_permitted_as_prerequisite()
+        self.codes_permitted = {n.code for n in self.program_tree.get_nodes_permitted_as_prerequisite()}
 
     def validate(self, *args, **kwargs):
+        node_not_in_codes_permitted = self.node.code not in self.codes_permitted
+        if self.program_tree.is_used_only_inside_minor_or_deepening(self.node) and node_not_in_codes_permitted:
+            self.add_error_message(
+                _("The learning unit %(acronym)s is not contained inside the formation") % {
+                    'acronym': self.node.code
+                }
+            )
         codes_used_in_prerequisite_string = self._extract_acronyms()
         codes_used_but_not_permitted = set(codes_used_in_prerequisite_string) - set(self.codes_permitted)
         if codes_used_but_not_permitted:
-            for code in codes_used_but_not_permitted:
+            for code in sorted(codes_used_but_not_permitted):
                 self.add_error_message(
                     _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': code}
                 )
