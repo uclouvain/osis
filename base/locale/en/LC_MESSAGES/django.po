@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-08 10:10+0100\n"
+"POT-Creation-Date: 2021-01-11 09:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -770,6 +770,15 @@ msgid "Education group detailed achievement"
 msgstr ""
 
 msgid "Education group edition"
+msgstr ""
+
+msgid "Education group extended daily management"
+msgstr ""
+
+msgid "Education group limited daily management"
+msgstr ""
+
+msgid "Education group switch"
 msgstr ""
 
 msgid "Education group year"
@@ -1726,6 +1735,9 @@ msgstr ""
 msgid "Other remark (intended for publication)"
 msgstr ""
 
+msgid "Other remark in english (intended for publication)"
+msgstr ""
+
 msgid "Other special needs"
 msgstr ""
 
@@ -1785,9 +1797,6 @@ msgid "Pending"
 msgstr ""
 
 msgid "Periodicity"
-msgstr ""
-
-msgid "Person entities"
 msgstr ""
 
 msgid "Person with reduced mobility"
@@ -2235,6 +2244,9 @@ msgid "Start date"
 msgstr ""
 
 msgid "Start date and end date are mandatory"
+msgstr ""
+
+msgid "Start date is mandatory"
 msgstr ""
 
 msgid "Start date must be lower than end date"

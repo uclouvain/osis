@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from ajax_select import register, LookupChannel
 from django import forms
@@ -39,7 +39,9 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
@@ -312,7 +314,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: Optional[str],
+                 training: 'Training' = None, **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
@@ -332,15 +335,19 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         self.__init_secondary_domains()
 
     def __init_academic_year_field(self):
-        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
-        else:
-            working_academic_years = AcademicYear.objects.all()
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
+        self.fields['academic_year'].queryset = self.fields['end_year'].queryset = working_academic_years
 
-        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        self.fields['academic_year'].queryset = working_academic_years
-        self.fields['end_year'].queryset = AcademicYear.objects.filter(
-            year__gte=working_academic_years.first().year
+        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__in=EducationGroupPreparationCalendar().get_target_years_opened()
+            )
+
+        self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
+            year__gte=getattr(
+                self.fields['academic_year'].queryset.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
         )
 
     def __init_management_entity_field(self):
@@ -398,8 +405,8 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
         to_field_name="year"
     )
 
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year: int = None, **kwargs):
+        self.year = year
 
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
@@ -408,7 +415,10 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
-            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(
+                year__gte=initial_academic_year_value,
+                year__in=EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+            )
 
     def __init_certificate_aims_field(self):
         perm = 'base.change_educationgroupcertificateaim'
@@ -425,10 +435,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

@@ -118,6 +118,14 @@ class NodeFactory:
             children=[],
             node_id=None,
         )
+        if copied_node.type == NodeType.GROUP:
+            copied_node.constraint_type = None
+            copied_node.min_constraint = None
+            copied_node.max_constraint = None
+            copied_node.remark_en = None
+            copied_node.remark_fr = None
+            if copied_node.node_type in GroupType:
+                copied_node.credits = None
         copied_node._has_changed = True
         return copied_node
 
@@ -533,6 +541,7 @@ class NodeLearningUnitYear(Node):
     proposal_type = attr.ib(type=ProposalType, default=None)
     learning_unit_type = attr.ib(type=LearningContainerYearType, default=None)
     other_remark = attr.ib(type=str, default=None)
+    other_remark_english = attr.ib(type=str, default=None)
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import string
 import factory.fuzzy
 from faker import Faker
 
+from attribution.models.enums.decision_making import DecisionMakings
 from attribution.models.enums.function import Functions
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.tutor import TutorFactory
@@ -50,3 +51,8 @@ class AttributionNewFactory(factory.django.DjangoModelFactory):
     tutor = factory.SubFactory(TutorFactory)
     score_responsible = False
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
+    decision_making = ''
+
+
+class AttributionNewWithDecisionFactory(AttributionNewFactory):
+    decision_making = factory.Iterator(DecisionMakings.choices(), getter=lambda c: c[0])
