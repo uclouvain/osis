@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 11:30+0100\n"
+"POT-Creation-Date: 2021-01-20 07:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -574,9 +574,6 @@ msgid "Consolidate the proposal"
 msgstr ""
 
 msgid "Contacts"
-msgstr ""
-
-msgid "Continuing education academic year linkable to admission"
 msgstr ""
 
 msgid "Coordinator"
@@ -2083,9 +2080,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr ""
 
-msgid "Release"
-msgstr ""
-
 msgid "Remarks"
 msgstr ""
 
@@ -2303,15 +2297,7 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-
 msgid "Summary course submission force majeure"
-msgstr ""
-
-msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
 
 msgid "Suppression"
@@ -2342,9 +2328,6 @@ msgid "Technologic platform"
 msgstr ""
 
 msgid "Termination"
-msgstr ""
-
-msgid "Testing"
 msgstr ""
 
 msgid "The"
@@ -2912,9 +2895,6 @@ msgstr ""
 msgid "activities in English"
 msgstr ""
 
-msgid "ad hoc events"
-msgstr ""
-
 msgid "additional informations"
 msgstr ""
 
@@ -3081,9 +3061,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
-
-msgid "project events"
-msgstr ""
 
 msgid "regex error message"
 msgstr ""
