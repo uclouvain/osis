@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 08:58+0100\n"
+"POT-Creation-Date: 2021-01-19 07:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -826,7 +826,13 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English title common part"
+msgstr ""
+
 msgid "English title proper"
+msgstr ""
+
+msgid "English title specific complement"
 msgstr ""
 
 msgid "Enrolled"
@@ -2294,15 +2300,7 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-
 msgid "Summary course submission force majeure"
-msgstr ""
-
-msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
 
 msgid "Suppression"
@@ -2622,10 +2620,16 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "Title common part"
+msgstr ""
+
 msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
+msgstr ""
+
+msgid "Title specific complement"
 msgstr ""
 
 msgid "To complete"
