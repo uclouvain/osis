@@ -184,28 +184,12 @@ class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator
         self.tree = tree
 
     def validate(self):
-        minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
-        if minimum_children_types_reached:
-            raise MinimumChildTypesNotRespectedException(self.tree.root_node, minimum_children_types_reached)
+        tree_copy = copy.copy(self.tree)
+        parent_node = tree_copy.get_node_by_code_and_year(self.detach_from.code, self.detach_from.year)
+        child_node_to_detach = tree_copy.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
+        parent_node.detach_child(child_node_to_detach)
 
-    def _get_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        children_types_to_check = [child_node.node_type]
-        if self.tree.get_link(parent_node, child_node).is_reference():
-            children_types_to_check = [link_obj.child.node_type for link_obj in child_node.children]
-
-        counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
-
-        types_minimum_reached = []
-        for child_type in children_types_to_check:
-            current_count = counter[child_type]
-            relation = self.tree.authorized_relationships.get_authorized_relationship(parent_node.node_type, child_type)
-            if not relation:
-                # FIXME :: business cass to fix (cf unit test)
-                continue
-            if current_count == relation.min_count_authorized:
-                types_minimum_reached.append(child_type)
-
-        return types_minimum_reached
+        MinimumChildrenTypeAuthorizedValidator(tree_copy, parent_node).validate()
 
 
 class MaximumChildrenTypeAuthorizedValidator(business_validator.BusinessValidator):
@@ -248,18 +232,23 @@ class MinimumChildrenTypeAuthorizedValidator(business_validator.BusinessValidato
 
     def get_children_types_that_do_not_respect_minimum(self) -> List['EducationGroupTypesEnum']:
         children_types_counter = Counter(self.parent_node.get_children_types(include_nodes_used_as_reference=True))
-        return [
-            children_type for children_type, number_children in children_types_counter.items()
-            if self._is_minimum_children_not_respected(children_type, number_children)
-        ]
 
-    def _is_minimum_children_not_respected(self, children_type, number_children) -> bool:
-        authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
-            self.parent_node.node_type,
-            children_type
+        result = []
+        for child_type, minimum_required in self._get_minimum_child_required_by_child_type():
+            if children_types_counter.get(child_type, 0) < minimum_required:
+                result.append(child_type)
+
+        return result
+
+    def _get_minimum_child_required_by_child_type(self):
+        parent_authorized_relationships = [
+            relationship for relationship in self.tree.authorized_relationships.authorized_relationships
+            if relationship.parent_type == self.parent_node.node_type
+        ]
+        return Counter(
+            [(relationship.child_type, relationship.min_count_authorized)
+             for relationship in parent_authorized_relationships]
         )
-        minimum_children_authorized = authorized_relationship.min_count_authorized if authorized_relationship else 0
-        return number_children < minimum_children_authorized
 
 
 class ChildTypeValidator(business_validator.BusinessValidator):
