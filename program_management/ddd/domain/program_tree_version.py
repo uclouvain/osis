@@ -113,7 +113,8 @@ class ProgramTreeVersionBuilder:
         validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
             command.start_year,
             command.offer_acronym,
-            command.version_name
+            command.version_name,
+            command.is_transition
         )
         if validator.is_valid():
             assert isinstance(from_standard_version, ProgramTreeVersion)

@@ -103,6 +103,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             last_existing_version = get_last_existing_version(
                 version_name=form.cleaned_data['version_name'],
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                is_transition=False
             )
 
             identities = []
@@ -207,6 +208,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             last_existing_version = get_last_existing_version(
                 version_name=form.cleaned_data['version_name'],
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                is_transition=True
             )
 
             identities = []
@@ -254,6 +256,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
     def _display_success_messages(self, identities: List['ProgramTreeVersionIdentity']):
         success_messages = []
         for created_identity in identities:
+            suffix_version_name = " - Transition" if created_identity.version_name else "Transition"
             success_messages.append(
                 _(
                     "Transition version for education group year "
@@ -261,7 +264,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                 ) % {
                     "link": self.get_url_program_version(created_identity),
                     "offer_acronym": created_identity.offer_acronym,
-                    "acronym": created_identity.version_name,
+                    "acronym": created_identity.version_name+suffix_version_name,
                     "academic_year": display_as_academic_year(created_identity.year)
                 }
             )
@@ -310,11 +313,15 @@ def _convert_form_to_prolong_command(
     )
 
 
-def get_last_existing_version(version_name: str, offer_acronym: str) -> 'ProgramTreeVersionIdentity':
+def get_last_existing_version(
+        version_name: str,
+        offer_acronym: str,
+        is_transition: bool
+) -> 'ProgramTreeVersionIdentity':
     return get_last_existing_version_service.get_last_existing_version_identity(
         GetLastExistingVersionNameCommand(
             version_name=version_name.upper(),
             offer_acronym=offer_acronym.upper(),
-            is_transition=False,
+            is_transition=is_transition,
         )
     )

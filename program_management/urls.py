@@ -131,7 +131,7 @@ urlpatterns = [
         path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
     ])),
 
-    path('<int:year>/<acronym:acronym>/', include([
+    path('<int:year>/<acronym:acronym>/<str:is_transition>/', include([
         path(
             'check_version_name/',
             program_management.views.tree_version.check_version_name.check_version_name,

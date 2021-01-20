@@ -53,6 +53,8 @@ from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAI
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
+TRANSITION = " - Transition"
+
 
 class SpecificVersionForm(forms.Form):
     version_name = forms.CharField(
@@ -86,9 +88,10 @@ class SpecificVersionForm(forms.Form):
     def _set_remote_validation_on_version_name(self):
         set_remote_validation(
             self.fields["version_name"],
-            reverse("check_version_name", args=[self.tree_version_identity.year,
-                                                self.tree_version_identity.offer_acronym]
-                    )
+            reverse(
+                "check_version_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym, False]
+            )
         )
 
     def _init_academic_year_choices(self):
@@ -121,7 +124,7 @@ class SpecificVersionForm(forms.Form):
 
 class TransitionVersionForm(forms.Form):
     version_name = forms.CharField(
-        max_length=15,
+        max_length=28,
         required=True,
         label=_('Acronym/Short title'),
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
@@ -148,12 +151,17 @@ class TransitionVersionForm(forms.Form):
         self._init_academic_year_choices()
         self._set_remote_validation_on_version_name()
 
+        suffix_version_name = " - Transition" if tree_version_identity.version_name else "Transition"
+        self.fields["version_name"].initial = tree_version_identity.version_name + suffix_version_name
+        self.fields["version_name"].disabled = True
+
     def _set_remote_validation_on_version_name(self):
         set_remote_validation(
             self.fields["version_name"],
-            reverse("check_version_name", args=[self.tree_version_identity.year,
-                                                self.tree_version_identity.offer_acronym]
-                    )
+            reverse(
+                "check_version_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym, True]
+            )
         )
 
     def _init_academic_year_choices(self):
@@ -181,6 +189,7 @@ class TransitionVersionForm(forms.Form):
         return int(end_year) if end_year else None
 
     def clean_version_name(self):
+        self.cleaned_data['version_name'] = self.tree_version_identity.version_name
         return self.cleaned_data['version_name'].upper()
 
 

@@ -39,9 +39,14 @@ from django.utils.translation import gettext_lazy as _
 @login_required
 @ajax_required
 @require_http_methods(['GET'])
-def check_version_name(request, year, acronym):
+def check_version_name(request, year, acronym, is_transition):
     version_name = request.GET['version_name']
-    cmd = command.CheckVersionNameCommand(year=year, offer_acronym=acronym, version_name=version_name)
+    cmd = command.CheckVersionNameCommand(
+        year=year,
+        offer_acronym=acronym,
+        version_name=version_name,
+        is_transition=bool(is_transition)
+    )
 
     try:
         check_version_name_service.check_version_name(cmd)

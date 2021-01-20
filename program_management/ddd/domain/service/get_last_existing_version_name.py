@@ -39,7 +39,7 @@ class GetLastExistingVersion(interface.DomainService):
             cls,
             version_name: str,
             offer_acronym: str,
-            is_transition: bool = False,
+            is_transition: bool,
     ) -> Union[ProgramTreeVersionIdentity, None]:
         group_version = EducationGroupVersion.objects.filter(
             version_name=version_name,

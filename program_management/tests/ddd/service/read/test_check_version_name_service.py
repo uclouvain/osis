@@ -40,7 +40,12 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
         )
 
     def test_should_check_version_name_format(self):
-        cmd = command.CheckVersionNameCommand(year=2018, offer_acronym="Offer", version_name="VER_SION")
+        cmd = command.CheckVersionNameCommand(
+            year=2018,
+            offer_acronym="Offer",
+            version_name="VER_SION",
+            is_transition=False
+        )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
             check_version_name_service.check_version_name(cmd)
@@ -52,7 +57,12 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
     def test_should_check_if_version_name_already_exists(self):
         self.mock_get_last_version.return_value = ProgramTreeVersionIdentityFactory(year=2018)
-        cmd = command.CheckVersionNameCommand(year=2018, offer_acronym="Offer", version_name="VERSION")
+        cmd = command.CheckVersionNameCommand(
+            year=2018,
+            offer_acronym="Offer",
+            version_name="VERSION",
+            is_transition=False
+        )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
             check_version_name_service.check_version_name(cmd)
@@ -64,7 +74,12 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
     def test_should_check_if_version_name_has_existed(self):
         self.mock_get_last_version.return_value = ProgramTreeVersionIdentityFactory(year=2016)
-        cmd = command.CheckVersionNameCommand(year=2018, offer_acronym="Offer", version_name="VERSION")
+        cmd = command.CheckVersionNameCommand(
+            year=2018,
+            offer_acronym="Offer",
+            version_name="VERSION",
+            is_transition=False
+        )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
             check_version_name_service.check_version_name(cmd)
