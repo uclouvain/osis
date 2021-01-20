@@ -39,6 +39,9 @@ from program_management.tests.ddd.factories.domain.prerequisite.prerequisite imp
 from program_management.tests.ddd.factories.domain.program_tree.LADRT100I_MINADROI import ProgramTreeMINADROIFactory
 from program_management.tests.ddd.factories.domain.program_tree.LDROI100B_DROI1BA import ProgramTreeDROI1BAFactory
 from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
+from program_management.tests.ddd.factories.domain.program_tree.LDROP221O_OPTDROI2MAR import \
+    ProgramTreeOptionLDROP221OFactory
+from program_management.tests.ddd.factories.domain.program_tree.LSPED200M_SPED2M import ProgramTreeSPED2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -239,6 +242,51 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         self.assertDictEqual(
             mock_search_trees.call_args[1],
             {'entity_ids': [minadroi.entity_id]},
+            "Should only search trees that have prerequisites for node to detach"
+        )
+
+    @mock.patch.object(TreePrerequisitesRepository, 'search')
+    @mock.patch.object(ProgramTreeRepository, 'search')
+    def test_should_raise_when_prerequisite_is_in_DROI2M_option_and_reused_in_other_2M(
+            self,
+            mock_search_trees,
+            mock_search_prerequisites
+    ):
+        droi2m = copy.deepcopy(self.tree)
+        option = ProgramTreeOptionLDROP221OFactory(root_node__year=self.year)
+        ldrop2011 = option.get_node_by_code_and_year(code="LDROP2011", year=self.year)
+
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=droi2m,
+            node_having_prerequisite=ldrop2011.entity_id,
+            nodes_that_are_prequisites=[self.ldroi2101]
+        )  # Set prerequisite between UE in option and UE in DROI2M
+
+        sped2m = ProgramTreeSPED2MFactory(root_node__year=self.year)
+        LinkFactory(
+            parent=sped2m.get_node_by_code_and_year(code="LSPED103G", year=self.year),
+            child=option.root_node
+        )  # Other 2M is reusing the same option
+
+        mock_search_prerequisites.return_value = [droi2m.prerequisites]
+        mock_search_trees.return_value = [droi2m]
+
+        with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
+            """
+            In context of DROI2M, LDROI2101 (inside DROI2M) is prerequisite of LDROP2011 (inside option used in DROI2M).
+            But in context of SPED2M, there is no prerequisites.
+            When we try to detach LDROI2101 inside SPED2M, the validator must raise an error.
+            """
+            IsHasPrerequisiteForAllTreesValidator(
+                sped2m,
+                node_to_detach=ldrop2011,
+                parent_node=option.get_node_by_code_and_year(code="LDROP100T", year=self.year),
+                program_tree_repository=ProgramTreeRepository(),
+                prerequisite_repository=TreePrerequisitesRepository(),
+            ).validate()
+        self.assertDictEqual(
+            mock_search_trees.call_args[1],
+            {'entity_ids': [droi2m.entity_id]},
             "Should only search trees that have prerequisites for node to detach"
         )
 
