@@ -36,9 +36,9 @@ from program_management.ddd.domain.education_group_version_academic_year import 
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 # Typing
-from program_management.ddd.domain.prerequisite import Prerequisites
-from program_management.ddd.repositories import load_node, load_prerequisite, \
-    load_authorized_relationship
+from program_management.ddd.domain.prerequisite import Prerequisites, NullPrerequisites
+from program_management.ddd.repositories import load_node, load_authorized_relationship
+from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -60,16 +60,13 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
     nodes = __load_tree_nodes(structure)
     links = __load_tree_links(structure)
-    has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
+    prerequisites_of_all_trees = TreePrerequisitesRepository().search(tree_root_ids=tree_root_ids)
     root_nodes = load_node.load_multiple(tree_root_ids)
     nodes.update({n.pk: n for n in root_nodes})
     for root_node in root_nodes:
         tree_root_id = root_node.pk
-        tree_prerequisites = {
-            'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
-        }
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
-        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
+        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, prerequisites_of_all_trees)
         trees.append(tree)
     return trees
 
@@ -136,22 +133,21 @@ def __build_tree(
         tree_structure: TreeStructure,
         nodes: Dict[NodeKey, 'Node'],
         links: Dict[LinkKey, 'Link'],
-        prerequisites
+        prerequisites_of_all_trees: List['Prerequisites']
 ) -> 'ProgramTree':
-    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import
     structure_by_parent = {}  # For performance
     for s_dict in tree_structure:
         if s_dict['path']:  # TODO :: Case child_id or parent_id is null - to remove after DB null constraint set
             parent_path = '|'.join(s_dict['path'].split('|')[:-1])
             structure_by_parent.setdefault(parent_path, []).append(s_dict)
-    root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
+    root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links)
     tree = program_tree.ProgramTree(
         root_node,
         authorized_relationships=load_authorized_relationship.load(),
-        prerequisites=Prerequisites(
-            context_tree=ProgramTreeIdentity(code=root_node.code, year=root_node.year),
-            prerequisites=list(prerequisites['has_prerequisite_dict'].values()),
-        ),
+    )
+    tree.prerequisites = next(
+        (prereq for prereq in prerequisites_of_all_trees if prereq.context_tree == tree.entity_id),
+        NullPrerequisites(context_tree=tree.entity_id)
     )
     return tree
 
@@ -160,8 +156,7 @@ def __build_children(
         root_path: 'Path',
         map_parent_path_with_tree_structure: Dict['Path', TreeStructure],
         nodes: Dict[NodeKey, 'Node'],
-        links: Dict[LinkKey, 'Link'],
-        prerequisites
+        links: Dict[LinkKey, 'Link']
 ) -> List['Link']:
     children = []
     for child_structure in map_parent_path_with_tree_structure.get(root_path) or []:
@@ -175,8 +170,7 @@ def __build_children(
                 child_structure['path'],
                 map_parent_path_with_tree_structure,
                 nodes,
-                links,
-                prerequisites
+                links
             )
 
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]

@@ -35,6 +35,8 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
     _HasPrerequisiteValidator, IsHasPrerequisiteForAllTreesValidator
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.LADRT100I_MINADROI import ProgramTreeMINADROIFactory
+from program_management.tests.ddd.factories.domain.program_tree.LDROI100B_DROI1BA import ProgramTreeDROI1BAFactory
 from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
@@ -133,6 +135,41 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
                 tree,
                 node_to_detach=mini_training_node,
                 parent_node=tree.get_node_by_code_and_year(code="LDROI100G", year=self.year),
+                program_tree_repository=ProgramTreeRepository()
+            )
+        )
+
+    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_reusing_node')
+    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_inside_node')
+    def test_should_not_raise_when_prerequisite_is_in_minor_and_reused_in_TC_of_other_tree(
+            self,
+            mock_trees_inside_node,
+            mock_trees_reusing_node
+    ):
+        droi1ba = ProgramTreeDROI1BAFactory(root_node__year=self.year)
+        ldroi900t = droi1ba.get_node_by_code_and_year(code="LDROI900T", year=self.year)
+        ldroi104g = droi1ba.get_node_by_code_and_year(code="LDROI104G", year=self.year)
+
+        minadroi = ProgramTreeMINADROIFactory(root_node__year=self.year)
+        ldroi1222 = minadroi.get_node_by_code_and_year(code="LDROI1222", year=self.year)
+
+        LinkFactory(
+            parent=ldroi104g,
+            child=minadroi.root_node,
+        )  # Add minor inside bachelor
+        LinkFactory(
+            parent=ldroi900t,
+            child=ldroi1222,  # Add UE inside TC of bachelor (reused twice)
+        )
+
+        mock_trees_inside_node.return_value = [minadroi]
+        mock_trees_reusing_node.return_value = [droi1ba]
+
+        self.assertValidatorNotRaises(
+            IsHasPrerequisiteForAllTreesValidator(
+                droi1ba,
+                node_to_detach=ldroi1222,
+                parent_node=ldroi900t,
                 program_tree_repository=ProgramTreeRepository()
             )
         )
