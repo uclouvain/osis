@@ -156,7 +156,7 @@ def _search_root_ids(entity_ids: List['ProgramTreeIdentity']) -> List[int]:
     for identity in entity_ids[1:]:
         filter_search_from |= _build_where_clause(identity)
     qs = qs.filter(filter_search_from)
-    return qs.values_list('pk', flat=True)
+    return list(qs.values_list('pk', flat=True))
 
 
 def _build_where_clause(node_identity: 'ProgramTreeIdentity') -> Q:
