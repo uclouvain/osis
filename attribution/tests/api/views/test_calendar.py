@@ -62,6 +62,8 @@ class ApplicationCoursesCalendarListViewTestCase(APITestCase):
 
         results = response.json()
         self.assertEqual(len(results), 1)
-        self.assertListEqual(
-            list(results[0].keys()), ["title", "start_date", "end_date", "authorized_target_year", "is_open"]
+
+        self.assertCountEqual(
+            list(results[0].keys()),
+            ["title", "start_date", "end_date", "authorized_target_year", "is_open"]
         )
