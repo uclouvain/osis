@@ -32,6 +32,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.domain.exception import CannotDetachLearningUnitsWhoArePrerequisiteException, \
     CannotDetachLearningUnitsWhoHavePrerequisiteException
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
 from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
     _HasPrerequisiteValidator, IsHasPrerequisiteForAllTreesValidator
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
@@ -106,12 +107,12 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite_and_used_twice_in_tree)
         )
 
-    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_reusing_node')
-    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_inside_node')
+    @mock.patch.object(TreePrerequisitesRepository, 'search')
+    @mock.patch.object(ProgramTreeRepository, 'search')
     def test_should_not_raise_when_node_to_detach_has_prerequisite_and_is_program_tree(
             self,
-            mock_trees_inside_node,
-            mock_trees_reusing_node
+            mock_search_trees,
+            mock_search_prerequisites
     ):
         tree = copy.deepcopy(self.tree)
 
@@ -123,8 +124,8 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             nodes_that_are_prequisites=[tree.get_node_by_code_and_year(code="LDROP2012", year=self.year)]
         )
 
-        mock_trees_inside_node.return_value = [mini_training_tree]
-        mock_trees_reusing_node.return_value = [tree]
+        mock_search_trees.return_value = [tree]
+        mock_search_prerequisites.return_value = [mini_training_tree.prerequisites]
 
         assertion = """
             The node to detach is a minitraining where there are prerequisite only inside itself.
@@ -135,16 +136,17 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
                 tree,
                 node_to_detach=mini_training_node,
                 parent_node=tree.get_node_by_code_and_year(code="LDROI100G", year=self.year),
-                program_tree_repository=ProgramTreeRepository()
+                program_tree_repository=ProgramTreeRepository(),
+                prerequisite_repository=TreePrerequisitesRepository(),
             )
         )
 
-    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_reusing_node')
-    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_inside_node')
+    @mock.patch.object(TreePrerequisitesRepository, 'search')
+    @mock.patch.object(ProgramTreeRepository, 'search')
     def test_should_not_raise_when_prerequisite_is_in_minor_and_reused_in_TC_of_other_tree(
             self,
-            mock_trees_inside_node,
-            mock_trees_reusing_node
+            mock_search_trees,
+            mock_search_prerequisites
     ):
         droi1ba = ProgramTreeDROI1BAFactory(root_node__year=self.year)
         ldroi900t = droi1ba.get_node_by_code_and_year(code="LDROI900T", year=self.year)
@@ -152,6 +154,11 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
         minadroi = ProgramTreeMINADROIFactory(root_node__year=self.year)
         ldroi1222 = minadroi.get_node_by_code_and_year(code="LDROI1222", year=self.year)
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=minadroi,
+            node_having_prerequisite=ldroi1222.entity_id,
+            nodes_that_are_prequisites=[minadroi.get_node_by_code_and_year(code="LDROI1223", year=self.year)]
+        )
 
         LinkFactory(
             parent=ldroi104g,
@@ -162,16 +169,77 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             child=ldroi1222,  # Add UE inside TC of bachelor (reused twice)
         )
 
-        mock_trees_inside_node.return_value = [minadroi]
-        mock_trees_reusing_node.return_value = [droi1ba]
+        mock_search_trees.return_value = [minadroi]
+        mock_search_prerequisites.return_value = [minadroi.prerequisites]
 
+        """
+        LDROI1222 has prerequisites only in the context of MINADROI (not in context of LDROI900T contained in DROI1BA).
+        So the validator should not raise exception
+        """
         self.assertValidatorNotRaises(
             IsHasPrerequisiteForAllTreesValidator(
                 droi1ba,
                 node_to_detach=ldroi1222,
                 parent_node=ldroi900t,
-                program_tree_repository=ProgramTreeRepository()
+                program_tree_repository=ProgramTreeRepository(),
+                prerequisite_repository=TreePrerequisitesRepository(),
             )
+        )
+        self.assertDictEqual(
+            mock_search_trees.call_args[1],
+            {'entity_ids': [minadroi.entity_id]},
+            "Should only search trees that have prerequisites for node to detach"
+        )
+
+    @mock.patch.object(TreePrerequisitesRepository, 'search')
+    @mock.patch.object(ProgramTreeRepository, 'search')
+    def test_should_raise_when_prerequisite_is_in_subgroup_minor_and_reused_in_TC_of_bachelor(
+            self,
+            mock_search_trees,
+            mock_search_prerequisites
+    ):
+        droi1ba = ProgramTreeDROI1BAFactory(root_node__year=self.year)
+        ldroi900t = droi1ba.get_node_by_code_and_year(code="LDROI900T", year=self.year)
+
+        minadroi = ProgramTreeMINADROIFactory(root_node__year=self.year)
+        ladrt102r = minadroi.get_node_by_code_and_year(code="LADRT102R", year=self.year)
+        ldroi1222 = minadroi.get_node_by_code_and_year(code="LDROI1222", year=self.year)
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=minadroi,
+            node_having_prerequisite=ldroi1222.entity_id,
+            nodes_that_are_prequisites=[minadroi.get_node_by_code_and_year(code="LDROI1223", year=self.year)]
+        )
+
+        self.assertIsNone(
+            droi1ba.get_node_by_code_and_year(code=minadroi.root_node.code, year=self.year),
+            "To run this test, the minor must be outside the tree"
+        )
+
+        LinkFactory(
+            parent=ldroi900t,
+            child=ladrt102r,  # Add subgroup containing prerequisite inside TC of bachelor
+        )
+
+        mock_search_prerequisites.return_value = [minadroi.prerequisites]
+        mock_search_trees.return_value = [minadroi]
+
+        with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
+            """
+            In context of DROI1BA, LADRT102R does not contain any nodes that have prerequisites.
+            But in context of MINADROI, LADRT102R contains nodes that have prerequisites.
+            In this case, the validator must raise an error.
+            """
+            IsHasPrerequisiteForAllTreesValidator(
+                droi1ba,
+                node_to_detach=ldroi1222,
+                parent_node=ladrt102r,
+                program_tree_repository=ProgramTreeRepository(),
+                prerequisite_repository=TreePrerequisitesRepository(),
+            ).validate()
+        self.assertDictEqual(
+            mock_search_trees.call_args[1],
+            {'entity_ids': [minadroi.entity_id]},
+            "Should only search trees that have prerequisites for node to detach"
         )
 
 

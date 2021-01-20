@@ -37,34 +37,48 @@ class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator
             tree: 'ProgramTree',
             parent_node: 'Node',
             node_to_detach: 'Node',
-            program_tree_repository: 'ProgramTreeRepository'
+            program_tree_repository: 'ProgramTreeRepository',
+            prerequisite_repository: 'TreePrerequisitesRepository'
     ):
         super().__init__()
         self.tree = tree
         self.node_to_detach = node_to_detach
         self.parent_node = parent_node
         self.program_tree_repository = program_tree_repository
+        self.prerequisite_repository = prerequisite_repository
 
     def validate(self, *args, **kwargs):
-        for tree in self.search_trees_reusing_node():
-            _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
-            _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
+        learning_unit_nodes = self.__get_learning_unit_nodes_to_detach()
+        if learning_unit_nodes:
+            prerequisites = self.prerequisite_repository.search(learning_unit_nodes=learning_unit_nodes)
+            tree_identities = [p.context_tree for p in prerequisites]
+            trees_containing_prerequisites = self.program_tree_repository.search(entity_ids=tree_identities)
+            for tree in trees_containing_prerequisites:
+                if tree.contains(self.parent_node) and tree.root_node != self.node_to_detach:
+                    _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
+                    _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
 
-        for tree in self.search_trees_inside_node():
-            if tree.contains(self.node_to_detach) and tree.root_node != self.node_to_detach:
-                _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
-                _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
+    def __get_learning_unit_nodes_to_detach(self):
+        if self.node_to_detach.is_learning_unit():
+            return [self.node_to_detach]
+        else:
+            return self.node_to_detach.get_all_children_as_learning_unit_nodes()
 
-    def search_trees_reusing_node(self) -> List['ProgramTree']:
-        return self.program_tree_repository.search_from_children([self.parent_node.entity_id])
+            # for tree in self.search_trees_inside_node():
+            #     if tree.contains(self.node_to_detach) and tree.root_node != self.node_to_detach:
+            #         _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
+            #         _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
 
-    def search_trees_inside_node(self):
-        trainings_and_minitrainings_root_ids = [
-            child.pk for child in self.tree.get_all_nodes()
-            if (child.is_training() or child.is_mini_training())
-            and child != self.tree.root_node
-        ]
-        return self.program_tree_repository.search(root_ids=trainings_and_minitrainings_root_ids)
+    # def search_trees_reusing_node(self) -> List['ProgramTree']:
+    #     return self.program_tree_repository.search_from_children([self.parent_node.entity_id])
+    #
+    # def search_trees_inside_node(self):
+    #     trainings_and_minitrainings_root_ids = [
+    #         child.pk for child in self.tree.get_all_nodes()
+    #         if (child.is_training() or child.is_mini_training())
+    #         and child != self.tree.root_node
+    #     ]
+    #     return self.program_tree_repository.search(root_ids=trainings_and_minitrainings_root_ids)
 
 
 class _IsPrerequisiteValidator(business_validator.BusinessValidator):

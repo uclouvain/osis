@@ -139,7 +139,7 @@ class TestPersistTree(TestCase):
         tree = load_tree.load(self.root_node.node_id)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
-        tree.detach_node(path_to_detach, mock.Mock())
+        tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
         persist_tree.persist(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
 

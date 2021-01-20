@@ -42,9 +42,12 @@ class ProgramTreeMINADROIFactory(ProgramTreeFactory):
         |
         |___ LADRT100T - PARTIEDEBASEMINADROI
                   |
-                  |___ LDROI1222 (UE)
-                  |
-                  |___ LDROI1223 (UE)
+                  |___ LADRT102R - MINAUTRESBAC
+                          |
+                          |___ LDROI1222 (UE)
+                          |
+                          |___ LDROI1223 (UE)
+
 
     """
 
@@ -68,6 +71,13 @@ class ProgramTreeMINADROIFactory(ProgramTreeFactory):
             end_year=end_year,
             year=current_year,
         )
+        ladrt102r = NodeGroupYearFactory(
+            code='LADRT102R',
+            title='MINAUTRESBAC',
+            node_type=GroupType.SUB_GROUP,
+            end_year=end_year,
+            year=current_year,
+        )
 
         ldroi1222 = NodeLearningUnitYearFactory(code='LDROI1222', year=current_year, end_date=end_year)
         ldroi1223 = NodeLearningUnitYearFactory(code='LDROI1223', year=current_year, end_date=end_year)
@@ -78,9 +88,13 @@ class ProgramTreeMINADROIFactory(ProgramTreeFactory):
         )
         LinkFactory(
             parent=ladrt100t,
+            child=ladrt102r
+        )
+        LinkFactory(
+            parent=ladrt102r,
             child=ldroi1222
         )
         LinkFactory(
-            parent=ladrt100t,
+            parent=ladrt102r,
             child=ldroi1223
         )

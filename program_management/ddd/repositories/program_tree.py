@@ -46,6 +46,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
             entity_ids: Optional[List['ProgramTreeIdentity']] = None,
             root_ids: List[int] = None
     ) -> List['ProgramTree']:
+        if entity_ids:
+            root_ids = _search_root_ids(entity_ids)
         if root_ids:
             return load_tree.load_trees(root_ids)
         return []
@@ -146,3 +148,19 @@ def _delete_node_content(parent_node: 'Node', delete_node_service: interface.App
         except exception.NodeIsUsedException:
             continue
         _delete_node_content(link.child, delete_node_service)
+
+
+def _search_root_ids(entity_ids: List['ProgramTreeIdentity']) -> List[int]:
+    qs = Element.objects.all()
+    filter_search_from = _build_where_clause(entity_ids[0])
+    for identity in entity_ids[1:]:
+        filter_search_from |= _build_where_clause(identity)
+    qs = qs.filter(filter_search_from)
+    return qs.values_list('pk', flat=True)
+
+
+def _build_where_clause(node_identity: 'ProgramTreeIdentity') -> Q:
+    return Q(
+        group_year__partial_acronym=node_identity.code,
+        group_year__academic_year__year=node_identity.year
+    )

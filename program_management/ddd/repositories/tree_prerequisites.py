@@ -79,11 +79,11 @@ class TreePrerequisitesRepository(interface.AbstractRepository):
             qs = qs.filter(
                 Q(prerequisite__learning_unit_year_id__element__pk__in=node_pks)
                 | Q(learning_unit__learningunityear__element__pk__in=node_pks)
-            ).distinct()
+            )
         if tree_root_ids:
             qs = qs.filter(prerequisite__education_group_version__root_group__element__id__in=tree_root_ids)
 
-        return _transform_model_to_domain(qs)
+        return _transform_model_to_domain(qs.distinct())
 
     @classmethod
     def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
