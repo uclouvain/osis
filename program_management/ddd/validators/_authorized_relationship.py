@@ -27,14 +27,16 @@ import copy
 import functools
 import itertools
 from collections import Counter
-from typing import List, Set
+from typing import List, Set, Dict, Any
+
+import typing
 
 from base.ddd.utils import business_validator
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
-    MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException
+    MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException, MaximumChildTypesReachedBisException
 
 
 class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValidator):
@@ -88,6 +90,7 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
                 self.get_children_node_types_that_surpass_maximum_allowed()
             )
 
+    # TODO use min validator
     def is_mandatory_child_converted_to_reference(self):
         if not self.link.is_reference():
             return False
@@ -102,6 +105,7 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
         has_parent_already_mandatory_child = self.link.child.node_type in child_node_types
         return not has_parent_already_mandatory_child
 
+    # TODO make another validator that check finalities count
     @functools.lru_cache()
     def get_children_node_types_that_surpass_maximum_allowed(self) -> Set[EducationGroupTypesEnum]:
         children_nodes = self.link.parent.children_as_nodes_with_respect_to_reference_link
@@ -202,3 +206,57 @@ class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator
                 types_minimum_reached.append(child_type)
 
         return types_minimum_reached
+
+
+class MaximumChildrenTypeAuthorizedValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', parent_node: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.parent_node = parent_node
+
+    def validate(self, *args, **kwargs):
+        children_type_that_surpassed_maximum_authorized = self.get_children_types_that_surpass_maximum_allowed()
+        if children_type_that_surpassed_maximum_authorized:
+            raise MaximumChildTypesReachedBisException(self.parent_node, children_type_that_surpassed_maximum_authorized)
+
+    def get_children_types_that_surpass_maximum_allowed(self) -> List['EducationGroupTypesEnum']:
+        children_types_counter = Counter(self.parent_node.get_children_types(include_nodes_used_as_reference=True))
+        return [
+            children_type for children_type, number_children in children_types_counter.items()
+            if self._is_maximum_children_surpassed(children_type, number_children)
+        ]
+    
+    def _is_maximum_children_surpassed(self, children_type, number_children) -> bool:
+        authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
+            self.parent_node.node_type,
+            children_type
+        )
+        maximum_children_authorized = authorized_relationship.max_count_authorized if authorized_relationship else 0
+        return number_children > maximum_children_authorized
+
+
+class MinimumChildrenTypeAuthorizedValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', parent_node: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.parent_node = parent_node
+
+    def validate(self, *args, **kwargs):
+        children_type_that_are_inferior_to_minimum = self.get_children_types_that_do_not_respect_minimum()
+        if children_type_that_are_inferior_to_minimum:
+            raise MinimumChildTypesNotRespectedException(self.parent_node, children_type_that_are_inferior_to_minimum)
+
+    def get_children_types_that_do_not_respect_minimum(self) -> List['EducationGroupTypesEnum']:
+        children_types_counter = Counter(self.parent_node.get_children_types(include_nodes_used_as_reference=True))
+        return [
+            children_type for children_type, number_children in children_types_counter.items()
+            if self._is_minimum_children_not_respected(children_type, number_children)
+        ]
+
+    def _is_minimum_children_not_respected(self, children_type, number_children) -> bool:
+        authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
+            self.parent_node.node_type,
+            children_type
+        )
+        minimum_children_authorized = authorized_relationship.min_count_authorized if authorized_relationship else 0
+        return number_children < minimum_children_authorized
