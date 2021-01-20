@@ -290,18 +290,6 @@ class ChildTypeNotAuthorizedException(BusinessException):
 
 
 class MaximumChildTypesReachedException(BusinessException):
-    def __init__(self, parent_node: 'Node', child_node: 'Node', node_types):
-        message = _(
-            "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
-            "for \"%(parent)s\" has already reached the limit.") % {
-            'child': child_node,
-            'child_types': ','.join([str(node_type.value) for node_type in node_types]),
-            'parent': parent_node
-        }
-        super().__init__(message)
-
-
-class MaximumChildTypesReachedBisException(BusinessException):
     def __init__(self, parent_node: 'Node', node_types):
         message = _(
             "The parent \"%(parent)s\" has reached the maximum number of children "
