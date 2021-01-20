@@ -25,10 +25,12 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List
+from typing import List, Set
+
+import typing
 
 from base.ddd.utils import business_validator
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
     MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException
@@ -88,8 +90,9 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
         ChildTypeValidator(self.tree, self.link.parent).validate()
         MinimumChildrenTypeAuthorizedValidator(self.tree, self.link.parent).validate()
         MaximumChildrenTypeAuthorizedValidator(self.tree, self.link.parent).validate()
+        if self.link.parent.is_finality_list_choice():
+            MaximumFinalitiesAuthorizedValidator(self.tree, self.link.parent).validate()
 
-    # TODO make another validator that check finalities count
     def _is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent(self):
         return self.link.parent.is_minor_major_list_choice() and self.link.child.is_minor_major_deepening()
 
@@ -189,3 +192,34 @@ class ChildTypeValidator(business_validator.BusinessValidator):
             node.node_type
         )
         return authorized_relationship is None
+
+
+class MaximumFinalitiesAuthorizedValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', parent_node: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.parent_node = parent_node
+
+    def validate(self, *args, **kwargs):
+        finalities_in_excess = self.get_finalities_exceeding_maximum_number_allowed()
+        if finalities_in_excess:
+            raise MaximumChildTypesReachedException(self.tree.root_node, finalities_in_excess)
+
+    def get_finalities_exceeding_maximum_number_allowed(self) -> List["EducationGroupTypesEnum"]:
+        finalities_counter = self._get_finalities_counter()
+        return [
+            child_type for child_type, child_number in finalities_counter.items()
+            if self._is_maximum_number_surpassed(child_type, child_number)
+        ]
+
+    def _is_maximum_number_surpassed(self, children_type, number_children) -> bool:
+        authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
+            self.parent_node.node_type,
+            children_type
+        )
+        maximum_children_authorized = authorized_relationship.max_count_authorized if authorized_relationship else 0
+        return number_children > maximum_children_authorized
+
+    def _get_finalities_counter(self) -> typing.Counter:
+        tree_finalities = self.tree.get_all_finalities()
+        return Counter([finality.node_type for finality in tree_finalities])
