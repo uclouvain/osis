@@ -482,7 +482,12 @@ class ProgramTree(interface.RootEntity):
 
         return {node_obj for node_obj, number in children_with_counter.items() if number > 0}
 
-    def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
+    def detach_node(
+            self,
+            path_to_node_to_detach: Path,
+            tree_repository: 'ProgramTreeRepository',
+            prerequisite_repository: 'TreePrerequisitesRepository'
+    ) -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
@@ -498,7 +503,8 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_detach,
             parent_path,
-            tree_repository
+            tree_repository,
+            prerequisite_repository
         ).validate()
 
         return parent.detach_child(node_to_detach)

@@ -24,17 +24,20 @@
 #
 ##############################################################################
 import itertools
-from typing import List, Dict
+from typing import List
+from typing import Optional
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Subquery, OuterRef, F
+from django.db.models import Subquery, OuterRef, F, Q
 
 from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel, PrerequisiteItem
-from program_management.ddd.domain import prerequisite as prerequisite_domain
+from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel
+from osis_common.ddd import interface
+from osis_common.ddd.interface import Entity, EntityIdentity, ApplicationService
 from program_management.ddd.business_types import *
-
+from program_management.ddd.domain import prerequisite as prerequisite_domain
+from program_management.ddd.domain.prerequisite import Prerequisites
+from program_management.models.element import Element
 
 TreeRootId = int
 NodeId = int
@@ -42,27 +45,56 @@ LearningUnitYearId = int
 IsPrerequisiteOfNodeId = int
 
 
-def load_has_prerequisite_multiple(
-        tree_root_ids: List[TreeRootId],
-        nodes: Dict[str, 'Node']
-) -> Dict[TreeRootId, Dict['NodeIdentity', prerequisite_domain.Prerequisite]]:
-    """
-    This function return a dict of prerequisite grouped by node_id
-    Ex: {
-       node_id:  Prerequisite,
-       ... : Prerequisite,
-    }
-    :param tree_root_ids: List of root nodes of the trees
-    :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
-    :return:
-    """
-    # FIXME :: cyclic import - use dependency injection instead ?
+class TreePrerequisitesRepository(interface.AbstractRepository):
+    @classmethod
+    def create(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
+        raise NotImplementedError
+
+    @classmethod
+    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeIdentity') -> 'Prerequisites':
+        tree_root_ids = Element.objects.filter(
+            group_year__partial_acronym=entity_id.code,
+            group_year__academic_year__year=entity_id.year,
+        ).values_list('pk', flat=True)
+        prerequisites_list = cls.search(tree_root_ids=tree_root_ids)
+        if prerequisites_list:
+            return prerequisites_list[0]
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['EntityIdentity']] = None,
+            learning_unit_nodes: List['NodeLearningUnitYear'] = None,
+            tree_root_ids: List['TreeRootId'] = None
+    ) -> List['Prerequisites']:
+        qs = PrerequisiteItemModel.objects
+        if entity_ids:
+            raise NotImplementedError
+        if learning_unit_nodes:
+            node_pks = set(n.pk for n in learning_unit_nodes)
+            qs = qs.filter(
+                Q(prerequisite__learning_unit_year_id__element__pk__in=node_pks)
+                | Q(learning_unit__learningunityear__element__pk__in=node_pks)
+            )
+        if tree_root_ids:
+            qs = qs.filter(prerequisite__education_group_version__root_group__element__id__in=tree_root_ids)
+
+        return _transform_model_to_domain(qs.distinct())
+
+    @classmethod
+    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+
+def _transform_model_to_domain(prerequisite_item_queryset) -> List['Prerequisites']:
+    # FIXME :: cyclic import
     from program_management.ddd.domain.program_tree import ProgramTreeIdentity
     from program_management.ddd.domain.node import NodeIdentity
-    prerequisite_item_qs = PrerequisiteItem.objects.filter(
-        prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
-        prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
-    ).annotate(
+    prerequisite_item_queryset = prerequisite_item_queryset.annotate(
         code=Subquery(
             LearningUnitYear.objects.filter(
                 learning_unit_id=OuterRef('learning_unit_id'),
@@ -94,8 +126,9 @@ def load_has_prerequisite_multiple(
         'year'
     )
 
-    prerequisites_dict_by_program_root_id = {}
-    result_grouped_by_ed_group_id = itertools.groupby(prerequisite_item_qs, key=lambda p: p['root_element_id'])
+    result = []
+
+    result_grouped_by_ed_group_id = itertools.groupby(prerequisite_item_queryset, key=lambda p: p['root_element_id'])
     for program_id, prerequisite_item_list in result_grouped_by_ed_group_id:
         prerequisites_dict = {}
         result_grouped_by_learn_unit_id = itertools.groupby(
@@ -123,5 +156,12 @@ def load_has_prerequisite_multiple(
                     ]
                 )
                 prerequisites_dict[node_identity].add_prerequisite_item_group(p_group_items)
-        prerequisites_dict_by_program_root_id[program_id] = prerequisites_dict
-    return prerequisites_dict_by_program_root_id
+
+        prerequisite_list = list(prerequisites_dict.values())
+        result.append(
+            Prerequisites(
+                context_tree=prerequisite_list[0].context_tree,
+                prerequisites=prerequisite_list,
+            )
+        )
+    return result

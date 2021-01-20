@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
     from program_management.ddd.repositories.program_tree import ProgramTreeRepository
     from program_management.ddd.repositories.node import NodeRepository
+    from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
 
     from base.ddd.utils.validation_message import BusinessValidationMessage
 
