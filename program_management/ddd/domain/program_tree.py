@@ -385,8 +385,9 @@ class ProgramTree(interface.RootEntity):
             )
         )
 
-    def count_usage(self, node: 'Node') -> int:
-        return Counter(_nodes_from_root(self.root_node))[node]
+    def count_usages_distinct(self, node: 'Node') -> int:
+        """Count the usage of the nodes with distinct parent. 2 links with the same parent are considered as 1 usage."""
+        return len(set(self.search_links_using_node(node)))
 
     def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
