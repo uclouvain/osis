@@ -48,6 +48,7 @@ from base.views.learning_units.detail import SEARCH_URL_PART
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from django.contrib.messages import get_messages
 
 
 @login_required
@@ -61,7 +62,8 @@ def learning_unit_pedagogy(request, learning_unit_year_id=None, code=None, year=
 def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, template, code: Optional[str] = None,
                                 year: Optional[int] = None):
     person = get_object_or_404(Person, user=request.user)
-    context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year))
+    context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year,
+                                                         messages=get_messages(request)))
 
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)

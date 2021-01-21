@@ -43,7 +43,7 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views import learning_unit
 from base.views.common import display_success_messages
-from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
+from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated, check_formations_impacted_by_update
 from base.views.learning_units.perms import PermissionDecorator
 from cms.models.text_label import TextLabel
 from learning_unit.views.utils import learning_unit_year_getter
@@ -120,6 +120,7 @@ def _post_learning_unit_pedagogy_form(request):
         last_academic_year_reported = form.luys[-1] if len(form.luys) >= 2 else None
         msg = build_success_message(last_academic_year_reported, form.luys[0])
         display_success_messages(request, msg)
+        check_formations_impacted_by_update(form.luys[0])
 
 
 def build_success_message(last_luy_reported, luy):

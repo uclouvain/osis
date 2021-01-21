@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from typing import List
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
@@ -47,19 +45,11 @@ from base.views.common import display_error_messages, display_success_messages, 
     show_error_message_for_form_invalid
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units.common import get_learning_unit_identification_context, \
-    get_common_context_learning_unit_year
+    get_common_context_learning_unit_year, check_formations_impacted_by_update
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
-from program_management.ddd.repositories.node import NodeRepository
-from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.serializers.program_trees_utilizations import utilizations_serializer
-from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
-from program_management.ddd.domain import exception
-from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
-from program_management.ddd.service.read import search_program_trees_using_node_service
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from django.contrib.messages import get_messages
+
 
 @login_required
 @waffle_flag("learning_unit_update")
@@ -143,7 +133,7 @@ def update_learning_unit(request, learning_unit_year_id):
 @permission_required('base.can_edit_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_messages(request))
 
     context['learning_units'] = _get_learning_units_for_context(luy=context['learning_unit_year'],
                                                                 with_family=form_type == "full")
@@ -199,11 +189,7 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
             display_success_messages(request, _('The learning unit has been updated (with report).'))
         else:
             display_success_messages(request, _('The learning unit has been updated (without report).'))
-        formations_using_ue = _find_training_using_ue(learning_unit_year)
-
-        if len(formations_using_ue) > 1:
-            for m in formations_using_ue:
-                messages.add_message(request, 50, m)
+        check_formations_impacted_by_update(learning_unit_year, request)
 
     except ConsistencyError as e:
         error_list = e.error_list
@@ -218,18 +204,3 @@ def is_not_past(form):
         not isinstance(form, LearningUnitPostponementForm) or
         (isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past)
     )
-
-
-def _find_training_using_ue(learning_unit_year: LearningUnitYear) -> List['str']:
-    node_identity = NodeIdentity(code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year)
-    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
-    node_pks = []
-    formations_using_ue = []
-
-    for direct_link in direct_parents:
-        for indirect_parent in direct_link.get('indirect_parents'):
-            if indirect_parent.get('node').pk not in node_pks:
-                node_pks.append(indirect_parent.get('node').pk)
-                formations_using_ue.append("{} - {}".format(indirect_parent.get('node').full_acronym(),
-                                                            indirect_parent.get('node').full_title()))
-    return formations_using_ue
