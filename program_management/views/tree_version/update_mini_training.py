@@ -1,4 +1,3 @@
-import functools
 from typing import Dict, List
 
 from django.db import transaction
@@ -11,6 +10,7 @@ from django.views import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
+from base.utils.cache import cached_result
 from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
@@ -57,9 +57,6 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
             "cancel_url": self.get_cancel_url(),
-            "acronym_suffix": "{}]".format(
-                " - Transition" if self.get_program_tree_version_obj().is_specific_transition else ""
-            )
         }
         return render(request, self.template_name, context)
 
@@ -92,11 +89,19 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_label(),
+                    "acronym": self.version_label(identity),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    @staticmethod
+    def version_label(identity: 'ProgramTreeVersionIdentity') -> str:
+        if identity.is_specific_transition():
+            return '{} - Transition'.format(identity.version_name)
+        elif identity.is_transition:
+            return 'Transition'
+        return identity.version_name
 
     def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
         last_identity = version_identities[-1]
@@ -187,7 +192,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             'initial': self._get_mini_training_version_form_initial_values()
         }
 
-    @functools.lru_cache()
+    @cached_result
     def get_mini_training_obj(self) -> 'MiniTraining':
         try:
             mini_training_abbreviated_title = self.get_program_tree_version_obj().entity_id.offer_acronym
@@ -199,7 +204,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         except MiniTrainingNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_group_obj(self) -> 'Group':
         try:
             get_cmd = command_education_group.GetGroupCommand(
@@ -210,7 +215,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         except GroupNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_version_obj(self) -> 'ProgramTreeVersion':
         get_cmd = command.GetProgramTreeVersionFromNodeCommand(
             code=self.kwargs['code'],
@@ -218,7 +223,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         )
         return get_program_tree_version_from_node_service.get_program_tree_version_from_node(get_cmd)
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_obj(self) -> 'ProgramTree':
         return self.get_program_tree_version_obj().get_tree()
 
