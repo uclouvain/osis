@@ -150,7 +150,9 @@ class TransitionVersionForm(forms.Form):
 
         self._init_academic_year_choices()
         self._set_remote_validation_on_version_name()
+        self._init_version_name(tree_version_identity)
 
+    def _init_version_name(self, tree_version_identity):
         suffix_version_name = " - Transition" if tree_version_identity.version_name else "Transition"
         self.fields["version_name"].initial = tree_version_identity.version_name + suffix_version_name
         self.fields["version_name"].disabled = True
@@ -182,7 +184,7 @@ class TransitionVersionForm(forms.Form):
 
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
-            self.fields["end_year"].initial = choices_years[-1]
+            self.fields["end_year"].initial = choices_years[0]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
