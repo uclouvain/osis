@@ -182,7 +182,6 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         max_digits=6,
         decimal_places=2,
         default=None,
-        coerce_to_string=True
     )
     practical_exercise_volume = VolumeField(
         source='child.volume_total_practical',
