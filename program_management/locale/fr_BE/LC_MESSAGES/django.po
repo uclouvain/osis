@@ -766,6 +766,12 @@ msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
 "L'unité d'enseignement %(acronym)s n'est pas contenue dans la formation"
 
+#, python-format
+msgid ""
+"The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
+"inside %(training)s"
+msgstr "L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais pas dans %(training)s"
+
 msgid "The learning unit has prerequisites"
 msgstr "L'UE a des prérequis"
 

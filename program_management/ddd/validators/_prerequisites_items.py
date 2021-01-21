@@ -22,21 +22,19 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import re
-from typing import List
 
 from program_management.ddd.business_types import *
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.domain.prerequisite import PrerequisiteExpression, ACRONYM_REGEX
+from program_management.ddd.domain import prerequisite
 
 
 class PrerequisiteItemsValidator(BusinessValidator):
     def __init__(
             self,
-            prerequisite_string: PrerequisiteExpression,
-            node: NodeLearningUnitYear,
+            prerequisite_string: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear',
             program_tree: 'ProgramTree'
     ):
         super().__init__()
@@ -48,9 +46,15 @@ class PrerequisiteItemsValidator(BusinessValidator):
     def validate(self, *args, **kwargs):
         node_not_in_codes_permitted = self.node.code not in self.codes_permitted
         if self.program_tree.is_used_only_inside_minor_or_deepening(self.node) and node_not_in_codes_permitted:
+            minor_or_deepening = [
+                n.full_acronym() for n in self.program_tree.search_indirect_parents(self.node)
+                if n.is_minor_or_deepening()
+            ]
             self.add_error_message(
-                _("The learning unit %(acronym)s is not contained inside the formation") % {
-                    'acronym': self.node.code
+                _("The learning unit %(acronym)s is used inside %(mini_trainings)s but not inside %(training)s") % {
+                    'acronym': self.node.code,
+                    'mini_trainings': ','.join(minor_or_deepening),
+                    'training': self.program_tree.root_node.full_acronym(),
                 }
             )
         codes_used_in_prerequisite_string = self._extract_acronyms()
@@ -76,4 +80,4 @@ class PrerequisiteItemsValidator(BusinessValidator):
             )
 
     def _extract_acronyms(self):
-        return re.findall(ACRONYM_REGEX, self.prerequisite_string)
+        return re.findall(prerequisite.ACRONYM_REGEX, self.prerequisite_string)

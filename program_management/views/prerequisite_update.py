@@ -58,7 +58,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
         form_kwargs["program_tree"] = self.program_tree
         form_kwargs["node"] = node
         form_kwargs["initial"] = {
-            "prerequisite_string": str(node.prerequisite)
+            "prerequisite_string": str(self.program_tree.get_prerequisite(node) or '')
         }
         return form_kwargs
 
