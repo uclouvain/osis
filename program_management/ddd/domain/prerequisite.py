@@ -26,11 +26,11 @@
 import re
 from typing import List
 
+from django.utils.translation import gettext as _
+
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
-from django.utils.translation import gettext as _
-
 
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'
@@ -122,12 +122,17 @@ class Prerequisite:
             for prereq_item_group in self.prerequisite_item_groups
         )
 
-    def __str__(self) -> PrerequisiteExpression:
+    def get_prerequisite_expression(self, translate=True):
         def _format_group(group: PrerequisiteItemGroup):
             return "({})" if len(group.prerequisite_items) > 1 and len(self.prerequisite_item_groups) > 1 else "{}"
-        return str(" " + _(self.main_operator) + " ").join(
+
+        main_operator = _(self.main_operator) if translate else self.main_operator
+        return str(" " + main_operator + " ").join(
             _format_group(group).format(group) for group in self.prerequisite_item_groups
         )
+
+    def __str__(self) -> PrerequisiteExpression:
+        return self.get_prerequisite_expression()
 
     def secondary_operator(self):
         return OR if self.main_operator == AND else AND
