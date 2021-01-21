@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -43,20 +44,14 @@ from education_group.ddd import command
 from education_group.ddd.domain.service.identity_search import MiniTrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
-from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd import command as command_program_management
 from program_management.ddd.service.read import node_identity_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
@@ -204,6 +199,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
             "view_publish_btn":
+                not program_manager.is_program_manager(self.request.user) and
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url()
         }

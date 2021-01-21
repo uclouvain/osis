@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -200,6 +201,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
             "view_publish_btn":
+                not program_manager.is_program_manager(self.request.user) and
                 (self.have_general_information_tab() or self.have_admission_condition_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
