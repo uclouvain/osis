@@ -85,7 +85,7 @@ class _IsPrerequisiteValidator(business_validator.BusinessValidator):
 
         return {
             n for n in learning_unit_nodes_detached
-            if self.tree.is_prerequisite(n) and self.tree.count_usage(n) <= 1
+            if self.tree.is_prerequisite(n) and self.tree.count_usages_distinct(n) <= 1
         }
 
 
@@ -111,5 +111,5 @@ class _HasPrerequisiteValidator(business_validator.BusinessValidator):
 
         return {
             node for node in learning_unit_nodes_removed
-            if self.tree.has_prerequisites(node) and self.tree.count_usage(node) <= 1
+            if self.tree.has_prerequisites(node) and self.tree.count_usages_distinct(node) <= 1
         }
