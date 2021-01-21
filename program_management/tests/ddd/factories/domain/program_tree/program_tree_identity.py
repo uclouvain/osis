@@ -23,31 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
 
-from program_management import publisher
-from program_management.ddd import command
-from program_management.ddd.domain import link
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.repositories import persist_tree, program_tree
-from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
+import factory.fuzzy
+
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 
-@transaction.atomic()
-def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
-    path_to_detach = detach_command.path
-    commit = detach_command.commit
-    root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
-    program_tree_repository = program_tree.ProgramTreeRepository()
+class ProgramTreeIdentityFactory(factory.Factory):
 
-    program_tree_identity = identity_search.ProgramTreeIdentitySearch.get_from_element_id(root_id)
-    working_tree = program_tree_repository.get(program_tree_identity)
+    class Meta:
+        model = ProgramTreeIdentity
+        abstract = False
 
-    deleted_link = working_tree.detach_node(path_to_detach, program_tree_repository, TreePrerequisitesRepository())
-
-    if commit:
-        persist_tree.persist(working_tree)
-        publisher.element_detached.send(None, path_detached=path_to_detach)
-
-    return deleted_link.entity_id
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
