@@ -122,7 +122,7 @@ class Prerequisite:
             for prereq_item_group in self.prerequisite_item_groups
         )
 
-    def get_prerequisite_expression(self, translate=True):
+    def get_prerequisite_expression(self, translate: bool = True) -> PrerequisiteExpression:
         def _format_group(group: PrerequisiteItemGroup):
             return "({})" if len(group.prerequisite_items) > 1 and len(self.prerequisite_item_groups) > 1 else "{}"
 
