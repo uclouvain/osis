@@ -90,11 +90,12 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def test_should_raise_exception_when_node_to_detach_is_prerequisite_twice_with_same_parent(self):
         tree = ProgramTreeDROI2MFactory(root_node__year=self.year)
+        ldroi2101 = tree.get_node_by_code_and_year(code="LDROI2101", year=self.year)
 
         subgroup = NodeGroupYearFactory(
             code='LDROI111G',
             title='SUBGROUP_REUSED_TWICE',
-            node_type=GroupType.FINALITY_120_LIST_CHOICE,
+            node_type=GroupType.SUB_GROUP,
             end_year=tree.root_node.end_year,
             year=self.year,
         )
@@ -116,19 +117,24 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         )
 
         tree.set_prerequisite(
-            prerequisite_expression="LDROI2101",
+            prerequisite_expression=ldroi2101.code,
             node_having_prerequisites=ldroi9999
         )
         node_that_is_prerequisite_and_used_twice_in_tree = ldroi9999
-        self.assertTrue(tree.count_usages_distinct(node_that_is_prerequisite_and_used_twice_in_tree) == 1)
+        self.assertTrue(tree.count_usages_distinct(ldroi9999) == 1)
 
         assertion = """
             The Learning unit LDROI2101 appears 2 times in tree, but with the same parent.
             In this case, the validator should raise exception
         """
-        self.assertValidatorNotRaises(
-            _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite_and_used_twice_in_tree)
-        )
+        with self.assertRaises(CannotDetachLearningUnitsWhoArePrerequisiteException):
+            _IsPrerequisiteValidator(
+                tree,
+                node_to_detach=ldroi2101
+            ).validate()
+
+        with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
+            _HasPrerequisiteValidator(tree, node_to_detach=ldroi9999).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_prerequisite_twice_with_different_parent(self):
         tree = ProgramTreeDROI2MFactory(root_node__year=self.year)
@@ -147,7 +153,9 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         node_that_is_prerequisite_and_used_twice_in_tree = ldroi2101
         self.assertTrue(tree.count_usages_distinct(node_that_is_prerequisite_and_used_twice_in_tree) == 2)
 
-        assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
+        assertion = """
+            While the prerequisite is used more than once in the same tree with different parents, we can detach it.
+        """
         self.assertValidatorNotRaises(
             _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite_and_used_twice_in_tree)
         )
