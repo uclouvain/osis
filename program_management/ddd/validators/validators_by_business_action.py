@@ -174,7 +174,6 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
         detach_from = tree.get_node(path_to_parent)
 
         prerequisites_validator = IsHasPrerequisiteForAllTreesValidator(
-            tree,
             detach_from,
             node_to_detach,
             tree_repository,

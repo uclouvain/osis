@@ -34,14 +34,12 @@ from program_management.ddd.domain.exception import CannotDetachLearningUnitsWho
 class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
     def __init__(
             self,
-            tree: 'ProgramTree',
             parent_node: 'Node',
             node_to_detach: 'Node',
             program_tree_repository: 'ProgramTreeRepository',
             prerequisite_repository: 'TreePrerequisitesRepository'
     ):
         super().__init__()
-        self.tree = tree
         self.node_to_detach = node_to_detach
         self.parent_node = parent_node
         self.program_tree_repository = program_tree_repository

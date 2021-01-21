@@ -136,7 +136,6 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         """
         self.assertValidatorNotRaises(
             IsHasPrerequisiteForAllTreesValidator(
-                tree,
                 node_to_detach=mini_training_node,
                 parent_node=tree.get_node_by_code_and_year(code="LDROI100G", year=self.year),
                 program_tree_repository=ProgramTreeRepository(),
@@ -181,7 +180,6 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         """
         self.assertValidatorNotRaises(
             IsHasPrerequisiteForAllTreesValidator(
-                droi1ba,
                 node_to_detach=ldroi1222,
                 parent_node=ldroi900t,
                 program_tree_repository=ProgramTreeRepository(),
@@ -233,7 +231,6 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             In this case, the validator must raise an error.
             """
             IsHasPrerequisiteForAllTreesValidator(
-                droi1ba,
                 node_to_detach=ldroi1222,
                 parent_node=ladrt102r,
                 program_tree_repository=ProgramTreeRepository(),
@@ -278,7 +275,6 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             When we try to detach LDROI2101 inside SPED2M, the validator must raise an error.
             """
             IsHasPrerequisiteForAllTreesValidator(
-                sped2m,
                 node_to_detach=ldrop2011,
                 parent_node=option.get_node_by_code_and_year(code="LDROP100T", year=self.year),
                 program_tree_repository=ProgramTreeRepository(),

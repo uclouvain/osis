@@ -40,9 +40,6 @@ from program_management.ddd.domain.prerequisite import Prerequisites
 from program_management.models.element import Element
 
 TreeRootId = int
-NodeId = int
-LearningUnitYearId = int
-IsPrerequisiteOfNodeId = int
 
 
 class TreePrerequisitesRepository(interface.AbstractRepository):
