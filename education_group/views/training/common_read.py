@@ -199,16 +199,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               ]
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
-            "can_publish":
-                self._has_a_publish_perm() and
+            "view_publish_btn":
                 (self.have_general_information_tab() or self.have_admission_condition_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
         }
-
-    def _has_a_publish_perm(self):
-        return self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer) or \
-               self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object())
 
     def get_permission_object(self) -> 'GroupYear':
         return self.education_group_version.root_group

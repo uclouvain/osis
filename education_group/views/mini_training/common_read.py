@@ -203,15 +203,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
-            "can_publish":
-                self._has_a_publish_perm() and
+            "view_publish_btn":
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url()
         }
-
-    def _has_a_publish_perm(self):
-        return self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()) or \
-               self.request.user.has_perm("base.change_pedagogyinformation", self.get_education_group_version().offer)
 
     def get_permission_object(self):
         return self.get_education_group_version().root_group
