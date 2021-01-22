@@ -68,6 +68,7 @@ from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
+from django.contrib.messages import get_messages
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -99,7 +100,8 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id=None, code=None, year=None):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year,
+                                                    messages=get_messages(request))
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
     data_components = get_same_container_year_components(context['learning_unit_year'])

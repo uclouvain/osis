@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import re
-from typing import Optional
+from typing import Optional, List
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
@@ -43,6 +43,13 @@ from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -84,7 +91,7 @@ def check_acronym(request, subtype):
 
 
 def get_learning_unit_identification_context(learning_unit_year_id, person):
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_message(request))
 
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
@@ -124,7 +131,7 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
 
 
 def get_common_context_learning_unit_year(person, learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None, year: Optional[int] = None):
+                                          code: Optional[str] = None, year: Optional[int] = None, messages: List = []):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -138,11 +145,13 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
         learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
-    return {
+    context = {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
+    update_context_with_messages_update_warnings(context, messages)
+    return context
 
 
 def get_text_label_translated(text_lb, user_language):
@@ -164,3 +173,47 @@ def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
         'can_edit_information': perm_to_edit,
         'can_edit_force_majeur_section': perm_to_edit_force_majeure
     }
+
+
+def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, request):
+    formations_using_ue = _find_root_trainings_using_ue(learning_unit_year.acronym,
+                                                        learning_unit_year.academic_year.year)
+    if len(formations_using_ue) > 1:
+        for m in formations_using_ue:
+            messages.add_message(request, 50, m)
+
+
+def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
+    node_identity = NodeIdentity(code=acronym, year=year)
+    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+
+    parents_root = set()
+    for direct_link in direct_parents:
+        root = None
+        parent_node = direct_link.get('link').parent
+        for indirect_parent in direct_link.get('indirect_parents'):
+            parent_node = indirect_parent.get('node')
+            indirect_parents = indirect_parent.get('indirect_parents')
+            if (indirect_parents is None or len(indirect_parents) == 0) or parent_node.is_minor_or_deepening():
+                root = indirect_parent.get('node')
+                break
+            else:
+                for indirect_parent_of_indirect_parent in indirect_parents:
+                    node = indirect_parent_of_indirect_parent.get('node')
+                    if parent_node.is_finality() and node.is_training():
+                        root = node
+                        break
+        if root is None:
+            root = parent_node
+        parents_root.add(root)
+
+    formations_using_ue = ["{} - {}".format(parent.full_acronym(), parent.full_title())for parent in parents_root]
+    return sorted(formations_using_ue)
+
+
+def update_context_with_messages_update_warnings(context, all_messages):
+    messages_update_warning = [m.message for m in all_messages if m.tags == '']
+    if messages_update_warning:
+        context['messages_update_warning'] = \
+            {'title': _('Pay attention! This learning unit is used in more than one formation'),
+             'messages': messages_update_warning}

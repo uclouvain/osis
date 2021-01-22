@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_warning_messages, add_to_session
 from osis_common.utils.models import get_object_or_none
 from django.contrib.messages import get_messages
+from base.views.learning_units.common import update_context_with_messages_update_warnings
 
 SEARCH_URL_PART = 'learning_units/by_'
 
@@ -135,13 +136,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
-
-        messages_update_warning = [m.message for m in get_messages(self.request) if m.tags == '']
-
-        if messages_update_warning:
-            context['messages_update_warning'] = \
-                {'title': _('Pay attention! This learning unit is used in more than one formation'),
-                 'messages': messages_update_warning}
+        update_context_with_messages_update_warnings(context, get_messages(self.request))
         return context
 
     def get_context_permission(self, proposal):

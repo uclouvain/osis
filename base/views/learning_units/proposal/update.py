@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_warning_messages
-from base.views.learning_units.common import get_learning_unit_identification_context
+from base.views.learning_units.common import get_learning_unit_identification_context, \
+    check_formations_impacted_by_update
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
 
@@ -93,6 +94,7 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
                     'acronym': learning_unit_year.acronym
                 }
             )
+            check_formations_impacted_by_update(learning_unit_year, request)
             return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
         else:
             show_error_message_for_form_invalid(request)
