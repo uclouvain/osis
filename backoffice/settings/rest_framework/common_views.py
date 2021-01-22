@@ -23,10 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 
 
 class LanguageContextSerializerMixin:
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
-        serializer_context['language'] = self.request.LANGUAGE_CODE
+        serializer_context['language'] = self._get_language_code()
         return serializer_context
+
+    def _get_language_code(self):
+        language_code = self.request.LANGUAGE_CODE
+        language_codes_supported = [lang[0] for lang in settings.LANGUAGES]
+        if language_code not in language_codes_supported:
+            return settings.LANGUAGE_CODE_FR
+        return language_code
