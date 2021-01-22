@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
-from django import template
+import factory.fuzzy
 
-register = template.Library()
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 
-@register.filter
-def shift_date(source_date, days_to_add):
-    try:
-        return source_date + datetime.timedelta(days=days_to_add)
-    except TypeError:
-        return None
+class ProgramTreeIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
