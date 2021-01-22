@@ -26,22 +26,23 @@
 from unittest import mock
 
 import attr
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase
 
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
+from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd.interface import BusinessExceptions
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.exception import InvalidBlockException, \
-    ReferenceLinkNotAllowedWithLearningUnitException, ReferenceLinkNotAllowedException
 from program_management.ddd.repositories import node as node_repositoriy
 from program_management.ddd.service.read import check_paste_node_service
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators.validators_by_business_action import CheckPasteNodeValidatorList
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, tree_builder
@@ -55,35 +56,7 @@ from testing.testcases import DDDTestCase
 
 class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "node_id": 1,
-            "end_year": 2025,
-            "children": [
-                {
-                    "node_type": GroupType.COMMON_CORE,
-                    "node_id": 2
-                },
-                {
-                    "node_type": GroupType.MINOR_LIST_CHOICE,
-                    "node_id": 3,
-                    "children": [
-                        {
-                            "node_type": MiniTrainingType.ACCESS_MINOR,
-                            "code": "LMINOR45",
-                            "year": 2020,
-                            "node_id": 5,
-                            "children": [{"node_type": NodeType.LEARNING_UNIT}]
-                        }
-                    ]
-                },
-                {
-                    "node_type": NodeType.LEARNING_UNIT,
-                    "node_id": 4
-                }
-            ]
-        }
-        self.tree = tree_builder(tree_data)
+        self.tree = ProgramTreeBachelorFactory(2020, 2025)
         self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
 
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
@@ -120,7 +93,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_where_to_paste_path_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|4",
+            path_where_to_paste="1|21|31|41",
         )
         self.assertRaisesBusinessException(
             exception.CannotPasteToLearningUnitException,
@@ -160,7 +133,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|2",
+            path_where_to_paste="1|21",
         )
 
         self.assertRaisesBusinessException(
@@ -169,29 +142,29 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
             invalid_command
         )
 
-    def test_cannot_paste_to_parent_if_attached_to_reference_link_and_dont_allow_learning_unit(self):
+    def test_cannot_paste_if_do_not_allow_referenced_children(self):
         tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "node_id": 10,
+            "node_type": GroupType.SUB_GROUP,
+            "year": 2020,
             "end_year": 2025,
+            "node_id": 100,
             "children": [
                 {
-                    "node_type": MiniTrainingType.ACCESS_MINOR,
-                    "code": "LMINOR45",
+                    "node_type": NodeType.LEARNING_UNIT,
                     "year": 2020,
-                    "node_id": 5,
-                    "link_data": {"link_type": LinkTypes.REFERENCE},
-                    "children": [{"node_type": NodeType.LEARNING_UNIT}]
+                    "end_date": 2025,
+                    "node_id": 101,
                 }
             ]
         }
-        tree_with_parent_as_reference_link = tree_builder(tree_data)
-        self.fake_program_tree_repository.root_entities.append(tree_with_parent_as_reference_link)
+        tree_to_paste = tree_builder(tree_data)
+        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
 
         invalid_command = PasteElementCommandFactory(
-            node_to_paste_code=self.node_to_paste.code,
-            node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|3|5",
+            node_to_paste_code=tree_to_paste.root_node.code,
+            node_to_paste_year=tree_to_paste.root_node.year,
+            path_where_to_paste="1|21",
+            link_type=LinkTypes.REFERENCE.name
         )
 
         self.assertRaisesBusinessException(
@@ -203,39 +176,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
 
 class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "node_id": 1,
-            "year": 2020,
-            "end_year": 2025,
-            "children": [
-                {
-                    "node_type": GroupType.COMMON_CORE,
-                    "year": 2020,
-                    "node_id": 2
-                },
-                {
-                    "node_type": GroupType.MINOR_LIST_CHOICE,
-                    "code": "LMINOR45",
-                    "year": 2020,
-                    "node_id": 3,
-                    "children": [
-                        {
-                            "node_type": MiniTrainingType.ACCESS_MINOR,
-                            "year": 2020,
-                            "node_id": 5,
-                        },
-                        {"node_type": MiniTrainingType.OPTION}
-                    ]
-                },
-                {
-                    "node_type": NodeType.LEARNING_UNIT,
-                    "year": 2020,
-                    "node_id": 4
-                }
-            ]
-        }
-        self.tree = tree_builder(tree_data)
+        self.tree = ProgramTreeBachelorFactory(2020, 2025)
 
         tree_to_paste_data = {
             "node_type": MiniTrainingType.OPTION,
@@ -283,7 +224,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         return mocked_method
 
     def test_can_not_attach_the_same_node_to_same_parent(self):
-        node_attached_to_root = self.tree.get_node("1|2")
+        node_attached_to_root = self.tree.get_node("1|22")
         tree_to_attach = ProgramTreeFactory(root_node=node_attached_to_root)
         self.fake_node_repository.root_entities.append(node_attached_to_root)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
@@ -297,7 +238,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_where_to_paste_path_command = PasteElementCommandFactory(
             node_to_paste_code=node_attached_to_root.code,
             node_to_paste_year=node_attached_to_root.year,
-            path_where_to_paste="1|2",
+            path_where_to_paste="1|22",
         )
 
         self.assertRaisesBusinessException(
@@ -310,7 +251,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_block_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|3",
+            path_where_to_paste="1|22",
             block="1298"
         )
 
@@ -324,43 +265,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|2",
-        )
-
-        self.assertRaisesBusinessException(
-            exception.ChildTypeNotAuthorizedException,
-            paste_element_service.paste_element,
-            invalid_command
-        )
-
-    def test_cannot_paste_to_parent_if_attached_to_reference_link_and_dont_group_type(self):
-        tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "node_id": 10,
-            "year": 2020,
-            "end_year": 2025,
-            "children": [
-                {
-                    "node_type": GroupType.MINOR_LIST_CHOICE,
-                    "code": "LMINOR45",
-                    "year": 2020,
-                    "link_data": {"link_type": LinkTypes.REFERENCE}
-                }
-            ]
-        }
-        tree_with_parent_as_reference_link = tree_builder(tree_data)
-        self.fake_program_tree_repository.root_entities.append(tree_with_parent_as_reference_link)
-        self.fake_tree_version_repository.root_entities.append(
-            StandardProgramTreeVersionFactory(
-                tree=tree_with_parent_as_reference_link,
-                program_tree_repository=self.fake_program_tree_repository,
-            )
-        )
-
-        invalid_command = PasteElementCommandFactory(
-            node_to_paste_code=self.node_to_paste.code,
-            node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|3",
+            path_where_to_paste="1|22",
         )
 
         self.assertRaisesBusinessException(
@@ -384,7 +289,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste="1|3",
+            path_where_to_paste="1|22",
         )
 
         self.assertRaisesBusinessException(
@@ -479,6 +384,65 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             node_to_paste_code=node_to_paste.code,
             node_to_paste_year=node_to_paste.year,
             path_where_to_paste="1",
+        )
+
+        self.assertRaisesBusinessException(
+            exception.MaximumChildTypesReachedException,
+            paste_element_service.paste_element,
+            invalid_command
+        )
+
+    def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_surpassed(self):
+        tree_to_paste_data = {
+            "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+            "year": 2020,
+            "children": [
+                {
+                    "node_type": TrainingType.MASTER_MD_120,
+                    "year": 2020,
+                    "end_year": 2025
+                },
+            ]
+        }
+
+        tree = ProgramTree2MFactory(2020, 2025)
+        tree_to_paste = tree_builder(tree_to_paste_data)
+
+        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_program_tree_repository.root_entities.append(tree)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+        tree.authorized_relationships.update(
+            parent_type=GroupType.FINALITY_120_LIST_CHOICE,
+            child_type=TrainingType.MASTER_MD_120,
+            min_count_authorized=1,
+            max_count_authorized=1
+        )
+        tree.authorized_relationships.authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                parent_type=GroupType.FINALITY_120_LIST_CHOICE,
+                child_type=GroupType.FINALITY_120_LIST_CHOICE,
+                min_count_authorized=0,
+                max_count_authorized=None
+            )
+        )
+
+        self.mocked_get_from_element_id.return_value = tree.entity_id
+
+        invalid_command = PasteElementCommandFactory(
+            node_to_paste_code=tree_to_paste.root_node.code,
+            node_to_paste_year=tree_to_paste.root_node.year,
+            path_where_to_paste="1|22",
         )
 
         self.assertRaisesBusinessException(

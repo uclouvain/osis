@@ -55,6 +55,7 @@ from program_management.tests.ddd.factories.authorized_relationship import Autho
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -957,10 +958,7 @@ class TestIsEmpty(SimpleTestCase):
 class TestGetIndirectParents(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.program_tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        self.program_tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
 
     def test_when_child_node_not_in_tree(self):
         child_node = NodeLearningUnitYearFactory()
@@ -982,10 +980,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_has_one_indirect_parent_which_has_one_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)
         result = tree.search_indirect_parents(child_node)
@@ -999,13 +994,10 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_used_twice_in_tree_with_2_different_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)  # Indirect parent is finality
-        common_core = next(n for n in tree.get_all_nodes() if n.is_common_core())
+        common_core = tree.get_node("1|21")
         common_core.add_child(child_node)  # Indirect parent is master 2M
 
         result = tree.search_indirect_parents(child_node)
