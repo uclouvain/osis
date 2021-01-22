@@ -24,13 +24,12 @@
 #
 ##############################################################################
 import copy
-from collections import Counter
-from typing import List, Set
-
 import typing
+from collections import Counter
+from typing import List
 
 from base.ddd.utils import business_validator
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
     MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException
@@ -132,7 +131,7 @@ class MaximumChildrenTypeAuthorizedValidator(business_validator.BusinessValidato
             children_type for children_type, number_children in children_types_counter.items()
             if self._is_maximum_children_surpassed(children_type, number_children)
         ]
-    
+
     def _is_maximum_children_surpassed(self, children_type, number_children) -> bool:
         authorized_relationship = self.tree.authorized_relationships.get_authorized_relationship(
             self.parent_node.node_type,
