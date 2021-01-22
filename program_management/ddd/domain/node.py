@@ -96,24 +96,24 @@ class NodeFactory:
 
         return node_cls(**node_attrs)
 
-    def duplicate(
+    def create_and_fill_from_node(
             self,
-            duplicate_from: 'Node',
+            create_from: 'Node',
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
         new_code = GenerateNodeCode().generate_from_parent_node(
-            parent_node=duplicate_from,
-            child_node_type=duplicate_from.node_type,
+            parent_node=create_from,
+            child_node_type=create_from.node_type,
         )
-        start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
+        start_year = create_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
-            duplicate_from,
-            entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
+            create_from,
+            entity_id=NodeIdentity(code=new_code, year=create_from.entity_id.year),
             code=new_code,
-            end_year=duplicate_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            end_year=create_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
             # TODO: Replace end_date by end_year
-            end_date=duplicate_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            end_date=create_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
             start_year=start_year,
             children=[],
             node_id=None,

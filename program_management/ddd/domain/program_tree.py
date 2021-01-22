@@ -95,7 +95,7 @@ class ProgramTreeBuilder:
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
         copy_from_node = program_tree.root_node
-        new_parent = node_factory.duplicate(
+        new_parent = node_factory.create_and_fill_from_node(
             copy_from_node,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
@@ -103,7 +103,7 @@ class ProgramTreeBuilder:
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
         for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
             child_node = copy_from_link.child
-            new_child = node_factory.duplicate(
+            new_child = node_factory.create_and_fill_from_node(
                 child_node,
                 override_end_year_to=override_end_year_to,
                 override_start_year_to=override_start_year_to
