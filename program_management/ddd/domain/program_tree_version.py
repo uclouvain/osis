@@ -119,6 +119,7 @@ class ProgramTreeVersionBuilder:
         if validator.is_valid():
             assert isinstance(from_standard_version, ProgramTreeVersion)
             assert from_standard_version.is_standard, "Forbidden to copy from a non Standard version"
+            ## TODO: From_standard_version is never is_transition
             if from_standard_version.is_transition:
                 self._tree_version = self._build_from_transition(from_standard_version, command)
             else:

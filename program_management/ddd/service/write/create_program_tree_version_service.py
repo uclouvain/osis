@@ -24,36 +24,34 @@
 #
 ##############################################################################
 from program_management.ddd.command import CreateProgramTreeVersionCommand, DuplicateProgramTree
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
-    STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import duplicate_program_tree_service
 
 
-def create_program_tree_version(
-        command: 'CreateProgramTreeVersionCommand',
-) -> ProgramTreeVersionIdentity:
+def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
 
     # GIVEN
-    identity_standard = ProgramTreeVersionIdentity(
+    tree_version_identity_from = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
         year=command.start_year,
-        version_name=STANDARD,
+        version_name=command.version_name,
         is_transition=False
     )
-    program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
+    program_tree_version_from = ProgramTreeVersionRepository().get(entity_id=tree_version_identity_from)
 
     # WHEN
-    new_program_tree_identity = duplicate_program_tree_service.duplicate_program_tree(
+    new_program_tree_identity = duplicate_program_tree_service.create_and_fill_from_existing_tree(
         DuplicateProgramTree(
-            from_root_code=program_tree_version_standard.program_tree_identity.code,
-            from_root_year=program_tree_version_standard.program_tree_identity.year,
+            from_root_code=program_tree_version_from.program_tree_identity.code,
+            from_root_year=program_tree_version_from.program_tree_identity.year,
+            duplicate_to_transition=command.is_transition,
             override_end_year_to=command.end_year,
-            override_start_year_to=command.start_year
+            override_start_year_to=command.start_year,
         )
     )
     new_program_tree_version = ProgramTreeVersionBuilder().create_from_standard_version(
-        program_tree_version_standard,
+        program_tree_version_from,
         new_program_tree_identity,
         command,
     )

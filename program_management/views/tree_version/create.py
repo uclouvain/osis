@@ -50,8 +50,8 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_last_existing_version_service
-from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
-    prolong_existing_tree_version_service
+from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service, \
+    prolong_existing_tree_version_service, create_and_postpone_tree_transition_version_service
 from program_management.forms.version import SpecificVersionForm, TransitionVersionForm
 
 
@@ -110,7 +110,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             if not last_existing_version:
                 command = _convert_form_to_create_specific_version_command(form)
                 try:
-                    identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+                    identities = create_and_postpone_tree_specific_version_service.create_and_postpone(command=command)
                 except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
@@ -215,7 +215,9 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             if not last_existing_version:
                 command = _convert_form_to_create_transition_version_command(form)
                 try:
-                    identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+                    identities = create_and_postpone_tree_transition_version_service.create_and_postpone(
+                        command=command
+                    )
                 except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)

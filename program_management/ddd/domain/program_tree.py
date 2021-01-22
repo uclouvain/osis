@@ -67,6 +67,7 @@ class ProgramTreeBuilder:
     def duplicate(
             self,
             duplicate_from: 'ProgramTree',
+            duplicate_to_transition: bool,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = None
     ) -> 'ProgramTree':
@@ -77,8 +78,9 @@ class ProgramTreeBuilder:
         :param override_start_year_to: This param override the 'start year' of all nodes and links in the Tree.
         :return:
         """
-        copied_root = self._duplicate_root_and_direct_children(
+        copied_root = self._create_and_fill_root_and_direct_children(
             duplicate_from,
+            duplicate_to_transition,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
@@ -89,9 +91,10 @@ class ProgramTreeBuilder:
         )
         return copied_tree
 
-    def _duplicate_root_and_direct_children(
+    def _create_and_fill_root_and_direct_children(
             self,
             program_tree: 'ProgramTree',
+            duplicate_to_transition: bool,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
@@ -99,6 +102,7 @@ class ProgramTreeBuilder:
         new_code = GenerateNodeCode().generate_from_parent_node(
             parent_node=root_node,
             child_node_type=root_node.node_type,
+            duplicate_to_transition=duplicate_to_transition
         )
         new_parent = node_factory.create_and_fill_from_node(
             create_from=root_node,
@@ -112,6 +116,7 @@ class ProgramTreeBuilder:
             new_code = GenerateNodeCode().generate_from_parent_node(
                 parent_node=child_node,
                 child_node_type=child_node.node_type,
+                duplicate_to_transition=duplicate_to_transition
             )
             new_child = node_factory.create_and_fill_from_node(
                 create_from=child_node,

@@ -550,6 +550,7 @@ DO_NOT_OVERRIDE = -1
 class DuplicateProgramTree(interface.CommandRequest):
     from_root_code = attr.ib(type=str)
     from_root_year = attr.ib(type=int)
+    duplicate_to_transition = attr.ib(type=bool)
     override_end_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
 
