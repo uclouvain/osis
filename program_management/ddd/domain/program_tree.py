@@ -45,6 +45,7 @@ from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -94,17 +95,27 @@ class ProgramTreeBuilder:
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
-        copy_from_node = program_tree.root_node
+        root_node = program_tree.root_node
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=root_node,
+            child_node_type=root_node.node_type,
+        )
         new_parent = node_factory.create_and_fill_from_node(
-            copy_from_node,
+            create_from=root_node,
+            new_code=new_code,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
-        for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
+        for copy_from_link in [n for n in root_node.children if n.child.node_type in mandatory_children_types]:
             child_node = copy_from_link.child
+            new_code = GenerateNodeCode().generate_from_parent_node(
+                parent_node=child_node,
+                child_node_type=child_node.node_type,
+            )
             new_child = node_factory.create_and_fill_from_node(
-                child_node,
+                create_from=child_node,
+                new_code=new_code,
                 override_end_year_to=override_end_year_to,
                 override_start_year_to=override_start_year_to
             )

@@ -99,13 +99,10 @@ class NodeFactory:
     def create_and_fill_from_node(
             self,
             create_from: 'Node',
+            new_code: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
-        new_code = GenerateNodeCode().generate_from_parent_node(
-            parent_node=create_from,
-            child_node_type=create_from.node_type,
-        )
         start_year = create_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
             create_from,
