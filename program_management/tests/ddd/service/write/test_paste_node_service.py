@@ -26,7 +26,7 @@
 from unittest import mock
 
 import attr
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase
 
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
@@ -35,14 +35,14 @@ from base.models.enums.education_group_types import TrainingType, GroupType, Min
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd.interface import BusinessExceptions
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.exception import InvalidBlockException, \
-    ReferenceLinkNotAllowedWithLearningUnitException, ReferenceLinkNotAllowedException
 from program_management.ddd.repositories import node as node_repositoriy
 from program_management.ddd.service.read import check_paste_node_service
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators.validators_by_business_action import CheckPasteNodeValidatorList
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, tree_builder
@@ -56,7 +56,7 @@ from testing.testcases import DDDTestCase
 
 class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        self.tree = ProgramTreeFactory.produce_bachelor_tree(2020, 2025)
+        self.tree = ProgramTreeBachelorFactory(2020, 2025)
         self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
 
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
@@ -176,7 +176,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
 
 class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        self.tree = ProgramTreeFactory.produce_bachelor_tree(2020, 2025)
+        self.tree = ProgramTreeBachelorFactory(2020, 2025)
 
         tree_to_paste_data = {
             "node_type": MiniTrainingType.OPTION,
@@ -405,7 +405,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             ]
         }
 
-        tree = ProgramTreeFactory.produce_standard_2m_tree(2020, 2025)
+        tree = ProgramTree2MFactory(2020, 2025)
         tree_to_paste = tree_builder(tree_to_paste_data)
 
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
