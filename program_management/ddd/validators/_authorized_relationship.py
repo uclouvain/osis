@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import copy
-import typing
 from collections import Counter
 from typing import List
 
@@ -219,6 +218,6 @@ class MaximumFinalitiesAuthorizedValidator(business_validator.BusinessValidator)
         maximum_children_authorized = authorized_relationship.max_count_authorized if authorized_relationship else 0
         return number_children > maximum_children_authorized
 
-    def _get_finalities_counter(self) -> typing.Counter:
+    def _get_finalities_counter(self):
         tree_finalities = self.tree.get_all_finalities()
         return Counter([finality.node_type for finality in tree_finalities])
