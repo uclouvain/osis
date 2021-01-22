@@ -178,10 +178,6 @@ class TransitionVersionForm(forms.Form):
             for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)
-        if not ProgramTreeVersionRepository.get(standard_version_identity).end_year_of_existence:
-            choices_years += BLANK_CHOICE
-
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
             self.fields["end_year"].initial = choices_years[0]
