@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -51,15 +51,18 @@ class TestLearningUnitCommonView(TestCase):
         )
 
     def test_ue_used_in_one_training(self):
-        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year, TrainingType.BACHELOR, Categories.TRAINING)
+        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year,
+                            TrainingType.BACHELOR, Categories.TRAINING)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
                                             self.academic_year.year)
         expected = ['DROI2M - Bachelier droit']
         self.assertListEqual(res, expected)
 
     def test_ue_used_in_two_trainings(self):
-        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year, TrainingType.BACHELOR,Categories.TRAINING)
-        build_training_tree('ARK1BA', 'Bachelier archi', self.academic_year, self.element_learning_unit_year, TrainingType.BACHELOR, Categories.TRAINING)
+        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year,
+                            TrainingType.BACHELOR, Categories.TRAINING)
+        build_training_tree('ARK1BA', 'Bachelier archi', self.academic_year, self.element_learning_unit_year,
+                            TrainingType.BACHELOR, Categories.TRAINING)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
                                             self.academic_year.year)
         expected = ['ARK1BA - Bachelier archi',
@@ -68,8 +71,10 @@ class TestLearningUnitCommonView(TestCase):
 
     def test_ue_used_in_a_finality(self):
         training_root = build_training_tree('EDPH2M', 'Bachelier droit', self.academic_year, None,
-                            TrainingType.BACHELOR, Categories.TRAINING)
-        finality_root = build_training_tree('EDPH2MD', 'Bachelier droit', self.academic_year, self.element_learning_unit_year, TrainingType.MASTER_MA_120, Categories.TRAINING)
+                                            TrainingType.BACHELOR, Categories.TRAINING)
+        finality_root = build_training_tree('EDPH2MD', 'Bachelier droit', self.academic_year,
+                                            self.element_learning_unit_year,
+                                            TrainingType.MASTER_MA_120, Categories.TRAINING)
         GroupElementYearChildLeafFactory(parent_element=training_root,
                                          child_element=finality_root)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
@@ -82,7 +87,7 @@ class TestLearningUnitCommonView(TestCase):
                                             None,
                                             TrainingType.BACHELOR, Categories.TRAINING)
         minor_root = build_training_tree('MINEDPH', 'Mineure en droit', self.academic_year,
-                                            self.element_learning_unit_year, MiniTrainingType.SOCIETY_MINOR,
+                                         self.element_learning_unit_year, MiniTrainingType.SOCIETY_MINOR,
                                          Categories.MINI_TRAINING)
         GroupElementYearChildLeafFactory(parent_element=training_root,
                                          child_element=minor_root)
@@ -92,18 +97,18 @@ class TestLearningUnitCommonView(TestCase):
         self.assertListEqual(res, expected)
 
 
-def build_training_tree(acronym, title, academic_year, element_learning_unit_year, type, category):
+def build_training_tree(acronym, title, academic_year, element_learning_unit_year, education_group_type, category):
     # """
-    #    |DROI2M
-    #    |----COMMON
-    #         |----LECRI1508
+    #    |root_group
+    #    |----common_group
+    #         |----(element_learning_unit_year)
     # """
     offer = TrainingFactory(academic_year=academic_year,
                             title=title)
     root_group = GroupYearFactory(
         academic_year=academic_year,
         education_group_type__category=category.name,
-        education_group_type__name=type.name,
+        education_group_type__name=education_group_type.name,
         acronym=acronym
     )
     root_element = ElementGroupYearFactory(group_year=root_group)
@@ -120,7 +125,7 @@ def build_training_tree(acronym, title, academic_year, element_learning_unit_yea
     if element_learning_unit_year:
         GroupElementYearChildLeafFactory(parent_element=common_group_element,
                                          child_element=element_learning_unit_year)
-    education_group_version = EducationGroupVersionFactory(
+    EducationGroupVersionFactory(
         offer=offer,
         root_group=root_group,
         version_name=STANDARD,
