@@ -32,6 +32,7 @@ from program_management.ddd.domain import exception
 from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.program_tree import tree_builder, ProgramTreeFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
 from testing.mocks import MockPatcherMixin
@@ -39,7 +40,7 @@ from testing.mocks import MockPatcherMixin
 
 class TestUpdateLink(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        self.tree = ProgramTreeFactory.produce_bachelor_tree(2016, 2018)
+        self.tree = ProgramTreeBachelorFactory(2016, 2018)
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
         self.mock_repo(
             "program_management.ddd.service.write.update_link_service.ProgramTreeRepository",
