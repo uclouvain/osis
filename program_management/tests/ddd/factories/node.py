@@ -27,6 +27,7 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from program_management.ddd.domain._campus import Campus
@@ -83,6 +84,7 @@ class NodeGroupYearFactory(NodeFactory):
     end_year = factory.SelfAttribute('.end_date')
     children = factory.LazyFunction(list)
     teaching_campus = factory.SubFactory(CampusFactory)
+    constraint_type = factory.fuzzy.FuzzyChoice(ConstraintTypes)
     version_name = STANDARD
 
     class Params:
@@ -104,7 +106,6 @@ class NodeLearningUnitYearFactory(NodeFactory):
         abstract = False
 
     node_type = NodeType.LEARNING_UNIT
-    is_prerequisite_of = factory.LazyFunction(list)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)

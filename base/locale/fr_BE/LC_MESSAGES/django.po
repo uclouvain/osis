@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-08 10:10+0100\n"
+"POT-Creation-Date: 2021-01-19 07:54+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -588,9 +588,6 @@ msgstr "Consolider la proposition"
 msgid "Contacts"
 msgstr "Contacts"
 
-msgid "Continuing education academic year linkable to admission"
-msgstr "Formation continue année académique liable aux admissions"
-
 msgid "Coordinator"
 msgstr "Coordinateur"
 
@@ -791,7 +788,16 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
-msgstr "Édition des programmes"
+msgstr "Préparation des formations"
+
+msgid "Education group extended daily management"
+msgstr "Gestion journalière étendue - catalogue"
+
+msgid "Education group limited daily management"
+msgstr "Gestion journalière limitée - catalogue"
+
+msgid "Education group switch"
+msgstr "Basculement des formations"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
@@ -841,8 +847,14 @@ msgstr "Fin inscription aux examens"
 msgid "English"
 msgstr "Anglais"
 
+msgid "English title common part"
+msgstr "Intitulé en EN partie commune"
+
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
+
+msgid "English title specific complement"
+msgstr "Intitulé en EN compl. spéc. à l'UE"
 
 msgid "Enrolled"
 msgstr "Inscrit"
@@ -1773,6 +1785,9 @@ msgstr "Activités dans d'autres langues"
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
 
+msgid "Other remark in english (intended for publication)"
+msgstr "Autre remarque en anglais (destinée à la publication)"
+
 msgid "Other special needs"
 msgstr "Autre HTM"
 
@@ -2131,9 +2146,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Release"
-msgstr "Release"
-
 msgid "Remarks"
 msgstr "Remarques"
 
@@ -2297,6 +2309,9 @@ msgstr "Date de début"
 msgid "Start date and end date are mandatory"
 msgstr "Les dates de début et de fin sont obligatoires"
 
+msgid "Start date is mandatory"
+msgstr "La date de début est obligatoire"
+
 msgid "Start date must be lower than end date"
 msgstr "La date de début doit être inférieure à la date de fin"
 
@@ -2346,22 +2361,10 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Soumission des fiches descriptives"
-
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-"La modification des fiches descriptives (Cas de force majeure) n'est pas "
-"autorisée pour les enseignants durant cette période."
+msgstr "Edition fiches descriptives"
 
 msgid "Summary course submission force majeure"
-msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
-
-msgid "Summary course submission is not allowed for tutors during this period."
-msgstr ""
-"La modification des fiches descriptives n'est pas autorisée pour les "
-"enseignants durant cette période."
+msgstr "Edition fiches descriptives (cas de force majeure)"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2395,9 +2398,6 @@ msgstr "Plate-forme technologique"
 
 msgid "Termination"
 msgstr "Clôturé"
-
-msgid "Testing"
-msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
@@ -2735,11 +2735,17 @@ msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "Title common part"
+msgstr "Intitulé partie commune"
+
 msgid "Title in English"
 msgstr "Intitulé en anglais"
 
 msgid "Title in French"
 msgstr "Intitulé en français"
+
+msgid "Title specific complement"
+msgstr "Intitulé compl. spéc. à l'UE"
 
 msgid "To complete"
 msgstr "A compléter"
@@ -3040,9 +3046,6 @@ msgstr ""
 msgid "activities in English"
 msgstr "activités en anglais"
 
-msgid "ad hoc events"
-msgstr "événements ad hoc"
-
 msgid "additional informations"
 msgstr "informations supplémentaires"
 
@@ -3212,9 +3215,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
-
-msgid "project events"
-msgstr "événements projet"
 
 msgid "regex error message"
 msgstr "message d'erreur regex"

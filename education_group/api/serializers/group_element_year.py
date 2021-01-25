@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.api.serializers.utils import get_title_from_lang
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
@@ -83,6 +84,14 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
         many=True,
     )
 
+    def to_representation(self, obj: 'Link'):
+        data = super().to_representation(obj)
+        parent = obj.parent
+        if parent and parent.node_type in GroupType.minor_major_list_choice_enums() \
+                and obj.child.node_type in MiniTrainingType.minors_and_deepening() + [MiniTrainingType.FSA_SPECIALITY]:
+            data.pop('children')
+        return data
+
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     is_mandatory = serializers.BooleanField(read_only=True)
@@ -115,7 +124,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
     partial_title_en = serializers.CharField(source='child.offer_partial_title_en', read_only=True)
     min_constraint = serializers.IntegerField(source='child.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
-    constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
+    constraint_type = serializers.CharField(source='child.constraint_type.name', read_only=True)
     version_name = serializers.SerializerMethodField()
 
     @staticmethod
@@ -158,28 +167,37 @@ class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupC
     pass
 
 
+class VolumeField(serializers.DecimalField):
+    def to_representation(self, value):
+        return '%g' % value
+
+
 class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     node_type = serializers.ReadOnlyField(default=NodeType.LEARNING_UNIT.name)
     subtype = serializers.CharField(source='child.learning_unit_type.name', read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
-    lecturing_volume = serializers.DecimalField(
+    remark_en = serializers.CharField(source='child.other_remark_english', read_only=True)
+    lecturing_volume = VolumeField(
         source='child.volume_total_lecturing',
         max_digits=6,
         decimal_places=2,
-        default=None
+        default=None,
     )
-    practical_exercise_volume = serializers.DecimalField(
+    practical_exercise_volume = VolumeField(
         source='child.volume_total_practical',
         max_digits=6,
         decimal_places=2,
         default=None
     )
-    with_prerequisite = serializers.BooleanField(source='child.has_prerequisite', read_only=True)
+    with_prerequisite = serializers.SerializerMethodField(read_only=True)
     periodicity = serializers.CharField(source='child.periodicity.name', allow_null=True, read_only=True)
     quadrimester = serializers.CharField(source='child.quadrimester.name', allow_null=True, read_only=True)
     status = serializers.BooleanField(source='child.status', read_only=True)
-    proposal_type = serializers.CharField(source='child.proposal_type.name', allow_null=True, read_only=True)
+    proposal_type = serializers.CharField(source='child.proposal_type', allow_null=True, read_only=True)
+
+    def get_with_prerequisite(self, obj: 'Link') -> bool:
+        return self.context['program_tree'].has_prerequisites(obj.child)
 
     def get_title(self, obj: 'Link'):
         return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
