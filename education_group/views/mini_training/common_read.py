@@ -200,7 +200,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
             "view_publish_btn":
-                not(self.request.user.has_perm('base.view_publish_btn')) and
+                self.request.user.has_perm('base.view_publish_btn') and
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url()
         }

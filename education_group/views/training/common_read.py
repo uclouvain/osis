@@ -153,6 +153,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_context_data(self, **kwargs):
         user_person = self.request.user.person
+        print('----')
+        print(self.request.user.has_perm('base.view_publish_btn'))
         return {
             **super().get_context_data(**kwargs),
             "person": user_person,
@@ -202,7 +204,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
             "view_publish_btn":
-                not(self.request.user.has_perm('base.view_publish_btn')) and
+                self.request.user.has_perm('base.view_publish_btn') and
                 (self.have_general_information_tab() or self.have_admission_condition_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),

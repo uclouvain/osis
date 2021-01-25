@@ -120,13 +120,8 @@ class ProgramManager(EducationGroupRoleModel):
             'program_management.change_minitraining_version': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a specific version")
             ),
-            'base.view_publish_btn': not cls.is_program_manager_only()
+            'base.view_publish_btn': rules.always_deny,
         })
-
-    @classmethod
-    def is_program_manager_only(cls):
-        a_user = cls.person.user
-        return is_program_manager(a_user) and not a_user.is_faculty_manager and not a_user.is_central_manager
 
 
 def find_by_person(a_person):
