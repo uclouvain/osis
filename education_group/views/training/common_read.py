@@ -152,9 +152,12 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return root_node
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
+        print('----')
+        print(self.request.user.has_perm('base.view_publish_btn'))
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
             "group": self.group,
@@ -201,10 +204,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
             "view_publish_btn":
-                not program_manager.is_program_manager(self.request.user) and
+                self.request.user.has_perm('base.view_publish_btn') and
                 (self.have_general_information_tab() or self.have_admission_condition_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
+
         }
 
     def get_permission_object(self) -> 'GroupYear':

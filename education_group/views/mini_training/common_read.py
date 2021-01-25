@@ -152,9 +152,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return int(self.get_path().split("|")[0])
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "group": self.get_group(),
             "mini_training": self.get_mini_training(),
@@ -199,7 +200,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
             "view_publish_btn":
-                not program_manager.is_program_manager(self.request.user) and
+                self.request.user.has_perm('base.view_publish_btn') and
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url()
         }
