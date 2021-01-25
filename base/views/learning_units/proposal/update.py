@@ -137,7 +137,7 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         else:
             show_error_message_for_form_invalid(request)
 
-    context = get_learning_unit_identification_context(learning_unit_year.id, person)
+    context = get_learning_unit_identification_context(learning_unit_year.id, person, request)
     context.update({
         'person': person,
         'form_end_date': form_end_date,

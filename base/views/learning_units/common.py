@@ -91,7 +91,7 @@ def check_acronym(request, subtype):
                          'first_using': first_using, 'last_using': last_using}, safe=False)
 
 
-def get_learning_unit_identification_context(learning_unit_year_id, person):
+def get_learning_unit_identification_context(learning_unit_year_id, person, request):
     context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_messages(request))
 
     learning_unit_year = context['learning_unit_year']
