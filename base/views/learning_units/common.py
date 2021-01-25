@@ -44,6 +44,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.domain.node import NodeIdentity
@@ -91,7 +92,7 @@ def check_acronym(request, subtype):
 
 
 def get_learning_unit_identification_context(learning_unit_year_id, person):
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_message(request))
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_messages(request))
 
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
