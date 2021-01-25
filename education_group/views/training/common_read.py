@@ -153,8 +153,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_context_data(self, **kwargs):
         user_person = self.request.user.person
-        print('----')
-        print(self.request.user.has_perm('base.view_publish_btn'))
         return {
             **super().get_context_data(**kwargs),
             "person": user_person,
