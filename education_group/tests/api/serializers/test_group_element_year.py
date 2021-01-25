@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
@@ -30,6 +31,7 @@ from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.proposal_type import ProposalType
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
@@ -37,9 +39,11 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.domain.link import Link
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
@@ -49,6 +53,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         |--Common Core
            |-- Learning unit year
            |-- Access minor
+           |-- Learning unit year WITH PROPOSAL
         """
         self.year = 2018
         self.training = NodeGroupYearFactory(
@@ -83,6 +88,19 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.mini_gey = LinkFactory(
             parent=self.common_core, child=self.mini_training
         )
+
+        self.learning_unit_year_with_proposal = NodeLearningUnitYearFactory(
+            year=self.year,
+            credits=10,
+            status=False,
+            specific_title_en=None,
+            common_title_en='COMMON',
+            proposal_type=ProposalType.MODIFICATION.name
+        )
+        self.luy_gey = LinkFactory(
+            parent=self.common_core, child=self.learning_unit_year_with_proposal
+        )
+
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': self.training.title,
             'year': self.year
@@ -91,7 +109,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=self.training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=self.training)
             }
         )
 
@@ -159,6 +178,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'subtype',
             'code',
             'remark',
+            'remark_en',
             'lecturing_volume',
             'practical_exercise_volume',
             'with_prerequisite',
@@ -204,7 +224,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -232,11 +253,44 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
         self.assertEqual(serializer.data['children'][0]['code'], minor.code)
+
+    def test_ensure_get_mini_training_without_children_if_within_minor_major_list_from_bachelor(self):
+        training = NodeGroupYearFactory(
+            year=self.year,
+            node_type=TrainingType.BACHELOR
+        )
+        training_list = NodeGroupYearFactory(
+            year=self.year,
+            node_type=random.choice(GroupType.minor_major_list_choice_enums()),
+        )
+        minor = NodeGroupYearFactory(
+            year=self.year,
+            node_type=MiniTrainingType.ACCESS_MINOR,
+        )
+        luy = NodeLearningUnitYearFactory(year=self.year)
+        LinkFactory(parent=training, child=training_list)
+        LinkFactory(parent=training_list, child=minor)
+        LinkFactory(parent=minor, child=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.title,
+            'year': self.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
+            }
+        )
+        minor = serializer.data['children'][0]['children'][0]
+        self.assertNotIn('children', minor)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
@@ -251,25 +305,37 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
 
     def test_get_with_prerequisites(self):
         self.assertFalse(self.serializer.data['children'][0]['children'][0]['with_prerequisite'])
+        tree = ProgramTreeFactory(root_node__node_type=GroupType.COMMON_CORE, root_node__year=self.year)
 
-        luy = NodeLearningUnitYearFactory(
+        luy_has_prerequisites = NodeLearningUnitYearFactory(
             year=self.year,
         )
-        luy.set_prerequisite(PrerequisiteFactory())
-        gey = LinkFactory(
-            parent__node_type=GroupType.COMMON_CORE,
-            child=luy,
-            relative_credits=None
+        LinkFactory(
+            parent=tree.root_node,
+            child=luy_has_prerequisites,
+        )
+        luy_is_prerequisite = NodeLearningUnitYearFactory(
+            year=self.year,
+        )
+        LinkFactory(
+            parent=tree.root_node,
+            child=luy_is_prerequisite,
+        )
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=tree,
+            node_having_prerequisite=luy_has_prerequisites.entity_id,
+            nodes_that_are_prequisites=[luy_is_prerequisite]
         )
         url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
-            'partial_acronym': gey.parent.code,
+            'partial_acronym': tree.root_node.code,
             'year': self.year
         })
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=gey.parent),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': tree,
             }
         )
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
@@ -289,7 +355,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=gey.parent),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=gey.parent),
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
@@ -367,10 +434,15 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=gey.parent),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=gey.parent),
             }
         )
         return serializer
+
+    def test_learning_unit_children_is_proposal(self):
+        self.assertEqual(self.serializer.data['children'][0]['children'][2]['proposal_type'],
+                         ProposalType.MODIFICATION.name)
 
 
 class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCase):
@@ -403,6 +475,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }
@@ -493,6 +566,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }

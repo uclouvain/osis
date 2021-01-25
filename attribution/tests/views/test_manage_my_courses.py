@@ -48,7 +48,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -80,7 +80,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
         for ac_year in ac_year_in_past + [cls.current_ac_year] + cls.ac_year_in_future:
-            learning_container_year = LearningContainerYearFactory(
+            learning_container_year = LearningContainerYearInChargeFactory(
                 academic_year=ac_year,
                 requirement_entity=requirement_entity
             )
@@ -152,8 +152,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             msg[0].get('message'),
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
-                "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                "end_date": self.academic_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -208,8 +207,7 @@ class ManageMyCoursesViewTestCase(TestCase):
                 "start_date":
                     self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
                 "end_date":
-                    (self.academic_calendar_force_majeure.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                    self.academic_calendar_force_majeure.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.WARNING)

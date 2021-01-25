@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,14 +42,14 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
     LecturingLearningComponentYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory, \
+    LearningContainerYearNotInChargeFactory, LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.tutor import TutorFactory
@@ -62,11 +62,13 @@ class LearningUnitYearTest(TestCase):
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
         cls.academic_year = create_current_academic_year()
+        learning_container_yr = LearningContainerYearNotInChargeFactory()
         cls.learning_unit_year = LearningUnitYearFactory(
             acronym="LDROI1004",
             specific_title="Juridic law courses",
             academic_year=cls.academic_year,
-            subtype=learning_unit_year_subtypes.FULL
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year=learning_container_yr
         )
 
     def test_find_by_tutor_with_none_argument(self):
@@ -94,13 +96,9 @@ class LearningUnitYearTest(TestCase):
     def test_property_in_charge(self):
         self.assertFalse(self.learning_unit_year.in_charge)
 
-        a_container_year = LearningContainerYearFactory(acronym=self.learning_unit_year.acronym,
-                                                        academic_year=self.academic_year)
+        a_container_year = LearningContainerYearInChargeFactory(acronym=self.learning_unit_year.acronym,
+                                                                academic_year=self.academic_year)
         self.learning_unit_year.learning_container_year = a_container_year
-
-        self.assertFalse(self.learning_unit_year.in_charge)
-
-        a_container_year.in_charge = True
 
         self.assertTrue(self.learning_unit_year.in_charge)
 
@@ -231,51 +229,6 @@ class LearningUnitYearGetEntityTest(TestCase):
         self.assertIsNone(result)
 
 
-class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.learning_unit_year = LearningUnitYearFactory(
-            academic_year=cls.current_academic_year,
-            learning_container_year__academic_year=cls.current_academic_year,
-        )
-        cls.tutor = TutorFactory()
-        AttributionFactory(learning_unit_year=cls.learning_unit_year, tutor=cls.tutor)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_occurrence_found(self):
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertEqual(result.count(), 1)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_distinct_occurrence_found(self):
-        """In this test, we ensure that user see one line per learning unit year despite multiple attribution"""
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor, function=COORDINATOR)
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor, function=CO_HOLDER)
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor)
-
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertEqual(result.count(), 1)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_no_occurrence_found(self):
-        """In this test, we ensure that if the learning unit year as no learning container, it is not taking account"""
-        self.learning_unit_year.learning_container_year = None
-        self.learning_unit_year.save()
-
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertFalse(result.count())
-
-
 class LearningUnitYearWarningsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -302,7 +255,6 @@ class LearningUnitYearWarningsTest(TestCase):
         learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
         learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
         learning_component_year_partim_lecturing.save()
-
 
         self.luy_full.quadrimester = None
         self.luy_full.save()

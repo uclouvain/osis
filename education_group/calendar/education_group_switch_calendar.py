@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,14 +25,28 @@
 ##############################################################################
 import datetime
 
-from django import template
+from base.business.event_perms import AcademicEventCalendarHelper
+from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import AcademicYear
+from base.models.enums import academic_calendar_type
 
-register = template.Library()
 
+class EducationGroupSwitchCalendar(AcademicEventCalendarHelper):
+    event_reference = academic_calendar_type.EDUCATION_GROUP_SWITCH
 
-@register.filter
-def shift_date(source_date, days_to_add):
-    try:
-        return source_date + datetime.timedelta(days=days_to_add)
-    except TypeError:
-        return None
+    @classmethod
+    def ensure_consistency_until_n_plus_6(cls):
+        current_academic_year = AcademicYear.objects.current()
+        academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
+
+        for ac_year in academic_years:
+            AcademicCalendar.objects.get_or_create(
+                reference=cls.event_reference,
+                data_year=ac_year,
+                defaults={
+                    "title": "Basculement des formations",
+                    "start_date": datetime.date(ac_year.year, 7, 1),
+                    "end_date": datetime.date(ac_year.year + 1, 6, 30),
+                    "academic_year": ac_year  # To remove after refactoring
+                }
+            )
