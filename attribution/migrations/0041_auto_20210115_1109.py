@@ -14,7 +14,7 @@ def create_application_courses_calendar(apps, shema_editor):
     now = timezone.now()
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
-        qs = AcademicYear.objects.filter(year__gte=2015, year__lte=current_academic_year.year + 6)
+        qs = AcademicYear.objects.filter(year__gt=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
                 reference=academic_calendar_type.TEACHING_CHARGE_APPLICATION,
