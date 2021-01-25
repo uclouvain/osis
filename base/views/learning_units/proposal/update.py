@@ -42,6 +42,7 @@ from base.views.learning_units.common import get_learning_unit_identification_co
     check_formations_impacted_by_update
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
+from django.contrib.messages import get_messages
 
 
 @waffle_flag('learning_unit_proposal_update')
@@ -137,7 +138,7 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         else:
             show_error_message_for_form_invalid(request)
 
-    context = get_learning_unit_identification_context(learning_unit_year.id, person, request)
+    context = get_learning_unit_identification_context(learning_unit_year.id, person, get_messages(request))
     context.update({
         'person': person,
         'form_end_date': form_end_date,

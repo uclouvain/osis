@@ -100,8 +100,13 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id=None, code=None, year=None):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year,
-                                                    messages=get_messages(request))
+    context = get_common_context_learning_unit_year(
+        person,
+        learning_unit_year_id,
+        code,
+        year,
+        messages=get_messages(request)
+    )
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
     data_components = get_same_container_year_components(context['learning_unit_year'])

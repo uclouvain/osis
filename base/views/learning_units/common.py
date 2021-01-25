@@ -91,8 +91,8 @@ def check_acronym(request, subtype):
                          'first_using': first_using, 'last_using': last_using}, safe=False)
 
 
-def get_learning_unit_identification_context(learning_unit_year_id, person, request):
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_messages(request))
+def get_learning_unit_identification_context(learning_unit_year_id, person, messages):
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=messages)
 
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
@@ -131,8 +131,11 @@ def get_learning_unit_identification_context(learning_unit_year_id, person, requ
     return context
 
 
-def get_common_context_learning_unit_year(person, learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None, year: Optional[int] = None, messages: List = []):
+def get_common_context_learning_unit_year(person,
+                                          learning_unit_year_id: Optional[int] = None,
+                                          code: Optional[str] = None,
+                                          year: Optional[int] = None,
+                                          messages: List = []):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -151,7 +154,10 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
         'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
-    update_context_with_messages_update_warnings(context, messages)
+
+    messages_update_warning = update_context_with_messages_update_warnings(messages)
+    if messages_update_warning:
+        context['messages_update_warning'] = messages_update_warning
     return context
 
 
@@ -180,8 +186,8 @@ def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, re
     formations_using_ue = _find_root_trainings_using_ue(learning_unit_year.acronym,
                                                         learning_unit_year.academic_year.year)
     if len(formations_using_ue) > 1:
-        for m in formations_using_ue:
-            messages.add_message(request, 50, m)
+        for formation in formations_using_ue:
+            messages.add_message(request, 50, formation)
 
 
 def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
@@ -212,9 +218,11 @@ def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
     return sorted(formations_using_ue)
 
 
-def update_context_with_messages_update_warnings(context, all_messages):
+def update_context_with_messages_update_warnings(all_messages):
     messages_update_warning = [m.message for m in all_messages if m.tags == '']
     if messages_update_warning:
-        context['messages_update_warning'] = \
-            {'title': _('Pay attention! This learning unit is used in more than one formation'),
-             'messages': messages_update_warning}
+        return {
+            'title': _('Pay attention! This learning unit is used in more than one formation'),
+            'messages': messages_update_warning
+        }
+    return None

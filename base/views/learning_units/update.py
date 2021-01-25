@@ -60,7 +60,7 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
 
-    context = get_learning_unit_identification_context(learning_unit_year_id, person, request)
+    context = get_learning_unit_identification_context(learning_unit_year_id, person, get_messages(request))
 
     learning_unit_to_edit = learning_unit_year.learning_unit
     form = LearningUnitDailyManagementEndDateForm(
