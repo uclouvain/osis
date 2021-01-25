@@ -60,10 +60,14 @@ class EntityRoleHelper:
     """
     @staticmethod
     def get_all_roles(person: Person) -> List[EntityRoleModel]:
+        qs = []
+        if not person:
+            return qs
+
         role_mdls = [
             r for r in role.role_manager.roles if issubclass(r, EntityRoleModel)
         ]
-        qs = []
+
         for role_mdl in role_mdls:
             subqs = role_mdl.objects.filter(person=person)
             if hasattr(role_mdl, 'scopes'):
@@ -75,5 +79,5 @@ class EntityRoleHelper:
         return qs
 
     @staticmethod
-    def has_role(role: EntityRoleModel, user_roles: List[EntityRoleModel]):
+    def has_role(role: EntityRoleModel, user_roles: List[EntityRoleModel]) -> bool:
         return role in user_roles

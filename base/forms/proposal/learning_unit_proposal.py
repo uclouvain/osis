@@ -38,10 +38,12 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from learning_unit.auth.roles.faculty_manager import FacultyManager
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -157,7 +159,8 @@ class ProposalLearningUnitFilter(FilterSet):
     def __init_academic_year_field(self):
         target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
 
-        if self.person and self.person.is_faculty_manager:
+        user_roles = EntityRoleHelper.get_all_roles(self.person)
+        if EntityRoleHelper.has_role(FacultyManager, user_roles):
             target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
 
         self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
