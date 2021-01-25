@@ -41,10 +41,13 @@ from base.models.enums import learning_unit_year_subtypes, learning_component_ye
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 from reference.models.language import Language
 
 # This fields can not be disabled.
@@ -338,9 +341,10 @@ class FullForm(LearningUnitBaseForm):
 
     def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
-            if self.person.is_faculty_manager:
+            user_roles = EntityRoleHelper.get_all_roles(self.person)
+            if EntityRoleHelper.has_role(FacultyManager, user_roles):
                 target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
-            elif self.person.is_central_manager:
+            elif EntityRoleHelper.has_role(CentralManager, user_roles):
                 target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
             else:
                 target_years_opened = []
