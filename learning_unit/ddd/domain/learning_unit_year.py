@@ -95,6 +95,7 @@ class LearningUnitYear:
             status: bool = None,
             periodicity: PeriodicityEnum = None,
             other_remark: str = None,
+            other_remark_english: str = None,
             quadrimester: DerogationQuadrimester = None,
 
             lecturing_volume: LecturingVolume = None,
@@ -130,6 +131,7 @@ class LearningUnitYear:
         self.status = status
         self.periodicity = periodicity
         self.other_remark = other_remark
+        self.other_remark_english = other_remark_english
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume

@@ -210,7 +210,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
 
     @property
     def url_name(self):
-        return 'training_identification'
+        return 'element_identification'
 
     def navigation_function(self, *args, **kwargs):
         return navigation.navigation_group(*args, **kwargs)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+
 
 COMMON_ORDERING_FIELDS = (
     ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
@@ -155,12 +156,13 @@ class LearningUnitFilter(FilterSet):
         self.form.fields["academic_year"].initial = starting_academic_year()
 
     def filter_tutor(self, queryset, name, value):
+        value = value.replace(' ', '\\s')
         search_value = espace_special_characters(value)
         for tutor_name in search_value.split():
             queryset = queryset.filter(
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
+                Q(learning_container_year__attributionnew__tutor__person__first_name__iregex=tutor_name
                   ) |
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name)
+                Q(learning_container_year__attributionnew__tutor__person__last_name__iregex=tutor_name)
             ).distinct()
         return queryset
 

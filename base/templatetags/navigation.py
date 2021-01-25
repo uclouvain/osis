@@ -130,10 +130,11 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             named=True
         ).order_by(*order_by)
 
-
     current_row = _get_current_row(qs, obj)
 
     if current_row:
+        if not is_ue:
+            url_name = 'element_identification'
         context.update({
             "next_element_title": _get_title(current_row.next_title,
                                              current_row.next_version_label if not is_ue else None
