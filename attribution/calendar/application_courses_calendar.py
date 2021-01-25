@@ -45,8 +45,8 @@ class ApplicationCoursesCalendar(AcademicEventCalendarHelper):
                 data_year=ac_year,
                 defaults={
                     "title": "Candidature aux cours vacants",
-                    "start_date": datetime.date(ac_year.year - 1, 2, 15),
-                    "end_date": datetime.date(ac_year.year - 1, 2, 28),
+                    "start_date": datetime.date(ac_year.year, 2, 15),
+                    "end_date": datetime.date(ac_year.year, 2, 28),
                     "academic_year": ac_year  # To remove after refactoring
                 }
             )
