@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ from django.utils import timezone
 
 from attribution import models as mdl_attribution
 from base import models as mdl_base
+from base.models.enums.learning_container_year_types import IN_CHARGE_TYPES
+from base.models.proposal_learning_unit import is_in_suppression_proposal
 from osis_common.queue import queue_sender
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -63,15 +65,15 @@ def _compute_list(global_ids=None):
 
 
 def _get_all_attributions_with_charges(global_ids):
-    attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search()\
-        .filter(learning_component_year__learning_unit_year__learning_container_year__in_charge=True)\
-        .select_related('learning_component_year__learning_unit_year__academic_year')
+    attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search().filter(
+        learning_component_year__learning_unit_year__learning_container_year__container_type__in=IN_CHARGE_TYPES
+    ).select_related('learning_component_year__learning_unit_year__academic_year')
 
     if global_ids is not None:
         qs = mdl_attribution.attribution_new.search(global_id=global_ids)
     else:
         qs = mdl_attribution.attribution_new.search()
-
+    qs = qs.filter(decision_making='')
     return qs.exclude(tutor__person__global_id__isnull=True)\
              .exclude(tutor__person__global_id="")\
              .prefetch_related(
@@ -107,15 +109,16 @@ def _split_attribution_by_learning_unit_year(attribution):
         allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
         attribution_splitted.setdefault(lunit_year.id, {
-                'acronym': lunit_year.acronym,
-                'title': lunit_year.complete_title,
-                'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
-                'start_year': attribution.start_year,
-                'end_year': attribution.end_year,
-                'function': attribution.function,
-                'year': lunit_year.academic_year.year,
-                'weight': str(lunit_year.credits) if lunit_year.credits else '',
-                'is_substitute': bool(attribution.substitute)
+            'acronym': lunit_year.acronym,
+            'title': lunit_year.complete_title,
+            'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
+            'start_year': attribution.start_year,
+            'end_year': attribution.end_year,
+            'function': attribution.function,
+            'year': lunit_year.academic_year.year,
+            'weight': str(lunit_year.credits) if lunit_year.credits else '',
+            'is_substitute': bool(attribution.substitute),
+            'is_in_suppression_proposal': is_in_suppression_proposal(lunit_year),
         }).update({
             allocation_charge_key: str(attrib_charge.allocation_charge) if attrib_charge.allocation_charge is not None
             else '0.0'

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
 
-from django.http import Http404
+from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.domain.exception import InvalidVersionNameException
 
-from base.models.utils.utils import ChoiceEnum
-
-
-class VersionTypeEnum(ChoiceEnum):
-    STANDARD = "standard"
-    TRANSITION = "transition"
-    SPECIAL = "special"
+VERSION_NAME_REGEX = "^[A-Z]{0,15}$"
 
 
-def filter_version_type(queryset, value):
-    if value not in VersionTypeEnum.get_values():
-        raise Http404
-    elif value == VersionTypeEnum.TRANSITION.value:
-        return queryset.filter(is_transition=True)
-    elif value == VersionTypeEnum.SPECIAL.value:
-        return queryset.exclude(version_name='')
-    return queryset.filter(is_transition=False, version_name='')
+class VersionNamePatternValidator(BusinessValidator):
+
+    def __init__(self, version_name: str):
+        super().__init__()
+        self.version_name = version_name
+
+    def validate(self, *args, **kwargs):
+        if not bool(re.match(VERSION_NAME_REGEX, self.version_name.upper())):
+            raise InvalidVersionNameException()

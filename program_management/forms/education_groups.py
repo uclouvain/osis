@@ -34,11 +34,12 @@ from django_filters import OrderingFilter, filters, FilterSet
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import entity_version
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
 
 PARTICULAR = "PARTICULAR"
@@ -149,7 +150,9 @@ class GroupFilter(FilterSet):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.form.fields['academic_year'].initial = starting_academic_year()
+        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
+            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
+        ).first()
         self.form.fields['category'].initial = education_group_categories.TRAINING
         self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
         self.form.fields["version"].initial = kwargs.pop('version', None)

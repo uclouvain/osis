@@ -286,11 +286,10 @@ class TestEditLearningUnit(TestCase):
                 "professional_integration": self.learning_unit_year.professional_integration,
                 "campus": self.learning_unit_year.campus.pk,
                 "language": self.learning_unit_year.language.pk,
-                "periodicity": self.learning_unit_year.periodicity
-            },
-            'learning_unit_form': {
-                "faculty_remark": self.learning_unit_year.learning_unit.faculty_remark,
-                "other_remark": self.learning_unit_year.learning_unit.other_remark
+                "periodicity": self.learning_unit_year.periodicity,
+                "faculty_remark": self.learning_unit_year.faculty_remark,
+                "other_remark": self.learning_unit_year.other_remark,
+                "other_remark_english": self.learning_unit_year.other_remark_english
             }
         }
         for form_name, expected_initial in expected_initials.items():
