@@ -202,7 +202,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
             "view_publish_btn":
-                not(is_program_manager_only(self.request.user, user_person)) and
+                not(self.request.user.has_perm('base.view_publish_btn')) and
                 (self.have_general_information_tab() or self.have_admission_condition_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
@@ -383,8 +383,3 @@ def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -
         _get_view_name_from_tab(tab),
         args=[node_identity.year, node_identity.code]
     ) + url_parameters
-
-
-def is_program_manager_only(user, user_person):
-    return program_manager.is_program_manager(
-        user) and not user_person.is_faculty_manager and not user_person.is_central_manager

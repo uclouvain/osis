@@ -176,4 +176,5 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 (predicates.is_continuing_education_group_year |
                  predicates.is_education_group_limited_daily_management_calendar_open),
+            'base.view_publish_btn': rules.always_allow,
         })
