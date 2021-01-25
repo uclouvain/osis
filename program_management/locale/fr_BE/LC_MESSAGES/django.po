@@ -789,7 +789,7 @@ msgid ""
 "The parent \"%(parent)s\" has reached the maximum number of children allowed "
 "for the type(s) : \"%(child_types)s\"."
 msgstr ""
-"Le parent %(parent)s a atteint le nombre maximum authorisé d'enfants de type(s) : \"%(child_types)s\"."
+"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de type(s) : \"%(child_types)s\"."
 
 #, python-format
 msgid ""
