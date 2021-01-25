@@ -51,18 +51,18 @@ class TestLearningUnitCommonView(TestCase):
         )
 
     def test_ue_used_in_one_training(self):
-        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year,
-                            TrainingType.BACHELOR, Categories.TRAINING)
+        self.build_training_tree('DROI2M', 'Bachelier droit', self.element_learning_unit_year,
+                                 TrainingType.BACHELOR, Categories.TRAINING)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
                                             self.academic_year.year)
         expected = ['DROI2M - Bachelier droit']
         self.assertListEqual(res, expected)
 
     def test_ue_used_in_two_trainings(self):
-        build_training_tree('DROI2M', 'Bachelier droit', self.academic_year, self.element_learning_unit_year,
-                            TrainingType.BACHELOR, Categories.TRAINING)
-        build_training_tree('ARK1BA', 'Bachelier archi', self.academic_year, self.element_learning_unit_year,
-                            TrainingType.BACHELOR, Categories.TRAINING)
+        self.build_training_tree('DROI2M', 'Bachelier droit', self.element_learning_unit_year,
+                                 TrainingType.BACHELOR, Categories.TRAINING)
+        self.build_training_tree('ARK1BA', 'Bachelier archi', self.element_learning_unit_year,
+                                 TrainingType.BACHELOR, Categories.TRAINING)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
                                             self.academic_year.year)
         expected = ['ARK1BA - Bachelier archi',
@@ -70,11 +70,10 @@ class TestLearningUnitCommonView(TestCase):
         self.assertListEqual(res, expected)
 
     def test_ue_used_in_a_finality(self):
-        training_root = build_training_tree('EDPH2M', 'Bachelier droit', self.academic_year, None,
-                                            TrainingType.BACHELOR, Categories.TRAINING)
-        finality_root = build_training_tree('EDPH2MD', 'Bachelier droit', self.academic_year,
-                                            self.element_learning_unit_year,
-                                            TrainingType.MASTER_MA_120, Categories.TRAINING)
+        training_root = self.build_training_tree('EDPH2M', 'Bachelier droit', None, TrainingType.BACHELOR,
+                                                 Categories.TRAINING)
+        finality_root = self.build_training_tree('EDPH2MD', 'Bachelier droit', self.element_learning_unit_year,
+                                                 TrainingType.MASTER_MA_120, Categories.TRAINING)
         GroupElementYearChildLeafFactory(parent_element=training_root,
                                          child_element=finality_root)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
@@ -83,12 +82,10 @@ class TestLearningUnitCommonView(TestCase):
         self.assertListEqual(res, expected)
 
     def test_ue_used_in_a_minor_or_deepening(self):
-        training_root = build_training_tree('EDPH2M', 'Bachelier droit', self.academic_year,
-                                            None,
-                                            TrainingType.BACHELOR, Categories.TRAINING)
-        minor_root = build_training_tree('MINEDPH', 'Mineure en droit', self.academic_year,
-                                         self.element_learning_unit_year, MiniTrainingType.SOCIETY_MINOR,
-                                         Categories.MINI_TRAINING)
+        training_root = self.build_training_tree('EDPH2M', 'Bachelier droit', None, TrainingType.BACHELOR,
+                                                 Categories.TRAINING)
+        minor_root = self.build_training_tree('MINEDPH', 'Mineure en droit', self.element_learning_unit_year,
+                                              MiniTrainingType.SOCIETY_MINOR, Categories.MINI_TRAINING)
         GroupElementYearChildLeafFactory(parent_element=training_root,
                                          child_element=minor_root)
         res = _find_root_trainings_using_ue(LUY_ACRONYM,
@@ -96,39 +93,38 @@ class TestLearningUnitCommonView(TestCase):
         expected = ['MINEDPH - Mineure en droit']
         self.assertListEqual(res, expected)
 
+    def build_training_tree(self, acronym, title, element_learning_unit_year, education_group_type, category):
+        # """
+        #    |root_group
+        #    |----common_group
+        #         |----(element_learning_unit_year)
+        # """
+        offer = TrainingFactory(academic_year=self.academic_year,
+                                title=title)
+        root_group = GroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__category=category.name,
+            education_group_type__name=education_group_type.name,
+            acronym=acronym
+        )
+        root_element = ElementGroupYearFactory(group_year=root_group)
 
-def build_training_tree(acronym, title, academic_year, element_learning_unit_year, education_group_type, category):
-    # """
-    #    |root_group
-    #    |----common_group
-    #         |----(element_learning_unit_year)
-    # """
-    offer = TrainingFactory(academic_year=academic_year,
-                            title=title)
-    root_group = GroupYearFactory(
-        academic_year=academic_year,
-        education_group_type__category=category.name,
-        education_group_type__name=education_group_type.name,
-        acronym=acronym
-    )
-    root_element = ElementGroupYearFactory(group_year=root_group)
-
-    common_group = GroupYearFactory(
-        academic_year=academic_year,
-        education_group_type__category=Categories.GROUP.name,
-        education_group_type__name=GroupType.COMMON_CORE.name,
-        acronym='COMMON'
-    )
-    common_group_element = ElementGroupYearFactory(group_year=common_group)
-    GroupElementYearChildLeafFactory(parent_element=root_element,
-                                     child_element=common_group_element)
-    if element_learning_unit_year:
-        GroupElementYearChildLeafFactory(parent_element=common_group_element,
-                                         child_element=element_learning_unit_year)
-    EducationGroupVersionFactory(
-        offer=offer,
-        root_group=root_group,
-        version_name=STANDARD,
-        title_fr=None
-    )
-    return root_element
+        common_group = GroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__category=Categories.GROUP.name,
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            acronym='COMMON'
+        )
+        common_group_element = ElementGroupYearFactory(group_year=common_group)
+        GroupElementYearChildLeafFactory(parent_element=root_element,
+                                         child_element=common_group_element)
+        if element_learning_unit_year:
+            GroupElementYearChildLeafFactory(parent_element=common_group_element,
+                                             child_element=element_learning_unit_year)
+        EducationGroupVersionFactory(
+            offer=offer,
+            root_group=root_group,
+            version_name=STANDARD,
+            title_fr=None
+        )
+        return root_element
