@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 09:39+0100\n"
+"POT-Creation-Date: 2021-01-19 07:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -573,9 +573,6 @@ msgstr ""
 msgid "Contacts"
 msgstr ""
 
-msgid "Continuing education academic year linkable to admission"
-msgstr ""
-
 msgid "Coordinator"
 msgstr ""
 
@@ -829,7 +826,13 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English title common part"
+msgstr ""
+
 msgid "English title proper"
+msgstr ""
+
+msgid "English title specific complement"
 msgstr ""
 
 msgid "Enrolled"
@@ -1735,6 +1738,9 @@ msgstr ""
 msgid "Other remark (intended for publication)"
 msgstr ""
 
+msgid "Other remark in english (intended for publication)"
+msgstr ""
+
 msgid "Other special needs"
 msgstr ""
 
@@ -2077,9 +2083,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr ""
 
-msgid "Release"
-msgstr ""
-
 msgid "Remarks"
 msgstr ""
 
@@ -2297,15 +2300,7 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-
 msgid "Summary course submission force majeure"
-msgstr ""
-
-msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
 
 msgid "Suppression"
@@ -2339,9 +2334,6 @@ msgid "Technologic platform"
 msgstr ""
 
 msgid "Termination"
-msgstr ""
-
-msgid "Testing"
 msgstr ""
 
 msgid "The"
@@ -2628,10 +2620,16 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "Title common part"
+msgstr ""
+
 msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
+msgstr ""
+
+msgid "Title specific complement"
 msgstr ""
 
 msgid "To complete"
@@ -2909,9 +2907,6 @@ msgstr ""
 msgid "activities in English"
 msgstr ""
 
-msgid "ad hoc events"
-msgstr ""
-
 msgid "additional informations"
 msgstr ""
 
@@ -3078,9 +3073,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
-
-msgid "project events"
-msgstr ""
 
 msgid "regex error message"
 msgstr ""

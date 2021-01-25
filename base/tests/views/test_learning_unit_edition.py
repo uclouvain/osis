@@ -288,7 +288,8 @@ class TestEditLearningUnit(TestCase):
                 "language": self.learning_unit_year.language.pk,
                 "periodicity": self.learning_unit_year.periodicity,
                 "faculty_remark": self.learning_unit_year.faculty_remark,
-                "other_remark": self.learning_unit_year.other_remark
+                "other_remark": self.learning_unit_year.other_remark,
+                "other_remark_english": self.learning_unit_year.other_remark_english
             }
         }
         for form_name, expected_initial in expected_initials.items():

@@ -106,7 +106,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language', 'periodicity', 'other_remark', 'faculty_remark')
+                  'professional_integration', 'campus', 'language', 'periodicity', 'other_remark', 'faculty_remark',
+                  'other_remark_english')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
@@ -118,7 +119,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             ),
             'credits': forms.TextInput(),
             'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
-            'other_remark': forms.Textarea(attrs={'rows': '5'})
+            'other_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark_english': forms.Textarea(attrs={'rows': '5'})
         }
 
         labels = {
