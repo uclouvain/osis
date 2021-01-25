@@ -424,6 +424,9 @@ class EntityVersion(SerializableModel):
     def find_descendants(self, date=None):
         return EntityVersion.objects.descendants([self.entity], date)
 
+    def is_faculty(self) -> bool:
+        return self.entity_type == entity_type.FACULTY or self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
+
     def find_faculty_version(self, academic_yr):
         if self.entity_type == entity_type.FACULTY or self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS:
             return self

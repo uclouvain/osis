@@ -23,7 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+from datetime import datetime
+from typing import Iterable, Dict, Optional, List
+
+import attr
+from django.utils.functional import cached_property
+
 from base.models import entity_version, offer_year_entity
+from base.models.entity_version import EntityVersion, find_latest_version
+from base.models.enums.organization_type import MAIN
 
 SERVICE_COURSE = 'SERVICE_COURSE'
 
@@ -38,3 +47,43 @@ def find_entity_version_according_academic_year(entity_versions, academic_year):
     return next((entity_vers for entity_vers in entity_versions
                  if entity_vers.start_date <= academic_year.end_date and
                  (entity_vers.end_date is None or entity_vers.end_date > academic_year.end_date)), None)
+
+
+@attr.s(frozen=True, slots=True)
+class MainEntityStructure:
+    @attr.s(slots=True)
+    class Node:
+        entity_version = attr.ib(type=EntityVersion)
+        parent = attr.ib(type=Optional['MainEntityStructure.Node'], default=None)
+        direct_children = attr.ib(type=List['MainEntityStructure.Node'], factory=list)
+
+        def faculty(self) -> 'MainEntityStructure.Node':
+            if self.entity_version.is_faculty():
+                return self
+            if self.parent:
+                return self.parent.faculty()
+            return self
+
+        def get_all_children(self) -> List['MainEntityStructure.Node']:
+            return list(itertools.chain.from_iterable((child.get_all_children() for child in self.direct_children))) + \
+                self.direct_children
+
+    root = attr.ib(type='MainEntityStructure.Node')
+    nodes = attr.ib(type=Dict[int, 'MainEntityStructure.Node'])
+
+    def get_node(self, entity_id: int) -> Optional['MainEntityStructure.Node']:
+        return self.nodes.get(entity_id)
+
+
+def load_main_entity_structure(date: datetime.date) -> MainEntityStructure:
+    all_current_entities_version = find_latest_version(date=date).of_main_organization  # type: Iterable[EntityVersion]
+
+    nodes = {ev.entity.id: MainEntityStructure.Node(ev) for ev in all_current_entities_version}
+    for ev in all_current_entities_version:
+        if not ev.parent_id:
+            continue
+        nodes[ev.entity.id].parent = nodes[ev.parent_id]
+        nodes[ev.parent_id].direct_children.append(nodes[ev.entity.id])
+
+    root = next((value for key, value in nodes.items() if not value.parent))
+    return MainEntityStructure(root, nodes)

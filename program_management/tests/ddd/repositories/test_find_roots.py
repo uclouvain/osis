@@ -19,33 +19,35 @@ class TestFindAllRoots(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
 
-    def test_when_no_link_for_academic_year(self):
-        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
-        self.assertDictEqual(result, {})
+    def test_when_no_child_element_ids(self):
+        result = program_management.ddd.repositories.find_roots.find_roots_for_element_ids([])
+        self.assertListEqual(result, [])
 
-    def test_when_one_link_for_academic_year_should_but_do_not_match_criteria(self):
-        GroupElementYearFactory(parent_element__group_year__education_group_type__group=True)
+    def test_when_one_root_does_not_match_considered_type(self):
+        grp = GroupElementYearFactory(parent_element__group_year__education_group_type__group=True)
 
-        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
-        self.assertDictEqual(result, {})
+        result = program_management.ddd.repositories.find_roots.find_roots_for_element_ids([grp.child_element.id])
+        self.assertListEqual(result, [])
 
-    def test_should_return_all_children_root_for_academic_year(self):
-        GroupElementYearFactory(
+    def test_should_return_all_children_root_for_childs(self):
+        grp_1 = GroupElementYearFactory(
             parent_element__group_year__education_group_type__name=TrainingType.BACHELOR.name,
             parent_element__group_year__academic_year=self.academic_year,
             child_element__group_year__academic_year=self.academic_year,
         )
-        GroupElementYearChildLeafFactory(
+        grp_2 = GroupElementYearChildLeafFactory(
             parent_element__group_year__education_group_type__name=TrainingType.CAPAES.name,
             parent_element__group_year__academic_year=self.academic_year,
             child_element__learning_unit_year__academic_year=self.academic_year
         )
-        GroupElementYearChildLeafFactory(
+        grp_3 = GroupElementYearChildLeafFactory(
             parent_element__group_year__education_group_type__name=TrainingType.JUNIOR_YEAR.name,
             parent_element__group_year__academic_year=self.academic_year,
             child_element__learning_unit_year__academic_year=self.academic_year
         )
-        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
+        result = program_management.ddd.repositories.find_roots.find_roots_for_element_ids(
+            [grp_1.child_element.id, grp_2.child_element.id, grp_3.child_element.id]
+        )
         self.assertEqual(
             len(result),
             3

@@ -2,26 +2,19 @@ import collections
 import itertools
 from typing import List, Dict
 
-from base.models import education_group_year, group_element_year
+from base.models import group_element_year
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 from program_management.models.element import Element
 
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 
 
-#  DEPRECATED Suppress this method when borrowed course filter is refactored OSIS-3376
-def find_all_roots_for_academic_year(academic_year_id: int) -> Dict[int, List[int]]:
-    root_categories = DEFAULT_ROOT_CATEGORIES
-    root_categories_names = [root_type.name for root_type in root_categories]
-
-    child_root_list = group_element_year.GroupElementYear.objects.get_root_list(
-        academic_year_id=academic_year_id,
-        root_category_name=root_categories_names
+def find_roots_for_element_ids(child_element_ids: List[int]):
+    root_categories_names = [root_type.name for root_type in DEFAULT_ROOT_CATEGORIES]
+    return group_element_year.GroupElementYear.objects.get_root_list(
+        root_category_name=root_categories_names,
+        child_element_ids=child_element_ids
     )
-
-    roots_by_children_id = _group_roots_id_by_children_id(child_root_list)
-
-    return roots_by_children_id
 
 
 #  FIXME move this function out of the repository or replace by using load_trees_from_children()
