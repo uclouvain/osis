@@ -49,12 +49,12 @@ from base.tests.factories.academic_year import get_current_year, AcademicYearFac
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import CentralManagerForUEFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
@@ -135,7 +135,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_get_proposal_learning_unit_creation_form_with_central_user(self):
-        central_manager_person = CentralManagerForUEFactory()
+        central_manager_person = CentralManagerFactory(entity=self.entity).person
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
         self.client.force_login(central_manager_person.user)
