@@ -320,6 +320,12 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False
     },
+    'link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+    },
 }
 
 CKEDITOR_CONFIGS['education_group_pedagogy'] = dict(CKEDITOR_CONFIGS['minimal'])
