@@ -133,14 +133,12 @@ class NodeFactory:
         child = self.get_node(
             type=NodeType.GROUP,
             node_type=child_type,
-            code=GenerateNodeCode.generate_node_code(parent_node, child_type),
+            code=GenerateNodeCode.generate_node_code(parent_node.code, child_type),
             title=GenerateNodeAbbreviatedTitle.generate(
                 parent_node=parent_node,
                 child_node_type=child_type,
             ),
             year=parent_node.year,
-            teaching_campus=parent_node.teaching_campus,
-            management_entity_acronym=parent_node.management_entity_acronym,
             group_title_fr=generated_child_title,
             start_year=parent_node.year,
         )

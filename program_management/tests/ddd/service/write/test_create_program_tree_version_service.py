@@ -37,7 +37,7 @@ from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_program_tree_version_service
+from program_management.ddd.service.write import create_program_tree_specific_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -155,12 +155,12 @@ class TestCreateProgramTreeVersion(TestCase):
 
     def test_when_tree_version_standard_does_not_exist(self):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
-            create_program_tree_version_service.create_program_tree_version(self.command)
+            create_program_tree_specific_version_service.create_program_tree_version(self.command)
 
     def test_assert_tree_version_correctly_created(self):
         self._create_standard_version()
 
-        identity = create_program_tree_version_service.create_program_tree_version(self.command)
+        identity = create_program_tree_specific_version_service.create_program_tree_version(self.command)
 
         tree_version_created = ProgramTreeVersionRepository().get(identity)
         tree = tree_version_created.get_tree()
