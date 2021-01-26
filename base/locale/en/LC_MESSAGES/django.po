@@ -927,6 +927,9 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+msgid "Extended proposal management"
+msgstr ""
+
 msgid "External"
 msgstr ""
 
@@ -1308,6 +1311,9 @@ msgid "Lecturing vol."
 msgstr ""
 
 msgid "Legend"
+msgstr ""
+
+msgid "Limited proposal management"
 msgstr ""
 
 msgid "Link type"

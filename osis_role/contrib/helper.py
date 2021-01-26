@@ -54,3 +54,25 @@ class EntityRoleHelper:
                 qs = qs.union(subqs)
 
         return qs.get_entities_ids() if qs else Entity.objects.none()
+
+    """
+       Utility class to provide roles from a Person
+    """
+    @staticmethod
+    def get_all_roles(person: Person) -> List[EntityRoleModel]:
+        qs = []
+        if not person:
+            return qs
+
+        role_mdls = [
+            r for r in role.role_manager.roles if issubclass(r, EntityRoleModel)
+        ]
+
+        for role_mdl in role_mdls:
+            for s in role_mdl.objects.filter(person=person):
+                qs.append(type(s))
+        return qs
+
+    @staticmethod
+    def has_role(role: EntityRoleModel, user_roles: List[EntityRoleModel]) -> bool:
+        return role in user_roles

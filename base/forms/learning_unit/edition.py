@@ -32,8 +32,8 @@ from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
-from base.models.proposal_learning_unit import find_by_learning_unit
 from base.models.enums import learning_unit_year_subtypes
+from base.models.proposal_learning_unit import find_by_learning_unit
 
 
 # TODO Convert it in ModelForm
@@ -118,12 +118,14 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
         super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
 
-    @classmethod
-    def get_event_perm_generator(cls):
-        return event_perms.generate_event_perm_creation_end_date_proposal
-
     def _get_academic_years(self, max_year):
-        super()._get_academic_years(max_year)
+        if not has_proposal(self.learning_unit) and self.learning_unit.is_past():
+            raise ValueError(
+                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
+                    self.learning_unit.end_year)
+            )
+
+        self.luy_current_year = self.learning_unit_year.academic_year.year
         # Allow previous year as last organisation year for suppression proposal
         return AcademicYear.objects.filter(year=self.luy_current_year - 1)
 

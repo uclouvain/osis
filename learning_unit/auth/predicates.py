@@ -10,6 +10,10 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
@@ -154,39 +158,43 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("You are not allowed to create proposal during this academic year"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_proposal_creation_period_open(self, user, group_year: 'GroupYear' = None):
+    calendar = LearningUnitLimitedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("You are not allowed to put in proposal for ending date during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_proposal_date_edition_period_open(self, user, learning_unit_year):
-    if learning_unit_year:
-        for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_creation_end_date_proposal(
-                role.person, learning_unit_year, raise_exception=False
-            ).is_open()
-    return None
+def is_proposal_date_edition_period_open(self, user, group_year: 'GroupYear' = None):
+    calendar = LearningUnitLimitedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You are not allowed to put in proposal for modification during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_proposal_edition_period_open(self, user, learning_unit_year):
-    if learning_unit_year:
-        for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_modification_transformation_proposal(
-                role.person, learning_unit_year, raise_exception=False
-            ).is_open()
-    return None
+def is_proposal_edition_period_open(self, user, group_year: 'GroupYear' = None):
+    calendar = LearningUnitLimitedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("You are not allowed to create proposal during this academic year"))
+@predicate_failed_msg(message=_("You are not allowed to manage proposal during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_proposal_creation_period_open(self, user, learning_unit_year):
-    if learning_unit_year:
-        for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_creation_end_date_proposal(
-                role.person, learning_unit_year, raise_exception=False
-            ).is_open()
-    return None
+def is_proposal_extended_management_calendar_open(self, user, group_year: 'GroupYear' = None):
+    calendar = LearningUnitExtendedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)

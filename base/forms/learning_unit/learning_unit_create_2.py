@@ -31,7 +31,6 @@ from django.db.models import Case, When, Value, IntegerField
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from base.business import event_perms
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
@@ -42,6 +41,13 @@ from base.models.enums import learning_unit_year_subtypes, learning_component_ye
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 from reference.models.language import Language
 
 # This fields can not be disabled.
@@ -335,5 +341,11 @@ class FullForm(LearningUnitBaseForm):
 
     def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
-            event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
-            self.fields["academic_year"].queryset = event_perm.get_academic_years()
+            user_roles = EntityRoleHelper.get_all_roles(self.person)
+            if EntityRoleHelper.has_role(FacultyManager, user_roles):
+                target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+            elif EntityRoleHelper.has_role(CentralManager, user_roles):
+                target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
+            else:
+                target_years_opened = []
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
