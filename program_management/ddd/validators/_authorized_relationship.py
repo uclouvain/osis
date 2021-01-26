@@ -29,6 +29,7 @@ from typing import List
 
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
     MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException
@@ -46,7 +47,7 @@ class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValid
 
 
 class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', parent_node: 'Node', link_type=None):
+    def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', parent_node: 'Node', link_type: LinkTypes = None):
         self.tree = copy.copy(tree)
         self.parent_node = self.tree.get_node_by_code_and_year(parent_node.code, parent_node.year)
         self.link_created = self.parent_node.add_child(node_to_paste, link_type=link_type)
