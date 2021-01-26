@@ -29,7 +29,9 @@ register = template.Library()
 
 
 @register.simple_tag
-def version_name_suffix(tree_version_identity: 'ProgramTreeVersionIdentity'):
-    return "{}]".format(
-        " - Transition" if tree_version_identity.is_specific_transition else ""
-    )
+def version_label(tree_version_identity: 'ProgramTreeVersionIdentity', only_suffix: bool = False):
+    if tree_version_identity.is_specific_transition():
+        return '{} - Transition'.format("" if only_suffix else tree_version_identity.version_name)
+    elif tree_version_identity.is_transition:
+        return 'Transition'
+    return "" if only_suffix else tree_version_identity.version_name

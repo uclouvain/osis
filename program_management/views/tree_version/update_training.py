@@ -31,6 +31,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
+from program_management.templatetags.version_label import version_label
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -91,19 +92,11 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": self.version_label(identity),
+                    "acronym": version_label(identity),
                     "academic_year": display_as_academic_year(identity.year),
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
-
-    @staticmethod
-    def version_label(identity: 'ProgramTreeVersionIdentity') -> str:
-        if identity.is_specific_transition():
-            return '{} - Transition'.format(identity.version_name)
-        elif identity.is_transition:
-            return 'Transition'
-        return identity.version_name
 
     def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
         is_new_end_year_lower_than_initial_one = operator.is_year_lower(

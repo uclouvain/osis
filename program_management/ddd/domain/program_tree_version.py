@@ -197,7 +197,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_standard(self):
-        return self.entity_id.is_standard()
+        return self.entity_id.version_name == STANDARD
 
     @property
     def end_year(self):
