@@ -72,6 +72,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
             'prerequisites_string',
@@ -94,7 +95,10 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
             self.assertEqual(self.ldroi100a.code, self.serializer.data.get('code'))
 
         with self.subTest('prerequisites_string'):
-            self.assertEqual(str(self.ldroi100a.prerequisite), self.serializer.data.get('prerequisites_string'))
+            self.assertEqual(
+                self.ldroi100a.prerequisite.get_prerequisite_expression(translate=False),
+                self.serializer.data.get('prerequisites_string')
+            )
 
 
 class TestLearningUnitBaseSerializer(SimpleTestCase):
@@ -131,6 +135,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
         ]
