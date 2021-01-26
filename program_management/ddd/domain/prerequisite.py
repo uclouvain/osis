@@ -132,7 +132,7 @@ class Prerequisite:
 
         main_operator = _(self.main_operator) if translate else self.main_operator
         return str(" " + main_operator + " ").join(
-            _format_group(group).format(group.get_prerequisite_item_group(translate=translate))
+            _format_group(group).format(group.get_prerequisite_item_expression(translate=translate))
             for group in self.prerequisite_item_groups
         )
 
