@@ -57,6 +57,9 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     def is_specific_transition(self) -> bool:
         return not self.is_standard() and self.is_transition
 
+    def is_specific_official(self) -> bool:
+        return not self.is_standard() and not self.is_transition
+
 
 class ProgramTreeVersionBuilder:
 
