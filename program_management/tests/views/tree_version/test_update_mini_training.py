@@ -141,7 +141,6 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         self.assertEqual(response.context['mini_training_obj'], self.mini_training_obj)
         self.assertEqual(response.context['mini_training_version_obj'], self.mini_training_version_obj)
         self.assertEqual(response.context['group_obj'], self.group_obj)
-        self.assertEqual(response.context['acronym_suffix'], "]")
         expected_tabs = [
             {
                 "text": _("Identification"),
