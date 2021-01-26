@@ -30,7 +30,7 @@
             <div class="col-md-6">
                 {% bootstrap_label training_version_form.version_name.label label_class="control-label" %}
                 <div class="version_name-group">
-                    {% version_name_suffix mini_training_version_obj.entity_id as version_suffix %}
+                    {% version_name_suffix training_version_obj.entity_id as version_suffix %}
                     {% bootstrap_field training_version_form.version_name form_group_class='form-group' show_label=False addon_before=training_obj.acronym|add:" [" addon_after=version_suffix %}
                 </div>
             </div>
