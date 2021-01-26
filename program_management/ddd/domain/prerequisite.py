@@ -90,8 +90,12 @@ class PrerequisiteItemGroup:
             return True
         return False
 
-    def __str__(self):
-        return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
+    def get_prerequisite_item_expression(self, translate: bool = True) -> PrerequisiteExpression:
+        operator = _(self.operator) if translate else self.operator
+        return str(" " + operator + " ").join(str(p_item) for p_item in self.prerequisite_items)
+
+    def __str__(self) -> PrerequisiteExpression:
+        return self.get_prerequisite_item_expression()
 
 
 class Prerequisite:
@@ -128,7 +132,8 @@ class Prerequisite:
 
         main_operator = _(self.main_operator) if translate else self.main_operator
         return str(" " + main_operator + " ").join(
-            _format_group(group).format(group) for group in self.prerequisite_item_groups
+            _format_group(group).format(group.get_prerequisite_item_expression(translate=translate))
+            for group in self.prerequisite_item_groups
         )
 
     def __str__(self) -> PrerequisiteExpression:
