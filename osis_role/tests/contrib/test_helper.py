@@ -51,6 +51,25 @@ class TestRoleModel(TestCase):
         cls.central_manager_for_eg = CentralManagerEGFactory(entity=cls.entity)
         cls.central_manager_for_lu = CentralManagerLUFactory(entity=cls.entity)
 
+    def test_get_all_entities(self):
+        cases = [
+            {
+                'name': 'Central manager EG',
+                'value_to_test': EntityRoleHelper.get_all_entities(self.central_manager_for_eg.person,
+                                                                   {CentralManagerEG.group_name}),
+                'expected_value': {self.entity.id}
+            },
+            {
+                'name': 'Central manager LU',
+                'value_to_test': EntityRoleHelper.get_all_entities(self.central_manager_for_lu.person,
+                                                                   {CentralManagerLU.group_name}),
+                'expected_value': {self.entity.id}
+            }
+        ]
+        for case in cases:
+            with self.subTest(case['name']):
+                self.assertEqual(case['value_to_test'], case['expected_value'])
+
     def test_get_all_roles(self):
         cases = [
             {
