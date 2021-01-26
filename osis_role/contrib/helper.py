@@ -69,13 +69,8 @@ class EntityRoleHelper:
         ]
 
         for role_mdl in role_mdls:
-            subqs = role_mdl.objects.filter(person=person)
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
-
-            if subqs:
-                for s in subqs:
-                    qs.append(type(s))
+            for s in role_mdl.objects.filter(person=person):
+                qs.append(type(s))
         return qs
 
     @staticmethod
