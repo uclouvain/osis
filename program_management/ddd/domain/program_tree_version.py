@@ -104,9 +104,9 @@ class ProgramTreeVersionBuilder:
             title_en=None,
         )
 
-    def create_from_standard_version(
+    def create_from_existing_version(
             self,
-            from_standard_version: 'ProgramTreeVersion',
+            from_existing_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',
             command: 'CreateProgramTreeVersionCommand',
     ) -> 'ProgramTreeVersion':
@@ -117,31 +117,19 @@ class ProgramTreeVersionBuilder:
             command.is_transition
         )
         if validator.is_valid():
-            assert isinstance(from_standard_version, ProgramTreeVersion)
-            assert from_standard_version.is_standard, "Forbidden to copy from a non Standard version"
-            ## TODO: From_standard_version is never is_transition
-            if from_standard_version.is_transition:
-                self._tree_version = self._build_from_transition(from_standard_version, command)
-            else:
-                self._tree_version = self._build_from_standard(
-                    from_standard_version,
-                    new_tree_identity,
-                    command,
-                )
+            assert isinstance(from_existing_version, ProgramTreeVersion)
+            self._tree_version = self._build_from_existing(
+                from_existing_version,
+                new_tree_identity,
+                command,
+            )
             return self.program_tree_version
 
     @property
     def program_tree_version(self):
         return self._tree_version
 
-    def _build_from_transition(
-            self,
-            from_tree_version: 'ProgramTreeVersion',
-            command: 'CreateProgramTreeVersionCommand'
-    ) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-    def _build_from_standard(
+    def _build_from_existing(
             self,
             from_tree_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',

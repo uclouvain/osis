@@ -50,7 +50,7 @@ def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> P
             override_start_year_to=command.start_year,
         )
     )
-    new_program_tree_version = ProgramTreeVersionBuilder().create_from_standard_version(
+    new_program_tree_version = ProgramTreeVersionBuilder().create_from_existing_version(
         program_tree_version_from,
         new_program_tree_identity,
         command,
