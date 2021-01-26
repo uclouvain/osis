@@ -32,13 +32,12 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from program_management.forms.version import UpdateTrainingVersionForm, UpdateMiniTrainingVersionForm
+from program_management.forms.version import UpdateMiniTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
-    StandardProgramTreeVersionFactory
+    StandardProgramTreeVersionFactory, StandardTransitionProgramTreeVersionFactory
 from program_management.views.tree_version.update_mini_training import MiniTrainingVersionUpdateView
 
 
@@ -142,6 +141,7 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         self.assertEqual(response.context['mini_training_obj'], self.mini_training_obj)
         self.assertEqual(response.context['mini_training_version_obj'], self.mini_training_version_obj)
         self.assertEqual(response.context['group_obj'], self.group_obj)
+        self.assertEqual(response.context['acronym_suffix'], "]")
         expected_tabs = [
             {
                 "text": _("Identification"),
@@ -157,6 +157,33 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
             kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
         )
         self.assertEqual(response.context['cancel_url'], expected_cancel_url)
+
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
+                'calculate_version_max_end_year', return_value=2025)
+    def test_assert_get_context_of_standard_transition(self, mock_max_postponement, mock_program_tree_version_repo):
+        mini_training_version_obj = StandardTransitionProgramTreeVersionFactory(tree__root_node__year=2020)
+        group_obj = GroupFactory(
+            entity_identity=GroupIdentity(
+                code=mini_training_version_obj.tree.root_node.code,
+                year=mini_training_version_obj.tree.root_node.year
+            ),
+        )
+        MiniTrainingFactory()
+
+        url = reverse(
+            'mini_training_version_update',
+            kwargs={"code": group_obj.code, "year": group_obj.year}
+        )
+
+        # Create db data for permission
+        group_year_db = GroupYearDBFactory(partial_acronym=group_obj.code, academic_year__year=group_obj.year, )
+        CentralManagerFactory(entity=group_year_db.management_entity, person=self.central_manager.person)
+        mock_program_tree_version_repo.return_value = mini_training_version_obj
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context['acronym_suffix'], "]")
 
 
 class TestMiniTrainingVersionUpdatePostView(TestCase):
@@ -177,7 +204,7 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
         )
 
         # Create db data for permission
-        group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year,)
+        group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year, )
         cls.central_manager = CentralManagerFactory(entity=group_year_db.management_entity)
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,

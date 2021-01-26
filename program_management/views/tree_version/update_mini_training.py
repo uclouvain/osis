@@ -40,10 +40,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/mini_training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_program_tree_version_obj().is_standard_version:
+        if self.get_program_tree_version_obj().is_official_standard:
             redirect_url = reverse('mini_training_update', kwargs={
                 'year': self.get_group_obj().year,
-                'code':  self.get_group_obj().code,
+                'code': self.get_group_obj().code,
                 'acronym': self.get_mini_training_obj().acronym
             })
             return HttpResponseRedirect(redirect_url)
