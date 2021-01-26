@@ -136,9 +136,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
-        messages_update_warning = update_context_with_messages_update_warnings(get_messages(self.request))
-        if messages_update_warning:
-            context['messages_update_warning'] = messages_update_warning
+        context['special_warning_messages'] = update_context_with_messages_update_warnings(get_messages(self.request))
 
         return context
 

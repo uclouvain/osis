@@ -43,15 +43,9 @@
         </div>
     {% endif %}
 
-    {% if messages_update_warning %}
+    {% if special_warning_messages %}
         <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
-            <b>{{ messages_update_warning.title }}</b>
-            <br>
-            <ul>
-                {% for message in messages_update_warning.messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
+            {{ special_warning_messages|safe }}
         </div>
     {% endif %}
 

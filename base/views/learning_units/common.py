@@ -30,6 +30,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
+from django.utils.safestring import mark_safe
 
 from base import models as mdl
 from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
@@ -155,9 +156,7 @@ def get_common_context_learning_unit_year(person,
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
 
-    messages_update_warning = update_context_with_messages_update_warnings(messages)
-    if messages_update_warning:
-        context['messages_update_warning'] = messages_update_warning
+    context['special_warning_messages'] = update_context_with_messages_update_warnings(messages)
     return context
 
 
@@ -221,8 +220,9 @@ def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
 def update_context_with_messages_update_warnings(all_messages):
     messages_update_warning = [m.message for m in all_messages if m.tags == '']
     if messages_update_warning:
-        return {
-            'title': _('Pay attention! This learning unit is used in more than one formation'),
-            'messages': messages_update_warning
-        }
+        html = "{}<ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
+        for message in messages_update_warning:
+            html += "<li>{}</li>".format(message)
+        html += "</ul>"
+        return mark_safe(html)
     return None
