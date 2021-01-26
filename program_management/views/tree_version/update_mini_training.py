@@ -1,4 +1,3 @@
-import functools
 from typing import Dict, List
 
 from django.db import transaction
@@ -11,6 +10,7 @@ from django.views import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
+from base.utils.cache import cached_result
 from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
@@ -30,6 +30,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
 from program_management.forms import version
+from program_management.templatetags.version_label import version_label
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -39,10 +40,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/mini_training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_program_tree_version_obj().is_standard_version:
+        if self.get_program_tree_version_obj().is_official_standard:
             redirect_url = reverse('mini_training_update', kwargs={
                 'year': self.get_group_obj().year,
-                'code':  self.get_group_obj().code,
+                'code': self.get_group_obj().code,
                 'acronym': self.get_mini_training_obj().acronym
             })
             return HttpResponseRedirect(redirect_url)
@@ -56,7 +57,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "mini_training_version_obj": self.get_program_tree_version_obj(),
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
         }
         return render(request, self.template_name, context)
 
@@ -89,7 +90,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
+                    "acronym": version_label(identity),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -111,7 +112,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
-    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+    @staticmethod
+    def get_url_program_version(version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
         return reverse(
             "element_identification",
@@ -168,16 +170,22 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     @cached_property
     def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
         mini_training_version_identity = self.get_program_tree_version_obj().entity_id
-        return version.UpdateMiniTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
-            year=self.kwargs['year'],
-            mini_training_version_identity=mini_training_version_identity,
-            mini_training_type=self.get_mini_training_obj().type,
-            initial=self._get_mini_training_version_form_initial_values()
-        )
+        form_parameters = self._get_form_parameters(mini_training_version_identity)
+        if mini_training_version_identity.is_standard_transition():
+            return version.UpdateMiniTrainingTransitionVersionForm(**form_parameters)
+        return version.UpdateMiniTrainingVersionForm(**form_parameters)
 
-    @functools.lru_cache()
+    def _get_form_parameters(self, mini_training_version_identity):
+        return {
+            'data': self.request.POST or None,
+            'user': self.request.user,
+            'year': self.kwargs['year'],
+            'mini_training_version_identity': mini_training_version_identity,
+            'mini_training_type': self.get_mini_training_obj().type,
+            'initial': self._get_mini_training_version_form_initial_values()
+        }
+
+    @cached_result
     def get_mini_training_obj(self) -> 'MiniTraining':
         try:
             mini_training_abbreviated_title = self.get_program_tree_version_obj().entity_id.offer_acronym
@@ -189,7 +197,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         except MiniTrainingNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_group_obj(self) -> 'Group':
         try:
             get_cmd = command_education_group.GetGroupCommand(
@@ -200,7 +208,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         except GroupNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_version_obj(self) -> 'ProgramTreeVersion':
         get_cmd = command.GetProgramTreeVersionFromNodeCommand(
             code=self.kwargs['code'],
@@ -208,7 +216,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         )
         return get_program_tree_version_from_node_service.get_program_tree_version_from_node(get_cmd)
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_obj(self) -> 'ProgramTree':
         return self.get_program_tree_version_obj().get_tree()
 
@@ -218,7 +226,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             academic_year__year=self.kwargs['year']
         )
 
-    def get_tabs(self) -> List:
+    @staticmethod
+    def get_tabs() -> List:
         return [
             {
                 "text": _("Identification"),
@@ -228,7 +237,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             },
         ]
 
-    def _get_default_error_messages(self) -> str:
+    @staticmethod
+    def _get_default_error_messages() -> str:
         return _("Error(s) in form: The modifications are not saved")
 
     def _get_mini_training_version_form_initial_values(self) -> Dict:

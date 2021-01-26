@@ -32,11 +32,10 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from program_management.forms.version import UpdateTrainingVersionForm, UpdateMiniTrainingVersionForm
+from program_management.forms.version import UpdateMiniTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
     StandardProgramTreeVersionFactory
 from program_management.views.tree_version.update_mini_training import MiniTrainingVersionUpdateView
@@ -177,7 +176,7 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
         )
 
         # Create db data for permission
-        group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year,)
+        group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year, )
         cls.central_manager = CentralManagerFactory(entity=group_year_db.management_entity)
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,

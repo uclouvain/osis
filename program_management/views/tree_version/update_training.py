@@ -1,4 +1,3 @@
-import functools
 from typing import Dict, List
 
 from django.db import transaction
@@ -12,6 +11,7 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
+from base.utils.cache import cached_result
 from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
@@ -31,6 +31,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
+from program_management.templatetags.version_label import version_label
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -40,10 +41,10 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_program_tree_version_obj().is_standard_version:
+        if self.get_program_tree_version_obj().is_official_standard:
             redirect_url = reverse('training_update', kwargs={
                 'year': self.get_group_obj().year,
-                'code':  self.get_group_obj().code,
+                'code': self.get_group_obj().code,
                 'title': self.get_training_obj().acronym
             })
             return HttpResponseRedirect(redirect_url)
@@ -58,7 +59,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
             "cancel_url": self.get_cancel_url(),
-            "is_finality_types": self.get_training_obj().is_finality()
+            "is_finality_types": self.get_training_obj().is_finality(),
         }
         return render(request, self.template_name, context)
 
@@ -91,14 +92,13 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
-                    "academic_year": display_as_academic_year(identity.year)
+                    "acronym": version_label(identity),
+                    "academic_year": display_as_academic_year(identity.year),
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
 
     def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
-
         is_new_end_year_lower_than_initial_one = operator.is_year_lower(
             self.training_version_form.cleaned_data["end_year"],
             self.training_version_form.initial['end_year']
@@ -108,13 +108,15 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             delete_message = _(
                 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
-                "offer_acronym": last_identity.offer_acronym,
-                "acronym": last_identity.version_name,
-                "academic_year": display_as_academic_year(self.training_version_form.cleaned_data["end_year"] + 1)
-            }
+                                 "offer_acronym": last_identity.offer_acronym,
+                                 "acronym": last_identity.version_name,
+                                 "academic_year": display_as_academic_year(
+                                     self.training_version_form.cleaned_data["end_year"] + 1)
+                             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
-    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+    @staticmethod
+    def get_url_program_version(version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
         return reverse(
             "element_identification",
@@ -166,16 +168,22 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     @cached_property
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
         training_version_identity = self.get_program_tree_version_obj().entity_id
-        return version.UpdateTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
-            year=self.kwargs['year'],
-            training_version_identity=training_version_identity,
-            training_type=self.get_training_obj().type,
-            initial=self._get_training_version_form_initial_values()
-        )
+        form_parameters = self._get_form_parameters(training_version_identity)
+        if training_version_identity.is_standard_transition():
+            return version.UpdateTrainingTransitionVersionForm(**form_parameters)
+        return version.UpdateTrainingVersionForm(**form_parameters)
 
-    @functools.lru_cache()
+    def _get_form_parameters(self, training_version_identity):
+        return {
+            'data': self.request.POST or None,
+            'user': self.request.user,
+            'year': self.kwargs['year'],
+            'training_version_identity': training_version_identity,
+            'training_type': self.get_training_obj().type,
+            'initial': self._get_training_version_form_initial_values()
+        }
+
+    @cached_result
     def get_training_obj(self) -> 'Training':
         try:
             training_acronym = self.get_program_tree_version_obj().entity_id.offer_acronym
@@ -187,7 +195,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         except TrainingNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_group_obj(self) -> 'Group':
         try:
             get_cmd = command_education_group.GetGroupCommand(
@@ -198,7 +206,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         except GroupNotFoundException:
             raise Http404
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_version_obj(self) -> 'ProgramTreeVersion':
         get_cmd = command.GetProgramTreeVersionFromNodeCommand(
             code=self.kwargs['code'],
@@ -206,7 +214,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         )
         return get_program_tree_version_from_node_service.get_program_tree_version_from_node(get_cmd)
 
-    @functools.lru_cache()
+    @cached_result
     def get_program_tree_obj(self) -> 'ProgramTree':
         return self.get_program_tree_version_obj().get_tree()
 
@@ -216,7 +224,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             academic_year__year=self.kwargs['year']
         )
 
-    def get_tabs(self) -> List:
+    @staticmethod
+    def get_tabs() -> List:
         return [
             {
                 "text": _("Identification"),
@@ -232,7 +241,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             },
         ]
 
-    def _get_default_error_messages(self) -> str:
+    @staticmethod
+    def _get_default_error_messages() -> str:
         return _("Error(s) in form: The modifications are not saved")
 
     def _get_training_version_form_initial_values(self) -> Dict:

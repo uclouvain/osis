@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_group import has_coorganization
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -49,8 +50,8 @@ from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -58,7 +59,6 @@ from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -145,7 +145,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ).format(
                 root=root_node,
                 version="[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard() else ""
+                if version_identity and not version_identity.is_official_standard() else ""
             )
             display_warning_messages(self.request, message)
             return root_node
@@ -217,7 +217,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path_to={}".format(self.path)
 
     def get_update_training_url(self):
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return reverse_with_get(
                 'training_update',
                 kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'],
@@ -231,19 +231,19 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         )
 
     def get_update_permission_name(self) -> str:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return "base.change_training"
         return "program_management.change_training_version"
 
     def get_delete_permanently_training_url(self):
-        if self.program_tree_version_identity.is_standard():
+        if self.program_tree_version_identity.is_official_standard():
             return reverse(
                 'training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             )
 
     def get_delete_permanently_tree_version_url(self):
-        if not self.program_tree_version_identity.is_standard():
+        if not self.program_tree_version_identity.is_official_standard():
             return reverse(
                 'delete_permanently_tree_version',
                 kwargs={
@@ -256,7 +256,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return "program_management.delete_permanently_training_version"
 
     def get_create_version_url(self):
-        if self.is_root_node and self.program_tree_version_identity.is_standard():
+        if self.is_root_node and self.program_tree_version_identity.is_official_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
@@ -283,7 +283,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': self.current_version.is_standard_version,
+                'display': self.current_version.is_official_standard,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, self.node_identity, self.path),
             },
             Tab.ADMINISTRATIVE_DATA: {
@@ -332,18 +332,18 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def have_administrative_data_tab(self):
         return self.group.type not in TrainingType.root_master_2m_types_enum() and \
-               self.current_version.is_standard_version
+               self.current_version.is_official_standard
 
     def have_general_information_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
     def have_skills_and_achievements_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_skills_achievements()
 
     def have_admission_condition_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_admission_condition()
 
 

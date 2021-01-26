@@ -45,8 +45,20 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
     is_transition = attr.ib(type=bool)
 
-    def is_standard(self):
-        return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
+    def is_standard(self) -> bool:
+        return self.version_name == STANDARD or self.version_name is None
+
+    def is_official_standard(self) -> bool:
+        return self.is_standard() and not self.is_transition
+
+    def is_standard_transition(self) -> bool:
+        return self.is_standard() and self.is_transition
+
+    def is_specific_transition(self) -> bool:
+        return not self.is_standard() and self.is_transition
+
+    def is_specific_official(self) -> bool:
+        return not self.is_standard() and not self.is_transition
 
 
 class ProgramTreeVersionBuilder:
@@ -191,7 +203,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_standard(self):
-        return self.entity_id.version_name == STANDARD
+        return self.entity_id.is_standard()
 
     @property
     def end_year(self):
@@ -201,13 +213,17 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_transition(self) -> bool:
         return self.entity_id.is_transition
 
+    @property
+    def is_specific_transition(self) -> bool:
+        return self.entity_id.is_specific_transition()
+
     @version_name.default
     def _version_name(self) -> str:
         return self.entity_id.version_name
 
     @property
-    def is_standard_version(self) -> bool:
-        return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
+    def is_official_standard(self) -> bool:
+        return self.entity_id.is_official_standard()
 
     @property
     def version_label(self):  # TODO :: to remove
