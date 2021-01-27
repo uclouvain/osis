@@ -291,7 +291,7 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
-class TestGetParentsUsingNodeAsReference(SimpleTestCase):
+class TestGetParentsNodeWithRespectToReference(SimpleTestCase):
     def setUp(self):
         self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
         self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
@@ -304,11 +304,11 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
     def test_when_node_is_not_used_as_reference(self):
         link_without_ref = LinkFactory(parent=self.link_with_root.child, link_type=None)
-        result = self.tree.get_parents_using_node_with_respect_to_reference(link_without_ref.child)
-        self.assertListEqual(result, [])
+        result = self.tree.get_parents_node_with_respect_to_reference(link_without_ref.child)
+        self.assertListEqual(result, [link_without_ref.child])
 
     def test_when_node_is_used_as_reference(self):
-        result = self.tree.get_parents_using_node_with_respect_to_reference(self.link_with_ref.child)
+        result = self.tree.get_parents_node_with_respect_to_reference(self.link_with_ref.child)
         self.assertListEqual(
             result,
             [self.link_with_ref.parent]
@@ -324,7 +324,7 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
             link_type=LinkTypes.REFERENCE
         )
 
-        result = self.tree.get_parents_using_node_with_respect_to_reference(child_used_twice)
+        result = self.tree.get_parents_node_with_respect_to_reference(child_used_twice)
 
         self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
