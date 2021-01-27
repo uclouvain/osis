@@ -71,9 +71,6 @@ def offers_search(request):
         'academic_year',
     )
 
-    # offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym) \
-    #     .select_related("entity_management", "academic_year")
-
     return render(request, "offers.html", {'academic_year': academic_yr,
                                            'entity_acronym': entity,
                                            'code': acronym,

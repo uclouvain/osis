@@ -278,7 +278,7 @@ urlpatterns = [
     url(r'^offers/', include([
         url(r'^$', offer.offers, name='offers'),
         url(r'^search$', offer.offers_search, name='offers_search'),
-    ])),  # TODO :: move into assessments
+    ])),
 
     url(r'^educationgroups/', include(education_groups_urls.urlpatterns)),
 
