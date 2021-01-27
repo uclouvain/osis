@@ -192,18 +192,3 @@ def _create_attribution(learning_unit_year, person, is_score_responsible=False):
         tutor=TutorFactory(person=person),
         score_responsible=is_score_responsible
     )
-
-
-def create_data_for_entity_address(academic_yr, offer_yr, entity_type):
-    past_date = datetime.datetime(year=2015, month=1, day=1)
-    education_group_year = EducationGroupYearFactory(academic_year=academic_yr)
-    country = CountryFactory()
-    entity = EntityFactory(country=country)
-    EntityVersionFactory(entity=entity,
-                         start_date=past_date,
-                         end_date=None)
-    OfferYearEntityFactory(offer_year=offer_yr,
-                           entity=entity,
-                           type=entity_type,
-                           education_group_year=education_group_year)
-    return entity

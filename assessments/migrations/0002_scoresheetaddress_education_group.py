@@ -8,7 +8,7 @@ def set_education_group_id_field(apps, schema_editor):
     EducationGroupYear = apps.get_model('base', 'educationgroupyear')
     OfferYear = apps.get_model('base', 'offeryear')
     ScoreSheetAddress = apps.get_model('assessments', 'scoresheetaddress')
-    current_year = 2019  # TODO :: change to 2020
+    current_year = 2020
     educ_group_years = EducationGroupYear.objects.filter(
         academic_year__year=current_year
     ).values(
@@ -48,16 +48,6 @@ def set_education_group_id_field(apps, schema_editor):
     ScoreSheetAddress.objects.bulk_update(to_update, ['education_group_id'], batch_size=1000)
     ScoreSheetAddress.objects.exclude(offer_year__academic_year__year=current_year).delete()
     ScoreSheetAddress.objects.filter(pk__in={obj.pk for obj in to_remove}).delete()
-
-
-#  TODO :: remove this and add migration file to remove OfferYear from ScoreSheetAddress
-"""
-select distinct year 
-from assessments_scoresheetaddress addr
-join base_offeryear bo on addr.offer_year_id = bo.id
-join base_academicyear ba on bo.academic_year_id = ba.id
-
-"""
 
 
 class Migration(migrations.Migration):

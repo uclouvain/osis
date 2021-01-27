@@ -106,8 +106,8 @@ def _save_from_entity_address(context, entity_version_id_selected, education_gro
     email_encode = request.POST.get('email')
     form = score_sheet_address_entity.ScoreSheetAddressEntityForm(request.POST)
     if form.is_valid():
-        score_encoding_sheet.save_address_from_entity(context.get('offer_year'), entity_version_id_selected,
-                                                      request.POST.get('email'))
+        score_encoding_sheet._save_address_from_entity(context.get('offer_year'), entity_version_id_selected,
+                                                       request.POST.get('email'))
         messages.add_message(request, messages.SUCCESS, _("Score sheet address was successfully saved."))
         return HttpResponseRedirect(reverse("offer_score_encoding_tab", args=[education_group_id]))
     else:

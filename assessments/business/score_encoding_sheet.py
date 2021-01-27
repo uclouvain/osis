@@ -44,7 +44,7 @@ from base.models.enums.organization_type import MAIN
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.exam_enrollment import justification_label_authorized, get_deadline
 
-OfferYearEntityType = str  # cf. offer_year_entity_type  # TODO :: to rename and remove the enumeration
+OfferYearEntityType = str  # cf. offer_year_entity_type
 EntityId = int
 
 
@@ -96,8 +96,7 @@ def get_map_entity_with_entity_type(educ_group_year: 'EducationGroupYear') -> Di
     return {value: key for key, value in _get_map_entity_type_with_entity(educ_group_year).items()}
 
 
-# TODO :: make private function
-def save_address_from_entity(educ_group_year: 'EducationGroupYear', entity_version_id_selected, email):
+def _save_address_from_entity(educ_group_year: 'EducationGroupYear', entity_version_id_selected, email):
     entity_id = entity_version.find_by_id(entity_version_id_selected).entity_id
     entity_id_mapped_with_type = get_map_entity_with_entity_type(educ_group_year)
     entity_address_choice = entity_id_mapped_with_type.get(entity_id)
