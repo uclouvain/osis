@@ -1,10 +1,8 @@
 from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
-from base.models.enums import prerequisite_operator
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer, \
     NodeBaseSerializer
-from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -93,7 +91,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         with self.subTest('prerequisites_string'):
             self.assertEqual(
-                self.ldroi100a.prerequisite.get_prerequisite_expression(translate=False),
+                self.tree.get_prerequisite(self.ldroi100a).get_prerequisite_expression(translate=False),
                 self.serializer.data.get('prerequisites_string')
             )
 
