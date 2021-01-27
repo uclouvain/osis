@@ -31,8 +31,9 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, offer_year, \
-    learning_unit_year
+    learning_unit_year, education_group_year
 from base.auth.roles import program_manager
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
 
 
@@ -41,7 +42,7 @@ def get_scores_encoding_list(user, **kwargs):
     current_number_session = session_exam_calendar.find_session_exam_number()
     is_program_manager = program_manager.is_program_manager(user)
     learning_unit_year_id = kwargs.get('learning_unit_year_id')
-    offer_year_id = kwargs.get('offer_year_id')
+    educ_group_year_id = kwargs.get('education_group_year_id')
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
     justification = kwargs.get('justification')
@@ -49,15 +50,17 @@ def get_scores_encoding_list(user, **kwargs):
 
     if is_program_manager:
         professor = tutor.find_by_id(tutor_id) if tutor_id else None
-        offers_year = [offer_year.find_by_id(offer_year_id)] if offer_year_id else \
-                       list(offer_year.find_by_user(user, academic_yr=current_academic_year))
+        if educ_group_year_id:
+            education_group_years = [EducationGroupYear.objects.filter(pk=educ_group_year_id).first()]
+        else:
+            education_group_years = education_group_year.find_by_user(user, academic_yr=current_academic_year)
 
         enrollments = exam_enrollment.find_for_score_encodings(
             academic_year=current_academic_year,
             session_exam_number=current_number_session,
             learning_unit_year_id=learning_unit_year_id,
             tutor=professor,
-            offers_year=offers_year,
+            education_group_years=education_group_years,
             registration_id=kwargs.get('registration_id'),
             student_last_name=kwargs.get('student_last_name'),
             student_first_name=kwargs.get('student_first_name'),

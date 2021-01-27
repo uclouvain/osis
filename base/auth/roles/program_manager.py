@@ -162,6 +162,7 @@ def find_by_offer_year(offer_yr):
         .order_by('person__last_name', 'person__first_name')
 
 
+# TODO :: to remove
 def find_by_user(user, academic_year=None):
     queryset = ProgramManager.objects
     if academic_year:

@@ -54,6 +54,7 @@ def generate_end_date(abstract_calendar):
 class OfferYearCalendarFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.OfferYearCalendar"
+        django_get_or_create = ('academic_calendar', 'education_group_year',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 

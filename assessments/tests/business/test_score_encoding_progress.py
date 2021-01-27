@@ -152,7 +152,7 @@ class ScoreEncodingProgressTest(TestCase):
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
-        offer_years = list(score_encoding_progress.find_related_offer_years(progress_list))
+        offer_years = list(score_encoding_progress.find_related_education_group_years(progress_list))
         self.assertEqual(len(offer_years), 2)
         # Check sort by acronym
         self.assertEqual(offer_years[0].acronym, self.offer_year.acronym)
