@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.urls import reverse_with_get
+from base.views.common import display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.domain.service.identity_search import MiniTrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
@@ -47,20 +48,14 @@ from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command as command_program_management
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.forms.custom_xls import CustomXlsForm
-from program_management.ddd import command as command_program_management
 from program_management.ddd.service.read import node_identity_service
+from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
-from education_group.forms.tree_version_choices import get_tree_versions_choices
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.forms.custom_xls import CustomXlsForm
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -157,9 +152,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return int(self.get_path().split("|")[0])
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "group": self.get_group(),
             "mini_training": self.get_mini_training(),
@@ -203,6 +199,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
+            "view_publish_btn":
+                self.request.user.has_perm('base.view_publish_btn') and
+                (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url()
         }
 
     def get_permission_object(self):
@@ -329,6 +329,12 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     def have_admission_condition_tab(self):
         return self.current_version.is_standard_version and \
             self.get_group().type.name in MiniTrainingType.with_admission_condition()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())
 
 
 def _get_view_name_from_tab(tab: Tab):

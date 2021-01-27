@@ -4,27 +4,27 @@
 {% load feature_flag %}
 {% load waffle_tags %}
 {% comment "License" %}
-* OSIS stands for Open Student Information System. It's an application
-* designed to manage the core business of higher education institutions,
-* such as universities, faculties, institutes and professional schools.
-* The core business involves the administration of students, teachers,
-* courses, programs and so on.
-*
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* A copy of this license - GNU General Public License - is available
-* at the root of the source code of this program.  If not,
-* see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block action_top %}
     {% include "learning_unit/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
@@ -66,13 +66,15 @@
                                     <div class="col-md-3">
                                         <label class="d-block">{% trans 'UE full' %}</label>
                                         <a id="full_acronym"
-                                           href="{% url 'learning_unit' learning_unit_year.parent.id %}" {{ differences|get_difference_css:'acronym' }}>
+                                           href="{% url 'learning_unit' learning_unit_year.parent.id %}"
+                                                {{ differences|get_difference_css:'acronym' }}>
                                             {{ learning_unit_year.learning_container_year.acronym }}</a>
                                     </div>
                                 {% else %}
                                     <div class="col-md-3">
                                         {# FIXME Use dl_tooltip for all label/span #}
-                                        <label class="d-block" {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label>
+                                        <label class="d-block"
+                                                {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label>
                                         <span {{ differences|get_difference_css:'acronym' }}
                                                 id="id_acronym">{{ learning_unit_year.acronym }}</span>
                                     </div>
@@ -134,7 +136,7 @@
                         {% block titles %}
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title"%}</label>
+                                    <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title" %}</label>
                                     {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True default_if_none="-" %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
                                         {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') specific_title=True default_if_none="-" %}
@@ -146,7 +148,7 @@
                             <br/>
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title in English"%}</label>
+                                    <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title in English" %}</label>
                                     {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True default_if_none="-" %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
                                         {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Partim)') label_text=_('Specific complement (Partim)') specific_title=True default_if_none="-" %}
@@ -187,6 +189,9 @@
                             </div>
                             <div>
                                 {% dl_tooltip learning_unit_year 'other_remark' %}
+                            </div>
+                            <div>
+                                {% dl_tooltip learning_unit_year 'other_remark_english' %}
                             </div>
                         </div>
                     </div>
@@ -254,7 +259,7 @@
                                 {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
                                     {% url 'organization_read' organization_id=organization.id as url_organization %}
                                     {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
-                                    {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name  %}
+                                    {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name %}
                                 {% endwith %}
                             {% endif %}
 

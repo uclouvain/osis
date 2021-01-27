@@ -40,13 +40,13 @@ class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
         academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
 
         for ac_year in academic_years:
-            AcademicCalendar.objects.update_or_create(
+            AcademicCalendar.objects.get_or_create(
                 reference=cls.event_reference,
                 data_year=ac_year,
                 defaults={
                     "title": "Préparation des formations",
-                    "start_date": datetime.date(ac_year.year - 1, 8, 15),
-                    "end_date": datetime.date(ac_year.year - 1, 11, 20),
+                    "start_date": datetime.date(ac_year.year - 1, 7, 1),
+                    "end_date": datetime.date(ac_year.year, 6, 1),
                     "academic_year": ac_year  # To remove after refactoring
                 }
             )

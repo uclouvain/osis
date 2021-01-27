@@ -27,33 +27,47 @@
 from rest_framework import serializers
 
 from learning_unit.api.serializers.utils import LearningUnitDDDHyperlinkedIdentityField
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import Node
 
 
 class NodeBaseSerializer(serializers.Serializer):
     title = serializers.SerializerMethodField()
+    title_en = serializers.SerializerMethodField()
     url = LearningUnitDDDHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(read_only=True)
 
     def get_title(self, obj: 'Node'):
-        lang = self.context.get('language', 'fr').lower()
-        lang = 'fr' if lang == 'fr-be' else lang
-        specific_title = getattr(obj, 'specific_title_{}'.format(lang))
-        common_title = getattr(obj, 'common_title_{}'.format(lang))
+        specific_title = getattr(obj, 'specific_title_fr')
+        common_title = getattr(obj, 'common_title_fr')
 
+        return self._get_complete_title(common_title, specific_title)
+
+    @staticmethod
+    def _get_complete_title(common_title: str, specific_title: str) -> str:
         complete_title = specific_title
         if common_title:
             complete_title = common_title + (' - ' + specific_title if specific_title else '')
         return complete_title
 
+    def get_title_en(self, obj: 'Node'):
+        specific_title = getattr(obj, 'specific_title_en')
+        common_title = getattr(obj, 'common_title_en')
+
+        return self._get_complete_title(common_title, specific_title)
+
 
 class ProgramTreePrerequisitesSerializer(NodeBaseSerializer):
-    prerequisites_string = serializers.CharField(source='prerequisite', read_only=True)
+    prerequisites_string = serializers.SerializerMethodField()
     prerequisites = serializers.SerializerMethodField()
 
-    def get_prerequisites(self, obj: 'Node'):
+    def get_prerequisites_string(self, obj: 'NodeLearningUnitYear'):
+        prerequisites = self.context['tree'].get_prerequisite(obj)
+        return prerequisites.get_prerequisite_expression(translate=False)
+
+    def get_prerequisites(self, obj: 'NodeLearningUnitYear'):
         list_nodes = []
-        for prig in obj.prerequisite.prerequisite_item_groups:
+        for prig in self.context['tree'].get_prerequisite(obj).prerequisite_item_groups:
             for prerequisite in prig.prerequisite_items:
                 node = self.context.get('tree').get_node_by_code_and_year(prerequisite.code, prerequisite.year)
                 list_nodes.append(node)
