@@ -40,7 +40,7 @@
 
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active" id="identification">
-                    <form method="POST" action="{% url 'save_score_sheet_address' offer_year.education_group_id %}"
+                    <form method="POST" action="{% url 'save_score_sheet_address' education_group_year.education_group_id %}"
                           id="form_score_sheet_address" novalidate>
                         {% csrf_token %}
                         <br>
@@ -48,7 +48,7 @@
                         <div class="alert alert-dismissible alert-warning text-justify">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             <p>
-                                {% blocktrans with acronym=offer_year.acronym %}
+                                {% blocktrans with acronym=education_group_year.acronym %}
                                     If you customize one of the field below, it only change the address displayed on the
                                     score encodings sheets for the program {{ acronym }}.
                                     It will never change the address of any structure. The list below will help you to

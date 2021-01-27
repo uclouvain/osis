@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import List, Dict
 
-from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -35,12 +34,10 @@ from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
 from attribution.models import attribution
 from base.models import entity as entity_model, entity_version as entity_version, person_address, \
-    session_exam_calendar, \
-    offer_year_entity
+    session_exam_calendar
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums.organization_type import MAIN
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.exam_enrollment import justification_label_authorized, get_deadline
 

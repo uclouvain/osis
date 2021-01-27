@@ -45,7 +45,7 @@ class OfferScoreSheetTabViewTest(TestCase):
                                                 end_date=today.replace(year=today.year + 1),
                                                 year=today.year)
         cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
-        cls.COMMON_CONTEXT_KEYS = ['offer_year', 'countries', 'is_program_manager', 'entity_versions']
+        cls.COMMON_CONTEXT_KEYS = ['education_group_year', 'countries', 'is_program_manager', 'entity_versions']
         cls.a_superuser = SuperUserFactory()
 
     def setUp(self):
@@ -62,12 +62,12 @@ class OfferScoreSheetTabViewTest(TestCase):
         self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
         context_keys = self.COMMON_CONTEXT_KEYS + ['entity_id_selected', 'form']
         self.assert_list_contains(list(response.context.keys()), context_keys)
-        self.assertEqual(response.context['offer_year'], self.educ_group_year)
+        self.assertEqual(response.context['education_group_year'], self.educ_group_year)
 
     def assert_list_contains(self, container, member):
         self.assertFalse([item for item in member if item not in container])
 
-    @mock.patch('assessments.business.score_encoding_sheet.save_address_from_entity')
+    @mock.patch('assessments.business.score_encoding_sheet._save_address_from_entity')
     @mock.patch('django.contrib.messages.add_message')
     def test_save_score_sheet_address_case_reuse_entity_address(self,
                                                                 mock_add_message,
