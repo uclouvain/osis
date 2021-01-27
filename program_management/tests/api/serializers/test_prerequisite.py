@@ -1,11 +1,10 @@
 from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
-from base.models.enums import prerequisite_operator
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer, \
     NodeBaseSerializer
-from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
@@ -48,17 +47,13 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         LinkFactory(parent=self.subgroup1, child=self.ldroi1300)
         LinkFactory(parent=self.subgroup1, child=self.lagro2400)
 
-        self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        self.p_group.add_prerequisite_item('LDROI1300', 2018)
-        self.p_group2 = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        self.p_group2.add_prerequisite_item('LAGRO2400', 2018)
-
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        p_req.add_prerequisite_item_group(self.p_group)
-        p_req.add_prerequisite_item_group(self.p_group2)
-        self.ldroi100a.set_prerequisite(p_req)
-
         self.tree = ProgramTree(root_node=self.root_node)
+
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=self.tree,
+            node_having_prerequisite=self.ldroi100a.entity_id,
+            nodes_that_are_prequisites=[self.ldroi1300, self.lagro2400]
+        )
 
         url = reverse('program_management_api_v1:training-prerequisites_official',
                       kwargs={'year': self.root_node.year, 'acronym': self.root_node.code})
@@ -92,11 +87,11 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
             self.assertEqual(url, self.serializer.data.get('url'))
 
         with self.subTest('code'):
-            self.assertEqual(self.ldroi100a.code, self.serializer.data.get('code'))
+            self.assertEqual("LDROI100A", self.serializer.data.get('code'))
 
         with self.subTest('prerequisites_string'):
             self.assertEqual(
-                self.ldroi100a.prerequisite.get_prerequisite_expression(translate=False),
+                self.tree.get_prerequisite(self.ldroi100a).get_prerequisite_expression(translate=False),
                 self.serializer.data.get('prerequisites_string')
             )
 

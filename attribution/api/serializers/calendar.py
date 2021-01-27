@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from rest_framework import serializers
 
-from django import template
-
-register = template.Library()
+from base.business.event_perms import AcademicEvent
 
 
-@register.filter
-def shift_date(source_date, days_to_add):
-    try:
-        return source_date + datetime.timedelta(days=days_to_add)
-    except TypeError:
-        return None
+class ApplicationCourseCalendarSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField(allow_null=True)
+    authorized_target_year = serializers.IntegerField()
+    is_open = serializers.SerializerMethodField()
+
+    def get_is_open(self, obj: AcademicEvent) -> bool:
+        return obj.is_open_now()
