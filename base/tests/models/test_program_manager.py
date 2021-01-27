@@ -37,7 +37,7 @@ from base.tests.factories.structure import StructureFactory
 from base.tests.factories.user import UserFactory
 
 
-class FindByOfferYearTest(TestCase):
+class TestIsProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
@@ -58,7 +58,14 @@ class FindByOfferYearTest(TestCase):
         user = UserFactory(username="NO_PGRM")
         self.assertFalse(program_manager.is_program_manager(user=user))
 
-    def test_find_program_manager_by_entity_administration_fac(self):
+
+class TestFindProgramManager(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+
+    def test_find_by_requirement_entity(self):
         a_management_entity = EntityVersionFactory()
         education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
