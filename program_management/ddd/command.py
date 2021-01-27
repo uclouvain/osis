@@ -417,6 +417,18 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class PostponeProgramTreeTransitionVersionCommand(interface.CommandRequest):
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    from_is_transition = attr.ib(type=bool)
+    from_end_year = attr.ib(type=int)
+
+    # FIXME :: to remove, the code can be found when converting ProgramTreeVersionIdentity to GroupIdentity
+    from_code = attr.ib(type=str, default=None)
+
+
+@attr.s(frozen=True, slots=True)
 class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_offer_acronym = attr.ib(type=str)

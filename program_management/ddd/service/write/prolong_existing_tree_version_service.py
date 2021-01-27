@@ -32,7 +32,7 @@ from program_management.ddd.command import PostponeProgramTreeVersionCommand, Ex
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.service.write import extend_existing_tree_version_service, \
-    update_program_tree_version_service, postpone_tree_version_service
+    update_program_tree_version_service, postpone_tree_specific_version_service
 
 
 @transaction.atomic()
@@ -45,7 +45,7 @@ def prolong_existing_tree_version(
     update_program_tree_version_service.update_program_tree_version(
         __convert_to_update_command(command)
     )
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_specific_version_service.postpone_program_tree_version(
         __convert_to_postpone_command(command)
     )
     return identities

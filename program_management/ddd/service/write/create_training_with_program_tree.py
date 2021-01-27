@@ -34,7 +34,7 @@ from education_group.ddd.command import CreateAndPostponeTrainingAndProgramTreeC
 from education_group.ddd.service.write import create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
-from program_management.ddd.service.write import create_standard_version_service, postpone_tree_version_service, \
+from program_management.ddd.service.write import create_standard_version_service, postpone_tree_specific_version_service, \
     create_standard_program_tree_service, postpone_program_tree_service
 
 
@@ -80,7 +80,7 @@ def create_and_report_training_with_program_tree(
     )
 
     # 4. Postpone standard version of program tree
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_specific_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=program_tree_version_identity.offer_acronym,
             from_version_name=program_tree_version_identity.version_name,

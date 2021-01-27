@@ -32,7 +32,7 @@ from education_group.ddd.service.write import postpone_training_and_group_modifi
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand, PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
     UpdateProgramTreeVersionEndDateCommand
-from program_management.ddd.service.write import postpone_tree_version_service, \
+from program_management.ddd.service.write import postpone_tree_specific_version_service, \
     postpone_program_tree_service, update_program_tree_version_end_date_service
 
 
@@ -59,7 +59,7 @@ def postpone_training_and_program_tree_modifications(
         )
     )
 
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_specific_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=update_command.postpone_from_acronym,
             from_version_name="",

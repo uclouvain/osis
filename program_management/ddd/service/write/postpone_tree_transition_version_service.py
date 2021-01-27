@@ -25,34 +25,39 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    PostponeProgramTreeCommand
+from django.db import transaction
+
+from education_group.ddd.domain.exception import TrainingNotFoundException
+from program_management.ddd.command import CopyTreeVersionToNextYearCommand, PostponeProgramTreeTransitionVersionCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_specific_version_service, postpone_program_tree_service, \
-    create_program_tree_specific_version_service
+from program_management.ddd.service.write import copy_program_version_service
 
 
-def create_and_postpone(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
+@transaction.atomic()
+def postpone_program_tree_version(
+        postpone_cmd: 'PostponeProgramTreeTransitionVersionCommand'
+) -> List['ProgramTreeVersionIdentity']:
+    identities_created = []
 
-    identity = create_program_tree_specific_version_service.create_program_tree_version(command)
-    tree_version = ProgramTreeVersionRepository().get(identity)
+    # GIVEN
+    from_year = postpone_cmd.from_year
 
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=tree_version.program_tree_identity.code,
-            from_year=tree_version.program_tree_identity.year,
-            offer_acronym=identity.offer_acronym,
-        )
-    )
+    # WHEN
+    while from_year < postpone_cmd.from_end_year:
+        try:
+            cmd_copy_from = CopyTreeVersionToNextYearCommand(
+                from_offer_acronym=postpone_cmd.from_offer_acronym,
+                from_year=from_year,
+                from_version_name=postpone_cmd.from_version_name,
+                from_is_transition=postpone_cmd.from_is_transition,
+                from_offer_code=postpone_cmd.from_code
+            )
+            identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)
+            identities_created.append(identity_next_year)
 
-    created_identities = postpone_tree_specific_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=identity.offer_acronym,
-            from_year=identity.year,
-            from_is_transition=identity.is_transition,
-            from_version_name=identity.version_name,
-        )
-    )
+            from_year += 1
+        except (exception.CannotCopyTreeVersionDueToEndDate, TrainingNotFoundException):
+            break
 
-    return [identity] + created_identities
+    return identities_created
