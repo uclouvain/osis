@@ -383,6 +383,8 @@ class UpdateMiniTrainingTransitionVersionForm(UpdateMiniTrainingVersionForm):
         super().__init__(mini_training_version_identity, **kwargs)
         if mini_training_version_identity.is_standard_transition():
             self.fields['version_name'].required = False
+        if BLANK_CHOICE[0] in self.fields["end_year"].choices:
+            self.fields["end_year"].choices.remove(BLANK_CHOICE[0])
 
 
 class UpdateTrainingTransitionVersionForm(UpdateTrainingVersionForm):
@@ -391,3 +393,5 @@ class UpdateTrainingTransitionVersionForm(UpdateTrainingVersionForm):
         super().__init__(training_version_identity, **kwargs)
         if training_version_identity.is_standard_transition():
             self.fields['version_name'].required = False
+        if BLANK_CHOICE[0] in self.fields["end_year"].choices:
+            self.fields["end_year"].choices.remove(BLANK_CHOICE[0])

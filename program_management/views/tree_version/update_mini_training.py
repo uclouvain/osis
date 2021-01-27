@@ -171,7 +171,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
         mini_training_version_identity = self.get_program_tree_version_obj().entity_id
         form_parameters = self._get_form_parameters(mini_training_version_identity)
-        if mini_training_version_identity.is_standard_transition():
+        if mini_training_version_identity.is_transition:
             return version.UpdateMiniTrainingTransitionVersionForm(**form_parameters)
         return version.UpdateMiniTrainingVersionForm(**form_parameters)
 

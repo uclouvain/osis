@@ -169,7 +169,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
         training_version_identity = self.get_program_tree_version_obj().entity_id
         form_parameters = self._get_form_parameters(training_version_identity)
-        if training_version_identity.is_standard_transition():
+        if training_version_identity.is_transition:
             return version.UpdateTrainingTransitionVersionForm(**form_parameters)
         return version.UpdateTrainingVersionForm(**form_parameters)
 
