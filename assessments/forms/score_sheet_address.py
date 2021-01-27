@@ -36,7 +36,8 @@ class ScoreSheetAddressForm(forms.ModelForm):
     location = forms.CharField(max_length=255, label=gettext_lazy('Locality'))
     postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
     city = forms.CharField(max_length=255, label=gettext_lazy('City'))
-    offer_year = forms.CharField()
+    offer_year = forms.CharField(required=False)
+    offer_acronym = forms.CharField(required=False)  # TODO :: to reuse instead of offer_year, and set required=True
     email = forms.EmailField(required=False)
 
     class Meta:

@@ -64,7 +64,7 @@ urlpatterns = [
     ])),
 
     url(r'^offers/', include([
-        url(r'^(?P<offer_year_id>[0-9]+)/', include([
+        url(r'^(?P<education_group_id>[0-9]+)/', include([
             url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
             url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
         ]))

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy
@@ -34,16 +34,19 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class ScoreSheetAddressAdmin(OsisModelAdmin):
-    list_display = ('offer_year', 'entity_address_choice', 'location', 'postal_code', 'city', 'phone', 'fax', 'email')
-    search_fields = ['offer_year__acronym', 'location']
-    list_filter = ('entity_address_choice',)
-    raw_id_fields = ('offer_year',)
+    list_display = ('offer_year', 'offer_acronym', 'entity_address_choice', 'location', 'postal_code', 'city', 'phone', 'fax', 'email')
+    search_fields = ['location', 'education_group__educationgroupyear__acronym']
+    list_filter = ('entity_address_choice', 'offer_year__academic_year__year')
 
 
 class ScoreSheetAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.OneToOneField('base.OfferYear', on_delete=models.CASCADE)
+    offer_year = models.OneToOneField('base.OfferYear', on_delete=models.CASCADE)  # TODO :: to remove
+    education_group = models.OneToOneField(
+        'base.EducationGroup',
+        on_delete=models.CASCADE,
+    )
     # Info to find the address
     entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
                                              choices=score_sheet_address_choices.CHOICES)
@@ -60,6 +63,10 @@ class ScoreSheetAddress(models.Model):
     phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Phone"))
     fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
     email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
+
+    @property
+    def offer_acronym(self):
+        return self.education_group.most_recent_acronym
 
     @property
     def customized(self):
@@ -85,3 +92,10 @@ def get_from_offer_year(off_year) -> ScoreSheetAddress:
 
 def search_from_offer_years(off_years: List[OfferYear]) -> List[ScoreSheetAddress]:
     return ScoreSheetAddress.objects.filter(offer_year__in=off_years)
+
+
+def get_from_education_group_id(education_group_id: int) -> Optional[ScoreSheetAddress]:
+    try:
+        return ScoreSheetAddress.objects.get(education_group_id=education_group_id)
+    except ObjectDoesNotExist:
+        return None
