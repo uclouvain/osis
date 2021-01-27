@@ -449,7 +449,11 @@ def __send_messages_for_each_offer_year(
     """
     sent_error_messages = []
     offer_years = get_offer_years_from_enrollments(updated_enrollments)
-    score_sheet_addresses = score_sheet_address_mdl.search_from_education_group_ids(offer_years)
+    education_group_ids = {
+        enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.education_group_id
+        for enrollment in updated_enrollments
+    }
+    score_sheet_addresses = score_sheet_address_mdl.search_from_education_group_ids(education_group_ids)
     for offer_year in offer_years:
         score_sheet_address = next(
             (
