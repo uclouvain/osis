@@ -65,7 +65,7 @@ class OfferViewTestCase(TestCase):
         })
 
         self.assertTemplateUsed(response, 'offers.html')
-        self.assertEqual(response.context['offer_years'].count(), 0)
+        self.assertEqual(response.context['educ_group_years'].count(), 0)
 
     def test_cannot_access_any_offer_pages_if_not_program_manager(self):
         offer_year = OfferYearCalendarFactory()

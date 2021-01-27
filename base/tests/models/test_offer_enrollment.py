@@ -26,6 +26,7 @@
 import datetime
 
 from base.models.offer_enrollment import OfferEnrollment
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 def create_date_enrollment():
@@ -33,7 +34,11 @@ def create_date_enrollment():
 
 
 def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
-                                                           student=student, offer_year=offer_year)
+    an_offer_enrollment = OfferEnrollment(
+        date_enrollment=create_date_enrollment(),
+        student=student,
+        offer_year=offer_year,
+        education_group_year=EducationGroupYearFactory(),
+    )
     an_offer_enrollment.save()
     return an_offer_enrollment

@@ -26,16 +26,31 @@ def set_education_group_id_field(apps, schema_editor):
             'offer_year'
         )
     )
+    to_remove = []
     for obj in existing_score_sheet_addresses:
         education_group_id = educ_group_id_by_acronym.get(obj.offer_year.acronym)
         if not education_group_id:
-            print('ERROR :: no education_group_id found for {}'.format(obj.offer_year.acronym))
+            educ_group_year = EducationGroupYear.objects.filter(
+                acronym=obj.offer_year.acronym
+            ).order_by(
+                'academic_year__year'
+            ).last()
+            if not educ_group_year:
+                msg = 'ERROR :: no education_group_id found for {} (this record will be removed)'.format(
+                    obj.offer_year.acronym
+                )
+                to_remove.append(obj)
+                print(msg)
+            else:
+                education_group_id = educ_group_year.education_group_id
         obj.education_group_id = education_group_id
         to_update.append(obj)
     ScoreSheetAddress.objects.bulk_update(to_update, ['education_group_id'], batch_size=1000)
     ScoreSheetAddress.objects.exclude(offer_year__academic_year__year=current_year).delete()
+    ScoreSheetAddress.objects.filter(pk__in={obj.pk for obj in to_remove}).delete()
 
 
+#  TODO :: remove this and add migration file to remove OfferYear from ScoreSheetAddress
 """
 select distinct year 
 from assessments_scoresheetaddress addr
@@ -58,4 +73,9 @@ class Migration(migrations.Migration):
             field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroup'),
         ),
         migrations.RunPython(set_education_group_id_field),
+        migrations.AlterField(
+            model_name='scoresheetaddress',
+            name='education_group',
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroup'),
+        ),
     ]

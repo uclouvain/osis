@@ -173,7 +173,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
         # Will contain lists of examEnrollments by offerYear (=Program)
         enrollments_by_program = {}  # {<offer_year_id> : [<ExamEnrollment>]}
         for exam_enroll in exam_enrollments:
-            key = exam_enroll.learning_unit_enrollment.offer_enrollment.offer_year.id
+            key = exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year.id
             if key not in enrollments_by_program.keys():
                 enrollments_by_program[key] = [exam_enroll]
             else:
@@ -181,17 +181,17 @@ def scores_sheet_data(exam_enrollments, tutor=None):
 
         for list_enrollments in enrollments_by_program.values():  # exam_enrollments by OfferYear
             exam_enrollment = list_enrollments[0]
-            off_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+            educ_group_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
             number_session = exam_enrollment.session_exam.number_session
-            deliberation_date = session_exam_calendar.find_deliberation_date(number_session, off_year)
+            deliberation_date = session_exam_calendar.find_deliberation_date(number_session, educ_group_year)
             if deliberation_date:
                 deliberation_date = deliberation_date.strftime(date_format)
             else:
                 deliberation_date = _('Not passed')
 
-            program = {'acronym': exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            program = {'acronym': educ_group_year.acronym,
                        'deliberation_date': deliberation_date,
-                       'address': _get_serialized_address(off_year)}
+                       'address': _get_serialized_address(educ_group_year)}
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
@@ -216,8 +216,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
     return data
 
 
-def _get_serialized_address(off_year):
-    address = get_score_sheet_address(off_year)['address']
+def _get_serialized_address(educ_group_year: 'EducationGroupYear'):
+    address = get_score_sheet_address(educ_group_year)['address']
     country = address.get('country')
     address['country'] = country.name if country else ''
     return address
