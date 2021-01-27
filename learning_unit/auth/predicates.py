@@ -10,6 +10,10 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
@@ -155,6 +159,26 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
                 role.person, learning_unit_year, raise_exception=False
             ).is_open()
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is not editable this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_edition_for_central_manager_period_open(self, user, learning_unit_year):
+    calendar = EducationGroupExtendedDailyManagementCalendar()
+    if learning_unit_year:
+        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is not editable this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_edition_for_faculty_manager_period_open(self, user, learning_unit_year):
+    calendar = EducationGroupLimitedDailyManagementCalendar()
+    if learning_unit_year:
+        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)
