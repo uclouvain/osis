@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 09:39+0100\n"
+"POT-Creation-Date: 2021-01-26 08:30+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -322,6 +322,9 @@ msgctxt "female"
 msgid "Annual"
 msgstr "Annuelle"
 
+msgid "Application for vacant courses"
+msgstr "Candidature aux cours vacants"
+
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
 
@@ -588,9 +591,6 @@ msgstr "Consolider la proposition"
 msgid "Contacts"
 msgstr "Contacts"
 
-msgid "Continuing education academic year linkable to admission"
-msgstr "Formation continue année académique liable aux admissions"
-
 msgid "Coordinator"
 msgstr "Coordinateur"
 
@@ -850,8 +850,14 @@ msgstr "Fin inscription aux examens"
 msgid "English"
 msgstr "Anglais"
 
+msgid "English title common part"
+msgstr "Intitulé en EN partie commune"
+
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
+
+msgid "English title specific complement"
+msgstr "Intitulé en EN compl. spéc. à l'UE"
 
 msgid "Enrolled"
 msgstr "Inscrit"
@@ -2143,9 +2149,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Release"
-msgstr "Release"
-
 msgid "Remarks"
 msgstr "Remarques"
 
@@ -2361,22 +2364,10 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Soumission des fiches descriptives"
-
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-"La modification des fiches descriptives (Cas de force majeure) n'est pas "
-"autorisée pour les enseignants durant cette période."
+msgstr "Edition fiches descriptives"
 
 msgid "Summary course submission force majeure"
-msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
-
-msgid "Summary course submission is not allowed for tutors during this period."
-msgstr ""
-"La modification des fiches descriptives n'est pas autorisée pour les "
-"enseignants durant cette période."
+msgstr "Edition fiches descriptives (cas de force majeure)"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2389,9 +2380,6 @@ msgstr "Suspendu"
 
 msgid "T=Cheating"
 msgstr "T=Tricherie"
-
-msgid "Teaching charge application"
-msgstr "Candidature en ligne"
 
 msgid "Teaching internship"
 msgstr "Stage d’enseignement"
@@ -2410,9 +2398,6 @@ msgstr "Plate-forme technologique"
 
 msgid "Termination"
 msgstr "Clôturé"
-
-msgid "Testing"
-msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
@@ -2750,11 +2735,17 @@ msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "Title common part"
+msgstr "Intitulé partie commune"
+
 msgid "Title in English"
 msgstr "Intitulé en anglais"
 
 msgid "Title in French"
 msgstr "Intitulé en français"
+
+msgid "Title specific complement"
+msgstr "Intitulé compl. spéc. à l'UE"
 
 msgid "To complete"
 msgstr "A compléter"
@@ -3055,9 +3046,6 @@ msgstr ""
 msgid "activities in English"
 msgstr "activités en anglais"
 
-msgid "ad hoc events"
-msgstr "événements ad hoc"
-
 msgid "additional informations"
 msgstr "informations supplémentaires"
 
@@ -3227,9 +3215,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
-
-msgid "project events"
-msgstr "événements projet"
 
 msgid "regex error message"
 msgstr "message d'erreur regex"
