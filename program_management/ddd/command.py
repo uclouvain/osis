@@ -331,6 +331,7 @@ class GetEndPostponementYearCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetVersionMaxEndYear(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
     year = attr.ib(type=int)
 
 

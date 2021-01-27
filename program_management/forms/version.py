@@ -98,6 +98,7 @@ class SpecificVersionForm(forms.Form):
         max_year = get_version_max_end_year.calculate_version_max_end_year(
             GetVersionMaxEndYear(
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                version_name=self.tree_version_identity.version_name,
                 year=self.tree_version_identity.year
             )
         )
@@ -170,6 +171,7 @@ class TransitionVersionForm(forms.Form):
         max_year = get_version_max_end_year.calculate_version_max_end_year(
             GetVersionMaxEndYear(
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                version_name=self.tree_version_identity.version_name,
                 year=self.tree_version_identity.year
             )
         )
