@@ -38,13 +38,11 @@ from assessments.models import score_sheet_address as score_sheet_address_model
 from base.auth.roles import program_manager
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.offer_year import OfferYear
-from osis_common.utils.models import get_object_or_none
 from reference.models.country import Country
 
 
 @login_required
-@permission_required('base.can_access_offer', raise_exception=True)  # TODO :: perm to remove at the end of refactoring
+@permission_required('base.can_access_education_group', raise_exception=True)
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @require_http_methods(["GET"])
 def offer_score_encoding_tab(request, education_group_id):
@@ -77,7 +75,7 @@ def _get_common_context(request, education_group_id):
 
 
 @login_required
-@permission_required('base.can_access_offer', raise_exception=True)  # TODO :: perm to remove at the end of refactoring
+@permission_required('base.can_access_education_group', raise_exception=True)
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @require_http_methods(["POST"])
 def save_score_sheet_address(request, education_group_id):
