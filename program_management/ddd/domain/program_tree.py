@@ -240,7 +240,7 @@ class ProgramTree(interface.RootEntity):
 
         non_reference_links = [link_obj for link_obj in links
                                if link_obj.child == parent_node and not link_obj.is_reference()]
-        if non_reference_links:
+        if non_reference_links or self.root_node == parent_node:
             return [parent_node] + _get_parents(parent_node)
         return _get_parents(parent_node)
 
