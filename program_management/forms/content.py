@@ -47,9 +47,9 @@ class LinkForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     block = forms.IntegerField(required=False)
-    comment_fr = forms.CharField(widget=CKEditorWidget(config_name='link_only'),
+    comment_fr = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
                                  required=False)
-    comment_en = forms.CharField(widget=CKEditorWidget(config_name='link_only'),
+    comment_en = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
                                  required=False)
 
     def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):

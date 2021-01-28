@@ -326,6 +326,13 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
         ],
     },
+    'comment_link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+        'height': 75
+    },
 }
 
 CKEDITOR_CONFIGS['education_group_pedagogy'] = dict(CKEDITOR_CONFIGS['minimal'])
