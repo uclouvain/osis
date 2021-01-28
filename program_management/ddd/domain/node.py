@@ -139,6 +139,8 @@ class NodeFactory:
                 child_node_type=child_type,
             ),
             year=parent_node.year,
+            teaching_campus=parent_node.teaching_campus,
+            management_entity_acronym=parent_node.management_entity_acronym,
             group_title_fr=generated_child_title,
             start_year=parent_node.year,
         )
