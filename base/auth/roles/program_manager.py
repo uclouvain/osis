@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import rules
 from django.db import models, IntegrityError
 from django.db.models import Prefetch
@@ -34,7 +36,7 @@ from base.auth.predicates import is_linked_to_offer
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
-from base.models.entity_version import find_parent_of_type_into_entity_structure
+from base.models.entity_version import find_parent_of_type_into_entity_structure, EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
@@ -44,7 +46,7 @@ from osis_role.contrib import predicates as osis_role_predicates
 
 
 class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
-    list_display = ('person', 'offer_year', 'changed', 'education_group')
+    list_display = ('person', 'offer_year', 'changed', 'education_group_most_recent_acronym')
     raw_id_fields = ('person', 'offer_year', 'education_group')
     list_filter = ('education_group__educationgroupyear__academic_year',)
 
@@ -53,13 +55,17 @@ class ProgramManager(EducationGroupRoleModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
-    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
+    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE, blank=True, null=True)  # TODO : to remove at the end of the refactoring
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
 
     @property
     def name(self):
         return self.__str__()
+
+    @property
+    def education_group_most_recent_acronym(self):
+        return self.education_group.most_recent_acronym
 
     def __str__(self):
         return "{} - {}".format(self.person, self.offer_year)
@@ -157,11 +163,6 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
     return result
 
 
-def find_by_offer_year(offer_yr):
-    return ProgramManager.objects.filter(offer_year=offer_yr) \
-        .order_by('person__last_name', 'person__first_name')
-
-
 def find_by_user(user, academic_year=None):
     queryset = ProgramManager.objects
     if academic_year:
@@ -170,13 +171,19 @@ def find_by_user(user, academic_year=None):
     return queryset.filter(person__user=user)
 
 
-def find_by_management_entity(administration_entity, academic_yr):
-    if administration_entity and academic_yr:
-        return ProgramManager.objects \
-            .filter(offer_year__entity_management__in=administration_entity, offer_year__academic_year=academic_yr) \
-            .select_related('person') \
-            .order_by('person__last_name', 'person__first_name') \
-            .distinct('person__last_name', 'person__first_name')
+def find_by_management_entity(administration_entities: List['EntityVersion']):
+    if administration_entities:
+        return ProgramManager.objects.filter(
+            education_group__educationgroupyear__management_entity__in=[ev.entity for ev in administration_entities]
+        ).select_related(
+            'person'
+        ).order_by(
+            'person__last_name',
+            'person__first_name'
+        ).distinct(
+            'person__last_name',
+            'person__first_name',
+        )
 
     return None
 
