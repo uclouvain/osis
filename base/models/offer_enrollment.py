@@ -40,10 +40,10 @@ class OfferEnrollment(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
-    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
+    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE, null=True, blank=True)  # TODO : to remove
     student = models.ForeignKey('Student', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=15, choices=offer_enrollment_state.STATES, blank=True, null=True)
-    education_group_year = models.ForeignKey('EducationGroupYear', null=True, on_delete=models.PROTECT)
+    education_group_year = models.ForeignKey('EducationGroupYear', null=True, on_delete=models.PROTECT)  # TODO :: set null=False
 
     def __str__(self):
         return u"%s - %s" % (self.student, self.offer_year)

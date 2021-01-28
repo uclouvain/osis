@@ -3,7 +3,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def set_education_group_year_field(apps, schema_editor):
+def set_session_exam_education_group_year_field(apps, schema_editor):
     SessionExam = apps.get_model('base', 'sessionexam')
     map_with_educ_group_id = _build_map(apps)
     to_update = []
@@ -42,7 +42,7 @@ def _build_map(apps):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0560_auto_20210120_0845'),
+        ('base', '0562_auto_20210127_1543'),
     ]
 
     operations = [
@@ -51,5 +51,5 @@ class Migration(migrations.Migration):
             name='education_group_year',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
         ),
-        migrations.RunPython(set_education_group_year_field),  # TODO :: add operation to remove OfferYaer from SessionExam
+        migrations.RunPython(set_session_exam_education_group_year_field),  # TODO :: add operation to remove OfferYaer from SessionExam
     ]

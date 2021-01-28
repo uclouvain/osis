@@ -31,7 +31,6 @@ import factory.fuzzy
 
 from assessments.models.enums import score_sheet_address_choices
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from reference.tests.factories.country import CountryFactory
 
 

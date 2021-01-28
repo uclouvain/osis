@@ -33,7 +33,6 @@ from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.views import score_sheet
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.user import SuperUserFactory
 
 

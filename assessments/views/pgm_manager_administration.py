@@ -110,7 +110,7 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
 
     @property
     def education_group_ids(self) -> list:
-        return self.request.GET.getlist('offer_year')
+        return self.request.GET['offer_year'].split(',')
 
     def get_success_url(self):
         url = reverse_lazy('manager_list') + "?"

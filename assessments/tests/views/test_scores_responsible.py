@@ -325,8 +325,6 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         )
         cls.program_manager = ProgramManagerFactory(
             education_group=cls.education_group_year.education_group,
-            offer_year__academic_year=cls.academic_year,
-            offer_year__corresponding_education_group_year=None
         )
         offer_enrollment = OfferEnrollmentFactory(
             education_group_year=cls.education_group_year,
