@@ -114,7 +114,7 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
         cls.exam_enrollments = data["exam_enrollments"]
         cls.attribution = data["attribution"]
         cls.learning_unit_year = data["learning_unit_year"]
-        cls.offer_year = data["offer_years"][0]
+        cls.offer_year = data["education_group_years"][0]
         cls.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
                         in cls.exam_enrollments]
 

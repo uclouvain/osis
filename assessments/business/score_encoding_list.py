@@ -30,7 +30,7 @@ from decimal import Decimal, Context, Inexact
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, offer_year, \
+from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, \
     learning_unit_year, education_group_year
 from base.auth.roles import program_manager
 from base.models.education_group_year import EducationGroupYear
@@ -116,8 +116,8 @@ def find_related_registration_ids(scores_encoding_list):
             for enrollment in scores_encoding_list.enrollments}
 
 
-def find_related_offer_years(scores_encoding_list):
-    return {enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+def find_related_education_group_years(scores_encoding_list):
+    return {enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
             for enrollment in scores_encoding_list.enrollments}
 
 
@@ -286,7 +286,7 @@ def sort_encodings(exam_enrollments):
     """
     Sort the list by
      0. LearningUnitYear.acronym
-     1. offerYear.acronym
+     1. EducationGroupYear.acronym
      2. student.lastname
      3. sutdent.firstname
     :param exam_enrollments: List of examEnrollments to sort
@@ -295,7 +295,7 @@ def sort_encodings(exam_enrollments):
     def _sort(key):
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment
-        acronym = off_enroll.offer_year.acronym
+        acronym = off_enroll.education_group_year.acronym
         last_name = off_enroll.student.person.last_name
         first_name = off_enroll.student.person.first_name
         last_name = _normalize_string(last_name) if last_name else None

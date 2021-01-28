@@ -166,7 +166,7 @@ def scores_encoding(request):
 
         all_tutors = score_encoding_progress.find_related_tutors(request.user, academic_yr, number_session)
 
-        all_offers = mdl.education_group_year.find_by_user(request.user, academic_yr=academic_yr)
+        all_offers = mdl.education_group_year.find_by_user(request.user, academic_yr=academic_yr).order_by('acronym')
 
         if not score_encoding_progress_list:
             messages.add_message(request, messages.WARNING, _('No result!'))
