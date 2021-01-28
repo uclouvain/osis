@@ -37,12 +37,13 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.business.learning_units.simple import deletion
-from base.models.enums import entity_type
+from base.models.enums import entity_type, academic_calendar_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -77,6 +78,14 @@ class LearningUnitYearDeletion(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_unit=cls.learning_unit)
         cls.the_partim = _('The partim')
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.academic_year
+        )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            data_year=cls.academic_year
+        )
 
     def test_check_related_partims_deletion(self):
         msg = deletion._check_related_partims_deletion(self.l_container_year)

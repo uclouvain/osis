@@ -111,6 +111,14 @@ class PermsTestCase(TestCase):
                 reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
                 data_year=ac
             )
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+                data_year=ac
+            )
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+                data_year=ac
+            )
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
