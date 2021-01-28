@@ -36,7 +36,7 @@ class CheckExistenceOfTransitionTest(TestCase, TestValidatorValidateMixin):
         start_year = 2020
         cls.initial_end_year = 2022
         cls.transition_version = StandardTransitionProgramTreeVersionFactory(
-            start_year=start_year, end_year_of_existence=2026, entity_id__year=start_year
+            start_year=start_year, end_year_of_existence=start_year + 5, entity_id__year=start_year
         )
 
     def test_should_be_valid_when_no_transition_in_future(self):
