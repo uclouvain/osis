@@ -106,7 +106,7 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
 
     def _get_academic_years(self, max_year):
-        super(LearningUnitProposalEndDateForm, self)._get_academic_years()
+        super(LearningUnitProposalEndDateForm, self)._get_academic_years(max_year)
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
         # Allow previous year as last organisation year for suppression proposal
@@ -121,7 +121,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     REQUIRED = False
 
     def _get_academic_years(self, max_year):
-        super(LearningUnitDailyManagementEndDateForm, self)._get_academic_years()
+        super(LearningUnitDailyManagementEndDateForm, self)._get_academic_years(max_year)
 
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
 

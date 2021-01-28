@@ -85,11 +85,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
             learning_unit_year_periodicity.ANNUAL
         )
         cls.person = CentralManagerFactory(entity=cls.learning_container_year.requirement_entity).person
-        for academic_year in cls.list_of_academic_years:
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-                data_year=academic_year
-            )
+        generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
         self.client.force_login(self.person.user)

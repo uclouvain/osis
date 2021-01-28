@@ -637,16 +637,7 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
             )
             for acy in cls.academic_years
         ]
-        # generate_learning_unit_edition_calendars(cls.academic_years)
-        for academic_year in cls.academic_years:
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-                data_year=academic_year
-            )
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
-                data_year=academic_year
-            )
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.central_manager = CentralManagerFactory(entity=entity)
         cls.faculty_manager_for_ue = FacultyManagerFactory(entity=entity)
