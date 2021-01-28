@@ -28,8 +28,6 @@ from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.validators._end_date_between_finalities_and_masters import \
-    CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
@@ -44,8 +42,9 @@ from program_management.ddd.validators._delete_check_versions_end_date import Ch
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
-from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
-    IsHasPrerequisiteForAllTreesValidator
+from program_management.ddd.validators._end_date_between_finalities_and_masters import \
+    CheckEndDateBetweenFinalitiesAndMasters2M
+from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -54,6 +53,7 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransitionValidator
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
@@ -234,6 +234,14 @@ class DeleteSpecificVersionValidatorList(business_validator.BusinessListValidato
     ):
         self.validators = [
             CheckVersionsEndDateValidator(program_tree_version),
+        ]
+        super().__init__()
+
+
+class ExtendTransitionVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, program_tree_version: 'ProgramTreeVersion', end_year: int):
+        self.validators = [
+            CheckExistenceOfTransitionValidator(program_tree_version, end_year),
         ]
         super().__init__()
 

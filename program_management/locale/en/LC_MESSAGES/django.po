@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:36+0100\n"
+"POT-Creation-Date: 2021-01-28 10:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -903,6 +903,12 @@ msgstr ""
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists"
 msgstr ""
 
 #, python-format

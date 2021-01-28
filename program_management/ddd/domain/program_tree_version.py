@@ -236,7 +236,10 @@ class ProgramTreeVersion(interface.RootEntity):
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)
+        initial_end_year = self.end_year_of_existence
         for field, new_value in data_as_dict.items():
             setattr(self, field, new_value)
         validators_by_business_action.UpdateProgramTreeVersionValidatorList(self).validate()
+        if self.is_transition and initial_end_year and initial_end_year < self.end_year_of_existence:
+            validators_by_business_action.ExtendTransitionVersionValidatorList(self, initial_end_year).validate()
         return self

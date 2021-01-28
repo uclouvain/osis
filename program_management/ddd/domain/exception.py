@@ -123,6 +123,17 @@ class CannotDeleteStandardDueToVersionEndDate(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class CannotExtendTransitionDueToExistenceOfOtherTransition(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't extend the program tree '{code}' in {year} as other transition version exists"
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
+        )
+        super().__init__(message, **kwargs)
+
+
 class NodeIsUsedException(Exception):
     pass
 

@@ -108,11 +108,11 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             delete_message = _(
                 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
-                                 "offer_acronym": last_identity.offer_acronym,
-                                 "acronym": last_identity.version_name,
-                                 "academic_year": display_as_academic_year(
-                                     self.training_version_form.cleaned_data["end_year"] + 1)
-                             }
+                "offer_acronym": last_identity.offer_acronym,
+                "acronym": version_label(last_identity),
+                "academic_year": display_as_academic_year(
+                    self.training_version_form.cleaned_data["end_year"] + 1)
+            }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
     @staticmethod
@@ -153,6 +153,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                     self.training_version_form.add_error("max_constraint", e.message)
                 else:
                     self.training_version_form.add_error(None, e.message)
+        except program_exception.CannotExtendTransitionDueToExistenceOfOtherTransition as e:
+            self.training_version_form.add_error("end_year", e.message)
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [

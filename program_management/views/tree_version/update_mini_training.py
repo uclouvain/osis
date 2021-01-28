@@ -25,6 +25,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
@@ -107,8 +108,9 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
                 "offer_acronym": last_identity.offer_acronym,
-                "acronym": last_identity.version_name,
-                "academic_year": display_as_academic_year(self.mini_training_version_form.cleaned_data["end_year"] + 1)
+                "acronym": version_label(last_identity),
+                "academic_year": display_as_academic_year(
+                    self.mini_training_version_form.cleaned_data["end_year"] + 1)
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
@@ -138,6 +140,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_version_form.add_error("min_constraint", e.message)
             self.mini_training_version_form.add_error("max_constraint", "")
+        except program_exception.CannotExtendTransitionDueToExistenceOfOtherTransition as e:
+            self.mini_training_version_form.add_error("end_year", e.message)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, exception_education_group.ContentConstraintTypeMissing):
