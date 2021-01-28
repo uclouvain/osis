@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict
+from typing import Dict, OrderedDict
 
 import attr
 from django import forms
@@ -381,17 +381,23 @@ class UpdateMiniTrainingTransitionVersionForm(UpdateMiniTrainingVersionForm):
 
     def __init__(self, mini_training_version_identity: 'ProgramTreeVersionIdentity', **kwargs):
         super().__init__(mini_training_version_identity, **kwargs)
+
+        self.fields = remove_blank_choice(self.fields)
         if mini_training_version_identity.is_standard_transition():
             self.fields['version_name'].required = False
-        if BLANK_CHOICE[0] in self.fields["end_year"].choices:
-            self.fields["end_year"].choices.remove(BLANK_CHOICE[0])
 
 
 class UpdateTrainingTransitionVersionForm(UpdateTrainingVersionForm):
 
     def __init__(self, training_version_identity: 'ProgramTreeVersionIdentity', **kwargs):
         super().__init__(training_version_identity, **kwargs)
+
+        self.fields = remove_blank_choice(self.fields)
         if training_version_identity.is_standard_transition():
             self.fields['version_name'].required = False
-        if BLANK_CHOICE[0] in self.fields["end_year"].choices:
-            self.fields["end_year"].choices.remove(BLANK_CHOICE[0])
+
+
+def remove_blank_choice(form_fields: OrderedDict):
+    if BLANK_CHOICE[0] in form_fields["end_year"].choices:
+        form_fields["end_year"].choices.remove(BLANK_CHOICE[0])
+    return form_fields
