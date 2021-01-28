@@ -27,16 +27,20 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from attribution.models.tutor_application import TutorApplication
-from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.proposal_learning_unit import find_by_learning_unit
-
-
 # TODO Convert it in ModelForm
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.helper import EntityRoleHelper
+
 
 class LearningUnitEndDateForm(forms.Form):
     EMPTY_LABEL = BLANK_CHOICE_DISPLAY
@@ -64,10 +68,6 @@ class LearningUnitEndDateForm(forms.Form):
         if max_year:
             self.fields['academic_year'].required = True
 
-    @classmethod
-    def get_event_perm_generator(cls):
-        raise NotImplementedError
-
     def _set_initial_value(self, end_year):
         self.fields['academic_year'].initial = end_year
 
@@ -77,19 +77,6 @@ class LearningUnitEndDateForm(forms.Form):
                 'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
                     self.learning_unit.end_year)
             )
-
-        event_perm = self.get_event_perm_generator()(self.person)
-        self.luy_current_year = self.learning_unit_year.academic_year.year
-
-        applications = TutorApplication.objects.filter(
-            learning_container_year__learning_container=self.learning_unit_year.learning_container_year.learning_container,
-            learning_container_year__academic_year__year__gte=self.learning_unit_year.learning_container_year.academic_year.year
-        ).order_by('learning_container_year__academic_year__year')
-        if not max_year and applications:
-            max_year = applications.first().learning_container_year.academic_year.year
-        academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
-
-        return academic_years
 
     def save(self, update_learning_unit_year=True):
         learning_unit_full_instance = None
@@ -119,11 +106,7 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
 
     def _get_academic_years(self, max_year):
-        if not has_proposal(self.learning_unit) and self.learning_unit.is_past():
-            raise ValueError(
-                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
-                    self.learning_unit.end_year)
-            )
+        super(LearningUnitProposalEndDateForm, self)._get_academic_years()
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
         # Allow previous year as last organisation year for suppression proposal
@@ -137,9 +120,28 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     EMPTY_LABEL = NO_PLANNED_END_DISPLAY
     REQUIRED = False
 
-    @classmethod
-    def get_event_perm_generator(cls):
-        return event_perms.generate_event_perm_learning_unit_edition
+    def _get_academic_years(self, max_year):
+        super(LearningUnitDailyManagementEndDateForm, self)._get_academic_years()
+
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+
+        user_roles = EntityRoleHelper.get_all_roles(self.person)
+        if EntityRoleHelper.has_role(FacultyManager, user_roles):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+
+        self.luy_current_year = self.learning_unit_year.academic_year.year
+
+        applications = TutorApplication.objects.filter(
+            learning_container_year__learning_container=
+            self.learning_unit_year.learning_container_year.learning_container,
+            learning_container_year__academic_year__year__gte=
+            self.learning_unit_year.learning_container_year.academic_year.year
+        ).order_by('learning_container_year__academic_year__year')
+        if not max_year and applications:
+            max_year = applications.first().learning_container_year.academic_year.year
+        academic_years = AcademicYear.objects.filter(year__in=target_years_opened, year__lte=max_year)
+
+        return academic_years
 
 
 def has_proposal(learning_unit):
