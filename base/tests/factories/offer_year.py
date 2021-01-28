@@ -32,6 +32,7 @@ from base.tests.factories.offer_type import OfferTypeFactory
 from base.tests.factories.structure import StructureFactory
 
 
+# TODO :: to remove
 class OfferYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.OfferYear"

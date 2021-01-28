@@ -42,4 +42,3 @@ class ProgramManagerFactory(EducationGroupRoleModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     offer_year = factory.SubFactory(OfferYearFactory)  # TODO :: to remove
     education_group = factory.SubFactory(EducationGroupFactory)
-

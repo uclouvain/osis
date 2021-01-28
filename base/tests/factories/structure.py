@@ -32,6 +32,7 @@ import factory.fuzzy
 from base.models.enums import structure_type
 
 
+# TODO :: to remove
 class StructureFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Structure'
