@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0559_remove_learningunit_other_remark'),
+        ('base', '0561_auto_20210127_1350'),
     ]
 
     operations = [
