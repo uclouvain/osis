@@ -53,7 +53,7 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, education_group_categories, \
-    learning_component_year_type, proposal_type, proposal_state, quadrimesters, academic_calendar_type
+    learning_component_year_type, proposal_type, proposal_state, quadrimesters
 from base.models.enums import entity_type
 from base.models.enums import internship_subtypes
 from base.models.enums import learning_container_year_types, organization_type
@@ -68,7 +68,7 @@ from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -117,10 +117,7 @@ class LearningUnitViewCreateFullTestCase(TestCase):
     def setUpTestData(cls):
         FrenchLanguageFactory()
         cls.current_academic_year = create_current_academic_year()
-        OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-            data_year=cls.current_academic_year
-        )
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         cls.url = reverse('learning_unit_create', kwargs={'academic_year_id': cls.current_academic_year.id})
         cls.user = CentralManagerFactory().person.user
 
@@ -250,10 +247,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
-        OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
-            data_year=cls.current_academic_year
-        )
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         entity_version = EntityVersionFactory()
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,

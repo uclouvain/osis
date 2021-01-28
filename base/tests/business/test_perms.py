@@ -111,14 +111,6 @@ class PermsTestCase(TestCase):
                 reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
                 data_year=ac
             )
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-                data_year=ac
-            )
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
-                data_year=ac
-            )
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
@@ -651,7 +643,10 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
     def _test_can_create_partim_based_on_person(self, person, max_range):
         for luy in self.learning_unit_years:
             with self.subTest(academic_year=luy.academic_year):
-                if self.current_acy.year <= luy.academic_year.year <= self.current_acy.year + max_range:
+                print(self.current_acy.year, luy.academic_year.year, self.current_acy.year + max_range)
+                print(self.current_acy.year <= luy.academic_year.year,
+                      luy.academic_year.year <= self.current_acy.year + max_range)
+                if luy.academic_year.year <= self.current_acy.year + max_range:
                     self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
                 else:
                     self.assertFalse(person.user.has_perm('base.can_create_partim', luy))

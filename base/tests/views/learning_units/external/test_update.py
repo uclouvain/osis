@@ -30,11 +30,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
-from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.organization_type import MAIN
-from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -54,10 +53,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
         cls.person = cls.manager.person
 
         cls.academic_year = create_current_academic_year()
-        OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-            data_year=cls.academic_year
-        )
+        generate_learning_unit_edition_calendars([cls.academic_year])
 
         cls.luy = LearningUnitYearFullFactory(
             academic_year=cls.academic_year,

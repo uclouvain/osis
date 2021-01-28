@@ -39,12 +39,11 @@ from waffle.testutils import override_flag
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
-    learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type, \
-    academic_calendar_type
+    learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_learning_unit_edition_calendars, OpenAcademicCalendarFactory
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -124,10 +123,7 @@ class TestEditLearningUnit(TestCase):
     def setUpTestData(cls):
         today = datetime.date.today()
         cls.an_academic_year = create_current_academic_year()
-        OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-            data_year=cls.an_academic_year
-        )
+        generate_learning_unit_edition_calendars([cls.an_academic_year])
 
         cls.parent_entity = EntityWithVersionFactory()
 
