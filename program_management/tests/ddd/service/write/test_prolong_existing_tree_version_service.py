@@ -41,7 +41,8 @@ class TestProlongExistingTreeVersion(TestCase):
     @mock.patch(
         "program_management.ddd.service.write.extend_existing_tree_version_service.extend_existing_past_version")
     @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch(
+        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     def test_should_call_update_group_service_and_update_tree_version_service(
             self,
             mock_postpone_program_tree_version,

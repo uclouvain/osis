@@ -32,7 +32,8 @@ from education_group.tests.ddd.factories.command.create_and_postpone_training_an
 
 
 class TestCreateAndReportTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch(
+        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
     @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")

@@ -85,6 +85,13 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return node_identity == self.node_identity
 
     @cached_property
+    def has_transition_version(self) -> 'EducationGroupVersion':
+        return EducationGroupVersion.objects.filter(
+            root_group__acronym=self.education_group_version.root_group.acronym,
+            is_transition=True
+        ).exists()
+
+    @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
