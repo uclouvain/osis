@@ -94,6 +94,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         elif node_to_paste.is_learning_unit():
             self.validators = [
                 CreateLinkValidatorList(parent_node, node_to_paste),
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, parent_node),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
