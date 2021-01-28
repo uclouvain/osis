@@ -33,4 +33,14 @@ class ScoreSheetAddressEntityForm(forms.ModelForm):
 
     class Meta:
         model = ScoreSheetAddress
-        exclude = ['external_id', 'changed', 'country', 'recipient', 'location', 'postal_code', 'city', 'offer_year']
+        exclude = [
+            'external_id',
+            'changed',
+            'country',
+            'recipient',
+            'location',
+            'postal_code',
+            'city',
+            'offer_year',
+            'education_group',
+        ]

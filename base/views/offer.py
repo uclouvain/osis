@@ -28,6 +28,8 @@ from django.shortcuts import render
 
 from base import models as mdl
 from base.models.academic_year import AcademicYear
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 
 
 @login_required
@@ -58,12 +60,20 @@ def offers_search(request):
 
     academic_years = AcademicYear.objects.all()
 
-    offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym) \
-        .select_related("entity_management", "academic_year")
+    offer_years = EducationGroupYear.objects.filter(
+        management_entity__entityversion__acronym__icontains=entity,
+        academic_year=academic_yr,
+        acronym__icontains=acronym,
+        education_group_type__category=Categories.TRAINING.name,
+    ).select_related(
+        'education_group',
+        'management_entity',
+        'academic_year',
+    )
 
     return render(request, "offers.html", {'academic_year': academic_yr,
                                            'entity_acronym': entity,
                                            'code': acronym,
                                            'academic_years': academic_years,
-                                           'offer_years': offer_years,
+                                           'educ_group_years': offer_years,
                                            'init': "0"})

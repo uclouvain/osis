@@ -142,7 +142,7 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
         user: an instance of auth.User
         offer_year: an annual offer to check whether the user is its program manager.
         learning_unit_year: an annual learning unit to check whether it is in the managed offers of the user.
-        education_group: equals to offer_year (will replace it)
+        education_group: equals to offer_year (will replace it)  # TODO :: update description
 
     Returns: True if the user manage an offer. False otherwise.
     """

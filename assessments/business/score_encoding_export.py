@@ -344,7 +344,9 @@ def _update_border_for_first_peps_column(cell):
 
 
 def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -> str:
-    addresses = score_sheet_address.search_from_offer_years(
-        {exam_enroll.learning_unit_enrollment.offer for exam_enroll in exam_enrollments}
-    )
+    education_group_ids = {
+        exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year.education_group_id
+        for exam_enroll in exam_enrollments
+    }
+    addresses = score_sheet_address.search_from_education_group_ids(education_group_ids)
     return ';'.join({address.email for address in addresses if address.email})

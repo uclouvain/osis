@@ -36,6 +36,7 @@ from base.models.enums import number_session, academic_calendar_type
 from base.models.session_exam_calendar import get_number_session_by_academic_calendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
@@ -186,34 +187,36 @@ class DeliberationDateTest(TestCase):
                                                         reference=academic_calendar_type.DELIBERATION)
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                    number_session=number_session.ONE)
-        cls.offer_yr = OfferYearFactory(academic_year=cls.current_academic_yr)
+        cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_yr)
 
     @override_settings(USE_TZ=False)
     def test_taking_correct_number_session(self):
         offer_year_cal = OfferYearCalendarFactory(academic_calendar=self.academic_calendar,
-                                                  offer_year=self.offer_yr)
-        self.assertEqual(session_exam_calendar.find_deliberation_date(number_session.ONE, offer_year_cal.offer_year),
-                         datetime.datetime(self.current_academic_yr.year + 1, 1, 1))
-        self.assertIsNone(session_exam_calendar.find_deliberation_date(number_session.TWO, offer_year_cal.offer_year))
+                                                  education_group_year=self.educ_group_year)
+        result = session_exam_calendar.find_deliberation_date(number_session.ONE, offer_year_cal.education_group_year)
+        expected_result = datetime.datetime(self.current_academic_yr.year + 1, 1, 1)
+        self.assertEqual(result, expected_result)
+        result = session_exam_calendar.find_deliberation_date(number_session.TWO, offer_year_cal.education_group_year)
+        self.assertIsNone(result)
 
     @override_settings(USE_TZ=False)
     def test_case_deliberation_date_is_set(self):
         delibe_date = datetime.datetime(self.current_academic_yr.year + 1, 6, 10)
         offer_year_cal = OfferYearCalendarFactory(academic_calendar=self.academic_calendar,
-                                                  offer_year=self.offer_yr,
+                                                  education_group_year=self.educ_group_year,
                                                   start_date=delibe_date,
                                                   end_date=delibe_date)
-        self.assertEqual(session_exam_calendar.find_deliberation_date(number_session.ONE, offer_year_cal.offer_year),
-                         delibe_date)
+        result = session_exam_calendar.find_deliberation_date(number_session.ONE, offer_year_cal.education_group_year)
+        self.assertEqual(result, delibe_date)
 
     @override_settings(USE_TZ=False)
     def test_case_deliberation_date_is_not_set(self):
         global_date = self.academic_calendar.start_date
         delibe_date = None
         OfferYearCalendarFactory(academic_calendar=self.academic_calendar,
-                                 offer_year=self.offer_yr,
+                                 education_group_year=self.educ_group_year,
                                  start_date=delibe_date,
                                  end_date=delibe_date)
-        result_delibe_date = session_exam_calendar.find_deliberation_date(number_session.ONE, self.offer_yr)
+        result_delibe_date = session_exam_calendar.find_deliberation_date(number_session.ONE, self.educ_group_year)
         self.assertNotEqual(result_delibe_date, global_date)
         self.assertIsNone(result_delibe_date)

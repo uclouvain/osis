@@ -29,7 +29,6 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Prefetch, Count
 
-from base.business import entity_version as business_entity_version
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
@@ -37,6 +36,9 @@ from base.models import learning_unit_year
 from base.models.entity import Entity
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.learning_component_year import LearningComponentYear
+
+
+SERVICE_COURSE = 'SERVICE_COURSE'
 
 
 def get_with_context(**learning_unit_year_data):
@@ -82,7 +84,7 @@ def append_latest_entities(learning_unit_yr, service_course_search=False):
     allocation_entity_version = learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)
 
     if service_course_search:
-        learning_unit_yr.entities[business_entity_version.SERVICE_COURSE] = is_service_course(
+        learning_unit_yr.entities[SERVICE_COURSE] = is_service_course(
             learning_unit_yr.academic_year,
             requirement_entity_version,
             allocation_entity_version

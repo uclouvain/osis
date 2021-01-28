@@ -55,7 +55,7 @@ class LearningUnitEnrollment(SerializableModel):
         return self.offer_enrollment.student
 
     @property
-    def offer(self):
+    def offer(self):  # TODO :: to remove
         return self.offer_enrollment.offer_year
 
     def __str__(self):

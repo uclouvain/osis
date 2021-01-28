@@ -426,6 +426,7 @@ def find_for_score_encodings(session_exam_number,
         )
 
     return queryset.select_related('learning_unit_enrollment__offer_enrollment__offer_year') \
+        .select_related('learning_unit_enrollment__offer_enrollment__education_group_year') \
         .select_related('session_exam') \
         .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
         .select_related('learning_unit_enrollment__learning_unit_year')

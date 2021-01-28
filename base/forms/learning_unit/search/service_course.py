@@ -27,8 +27,7 @@ from django import forms
 from django_filters import filters
 
 from base.business.entity import build_entity_container_prefetch
-from base.business.entity_version import SERVICE_COURSE
-from base.business.learning_unit_year_with_context import append_latest_entities
+from base.business.learning_unit_year_with_context import append_latest_entities, SERVICE_COURSE
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models.enums import entity_container_year_link_type
 from base.views.learning_units.search.common import SearchTypes

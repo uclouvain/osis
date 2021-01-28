@@ -95,10 +95,10 @@ def get_closest_new_session_exam(date=None):
         .first()
 
 
-def find_deliberation_date(nb_session, offer_year):
+def find_deliberation_date(nb_session, educ_group_year):
     """"
     :param nb_session The number of session research
-    :param offer_year The offer year research
+    :param educ_group_year The EducationGroupYear research
     :return the deliberation date of the offer and session
     """
     session_exam_cals = SessionExamCalendar.objects.filter(
@@ -108,9 +108,10 @@ def find_deliberation_date(nb_session, offer_year):
     academic_cals_id = [session_exam.academic_calendar_id for session_exam in list(session_exam_cals)]
 
     if academic_cals_id:
-        offer_year_cal = offer_year_calendar.find_by_offer_year(offer_yr=offer_year) \
-            .filter(academic_calendar__in=academic_cals_id) \
-            .first()
+        offer_year_cal = offer_year_calendar.OfferYearCalendar.objects.filter(
+            education_group_year=educ_group_year,
+            academic_calendar__in=academic_cals_id,
+        ).first()
         return offer_year_cal.start_date
 
     return None
