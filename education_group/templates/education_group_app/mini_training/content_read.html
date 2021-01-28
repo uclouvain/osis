@@ -73,26 +73,44 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% with comment=link.comment|default_if_none:'-' %}
-                                    {% if comment|length > 40 %}
-                                        <span data-toggle="tooltip" title='{{ comment }}'>
-                                            {{ comment | truncatechars_html:40|safe }}
-                                        </span>
-                                    {% else %}
-                                        {{ comment|safe }}
-                                    {% endif %}
-                                {% endwith %}
+                                {% if link.comment %}
+                                    <div id="div_comment_fr_{{ link.id }}" class="show_collapse">
+                                        <div class="collapse"
+                                             id="comment_fr_{{ link.id }}"
+                                             aria-expanded="false">
+                                            {{ link.comment|default_if_none:""|safe }}
+                                        </div>
+                                        <a role="button"
+                                           class="collapsed a_show_collapse"
+                                           data-toggle="collapse"
+                                           href="#comment_fr_{{ link.id }}"
+                                           aria-expanded="false"
+                                           aria-controls="comment_fr_{{ link.id }}">
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
-                                {% with comment_english=link.comment_english|default_if_none:'-' %}
-                                    {% if comment_english|length > 40 %}
-                                        <span data-toggle="tooltip" title='{{ comment_english }}'>
-                                            {{ comment_english | truncatechars_html:40|safe }}
-                                        </span>
-                                    {% else %}
-                                        {{ comment_english|safe }}
-                                    {% endif %}
-                                {% endwith %}
+                                {% if link.comment_english %}
+                                    <div id="div_comment_en_{{ link.id }}" class="show_collapse">
+                                        <div class="collapse"
+                                             id="comment_en_{{ link.id }}"
+                                             aria-expanded="false">
+                                            {{ link.comment_english|default_if_none:""|safe }}
+                                        </div>
+                                        <a role="button"
+                                           class="collapsed a_show_collapse"
+                                           data-toggle="collapse"
+                                           href="#comment_en_{{ link.id }}"
+                                           aria-expanded="false"
+                                           aria-controls="comment_en_{{ link.id }}">
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="btn-group pull-right" role="group" aria-label="actions">
