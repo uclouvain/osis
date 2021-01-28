@@ -81,7 +81,6 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
                 CreateLinkValidatorList(parent_node, node_to_paste),
-                PasteAuthorizedRelationshipValidator(tree, node_to_paste, parent_node, link_type=link_type),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
@@ -95,7 +94,6 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         elif node_to_paste.is_learning_unit():
             self.validators = [
                 CreateLinkValidatorList(parent_node, node_to_paste),
-                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, parent_node),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
