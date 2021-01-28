@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, OrderedDict
+from typing import Dict
 
 import attr
 from django import forms
@@ -397,7 +397,7 @@ class UpdateTrainingTransitionVersionForm(UpdateTrainingVersionForm):
             self.fields['version_name'].required = False
 
 
-def remove_blank_choice(form_fields: OrderedDict) -> OrderedDict:
+def remove_blank_choice(form_fields):
     if BLANK_CHOICE[0] in form_fields["end_year"].choices:
         form_fields["end_year"].choices.remove(BLANK_CHOICE[0])
     return form_fields
