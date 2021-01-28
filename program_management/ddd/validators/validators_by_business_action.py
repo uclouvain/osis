@@ -98,7 +98,6 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository, link_type),
                 RelativeCreditsValidator(relative_credits),
             ]
 
