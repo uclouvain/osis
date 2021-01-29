@@ -944,7 +944,7 @@ msgid "Execute selected action"
 msgstr "Exécuter l'action sélectionnée"
 
 msgid "Existing acronym"
-msgstr "Sigle déjà existant"
+msgstr "Code déjà existant"
 
 msgid "Export"
 msgstr "Exporter"
