@@ -70,18 +70,18 @@
                         </td>
                         <td>
                             {% if link.comment %}
-                                <div id="div_comment_fr_{{ link.id }}" class="show_collapse">
+                                <div id="div_comment_fr_{{ link.pk }}" class="show_collapse">
                                     <div class="collapse"
-                                         id="comment_fr_{{ link.id }}"
+                                         id="comment_fr_{{ link.pk }}"
                                          aria-expanded="false">
                                         {{ link.comment|default_if_none:""|safe }}
                                     </div>
                                     <a role="button"
                                        class="collapsed a_show_collapse"
                                        data-toggle="collapse"
-                                       href="#comment_fr_{{ link.id }}"
+                                       href="#comment_fr_{{ link.pk }}"
                                        aria-expanded="false"
-                                       aria-controls="comment_fr_{{ link.id }}">
+                                       aria-controls="comment_fr_{{ link.pk }}">
                                     </a>
                                 </div>
                             {% else %}
@@ -90,18 +90,18 @@
                         </td>
                         <td>
                             {% if link.comment_english %}
-                                <div id="div_comment_en_{{ link.id }}" class="show_collapse">
+                                <div id="div_comment_en_{{ link.pk }}" class="show_collapse">
                                     <div class="collapse"
-                                         id="comment_en_{{ link.id }}"
+                                         id="comment_en_{{ link.pk }}"
                                          aria-expanded="false">
                                         {{ link.comment_english|default_if_none:""|safe }}
                                     </div>
                                     <a role="button"
                                        class="collapsed a_show_collapse"
                                        data-toggle="collapse"
-                                       href="#comment_en_{{ link.id }}"
+                                       href="#comment_en_{{ link.pk }}"
                                        aria-expanded="false"
-                                       aria-controls="comment_en_{{ link.id }}">
+                                       aria-controls="comment_en_{{ link.pk }}">
                                     </a>
                                 </div>
                             {% else %}
