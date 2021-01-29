@@ -45,13 +45,10 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
 from django.contrib import messages
-from django.contrib.messages import get_messages
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories.node import NodeRepository
-from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
-from program_management.serializers.program_trees_utilizations import utilizations_serializer
+from program_management.ddd import command
+from program_management.ddd.service.read.search_indirect_parents import search_indirect_parents
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -190,29 +187,7 @@ def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, re
 
 
 def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
-    node_identity = NodeIdentity(code=acronym, year=year)
-    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
-
-    parents_root = set()
-    for direct_link in direct_parents:
-        root = None
-        parent_node = direct_link.get('link').parent
-        for indirect_parent in direct_link.get('indirect_parents'):
-            parent_node = indirect_parent.get('node')
-            indirect_parents = indirect_parent.get('indirect_parents')
-            if (indirect_parents is None or len(indirect_parents) == 0) or parent_node.is_minor_or_deepening():
-                root = indirect_parent.get('node')
-                break
-            else:
-                for indirect_parent_of_indirect_parent in indirect_parents:
-                    node = indirect_parent_of_indirect_parent.get('node')
-                    if parent_node.is_finality() and node.is_training():
-                        root = node
-                        break
-        if root is None:
-            root = parent_node
-        parents_root.add(root)
-
+    parents_root = search_indirect_parents(command.SearchIndirectParentCommand(year=year, code=acronym))
     formations_using_ue = ["{} - {}".format(parent.full_acronym(), parent.full_title())for parent in parents_root]
     return sorted(formations_using_ue)
 
