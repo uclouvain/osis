@@ -41,7 +41,8 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-                    <button type="submit" class="btn btn-primary pull-right">
+                    <button type="submit" class="btn btn-primary pull-right"
+                            onclick="CKupdate();$('#form_attach_node').submit();" id="btn_content_save">
                         <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
                     </button>
                 </div>

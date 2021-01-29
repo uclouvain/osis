@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from ckeditor.fields import RichTextField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Case, When, Q, Value, CharField
@@ -170,12 +170,12 @@ class GroupYear(models.Model):
         default="",
         verbose_name=_("Title in English")
     )
-    remark_fr = models.TextField(
+    remark_fr = RichTextField(
         blank=True,
         default="",
         verbose_name=_("remark")
     )
-    remark_en = models.TextField(
+    remark_en = RichTextField(
         blank=True,
         default="",
         verbose_name=_("remark in english")
