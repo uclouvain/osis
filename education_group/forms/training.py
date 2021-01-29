@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ckeditor.widgets import CKEditorWidget
 import functools
 import operator
 from typing import Dict, List, Union, Optional
@@ -256,8 +257,9 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     )
 
     # panel_remarks_form.html
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+    remark_fr = forms.CharField(widget=CKEditorWidget(config_name='link_only'), label=_("Remark"), required=False)
+    remark_english = forms.CharField(widget=CKEditorWidget(config_name='link_only'),
+                                     label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
     ares_code = forms.IntegerField(
