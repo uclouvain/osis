@@ -259,7 +259,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "teaching_campus": group_obj.teaching_campus.name,
 
             "remark_fr": group_obj.remark.text_fr,
-            "remark_english": group_obj.remark.text_en,
+            "remark_en": group_obj.remark.text_en,
         }
         return form_initial_values
 
