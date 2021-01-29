@@ -594,6 +594,7 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
                 container_year.save()
 
                 user = CentralManagerFactory(entity=container_year.requirement_entity).person.user
+                generate_learning_unit_edition_calendars([container_year.academic_year])
                 self.assertTrue(
                     user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year)
                 )
@@ -635,18 +636,19 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.faculty_manager_for_ue = FacultyManagerFactory(entity=entity)
 
     def test_for_faculty_manager_for_ue(self):
-        self._test_can_create_partim_based_on_person(self.faculty_manager_for_ue.person, MAX_ACADEMIC_YEAR_FACULTY)
-
-    def test_for_central_manager(self):
-        self._test_can_create_partim_based_on_person(self.central_manager.person, MAX_ACADEMIC_YEAR_CENTRAL)
-
-    def _test_can_create_partim_based_on_person(self, person, max_range):
+        person = self.faculty_manager_for_ue.person
         for luy in self.learning_unit_years:
             with self.subTest(academic_year=luy.academic_year):
-                print(self.current_acy.year, luy.academic_year.year, self.current_acy.year + max_range)
-                print(self.current_acy.year <= luy.academic_year.year,
-                      luy.academic_year.year <= self.current_acy.year + max_range)
-                if luy.academic_year.year <= self.current_acy.year + max_range:
+                if luy.academic_year.year <= self.current_acy.year + MAX_ACADEMIC_YEAR_FACULTY:
+                    self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
+                else:
+                    self.assertFalse(person.user.has_perm('base.can_create_partim', luy))
+
+    def test_for_central_manager(self):
+        person = self.central_manager.person
+        for luy in self.learning_unit_years:
+            with self.subTest(academic_year=luy.academic_year):
+                if self.current_acy.year <= luy.academic_year.year <= self.current_acy.year + MAX_ACADEMIC_YEAR_CENTRAL:
                     self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
                 else:
                     self.assertFalse(person.user.has_perm('base.can_create_partim', luy))
