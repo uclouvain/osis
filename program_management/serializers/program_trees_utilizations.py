@@ -22,16 +22,9 @@ def utilizations_serializer(
         )
     )
 
-    links_using_node = _search_links_using_node(node_repository.get(node_identity), program_trees)
-
-    map_node_with_indirect_parents = _get_map_node_with_indirect_parents(
-        direct_parents={link.parent for link in links_using_node},
-        program_trees=program_trees
-    )
-    indirect_parents = set(itertools.chain.from_iterable(map_node_with_indirect_parents.values()))
-
-    map_node_indirect_parents_of_indirect_parents = _get_map_node_with_indirect_parents(indirect_parents, program_trees)
-    map_node_with_indirect_parents.update(map_node_indirect_parents_of_indirect_parents)
+    links_using_node, map_node_with_indirect_parents = buid_map_node_with_indirect_parents(node_identity,
+                                                                                           node_repository,
+                                                                                           program_trees)
 
     return [
         {
@@ -80,3 +73,15 @@ def _search_links_using_node(node: 'Node', program_trees: List['ProgramTree']) -
     for tree in program_trees:
         direct_parents |= set(tree.search_links_using_node(node))
     return direct_parents
+
+
+def buid_map_node_with_indirect_parents(node_identity, node_repository, program_trees):
+    links_using_node = _search_links_using_node(node_repository.get(node_identity), program_trees)
+    map_node_with_indirect_parents = _get_map_node_with_indirect_parents(
+        direct_parents={link.parent for link in links_using_node},
+        program_trees=program_trees
+    )
+    indirect_parents = set(itertools.chain.from_iterable(map_node_with_indirect_parents.values()))
+    map_node_indirect_parents_of_indirect_parents = _get_map_node_with_indirect_parents(indirect_parents, program_trees)
+    map_node_with_indirect_parents.update(map_node_indirect_parents_of_indirect_parents)
+    return links_using_node, map_node_with_indirect_parents
