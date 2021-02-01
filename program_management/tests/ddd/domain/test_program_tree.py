@@ -53,6 +53,7 @@ from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
@@ -955,7 +956,7 @@ class TestIsEmpty(SimpleTestCase):
 class TestGetIndirectParents(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.program_tree = ProgramTreeFactory.produce_standard_2m_tree(
+        self.program_tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
@@ -997,7 +998,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_used_twice_in_tree_with_2_different_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2m_tree(
+        tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
