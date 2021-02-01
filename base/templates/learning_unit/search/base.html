@@ -10,7 +10,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@
         {% url 'learning_units_service_course' as service_course_url %}
         {% url 'learning_units_borrowed_course' as borrowed_course_url %}
         {% url 'learning_units_proposal' as learning_units_proposal_url %}
+        {% url 'learning_unit_proposal_search' as learning_units_proposal_search_url %}
         {% url 'learning_units_external' as learning_units_external_url %}
         {% url 'learning_units_summary' as learning_units_summary_url %}
     <ul class="nav nav-tabs" role="tablist">
@@ -88,7 +89,7 @@
                 {% trans 'Borrowed courses'%}
             </a>
         </li>
-        <li role="presentation" {% if request.path == learning_units_proposal_url %}class="active"{% endif %}>
+        <li role="presentation" {% if request.path == learning_units_proposal_url or request.path == learning_units_proposal_search_url %}class="active"{% endif %}>
             <a href="{{ learning_units_proposal_url }}" role="tab" id="lnk_proposal_search">
                 {% trans 'Proposals'%}
             </a>
