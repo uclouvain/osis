@@ -163,14 +163,6 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
     return result
 
 
-def find_by_user(user, academic_year=None):
-    queryset = ProgramManager.objects
-    if academic_year:
-        queryset = queryset.filter(offer_year__academic_year=academic_year)
-
-    return queryset.filter(person__user=user)
-
-
 def find_by_management_entity(administration_entities: List['EntityVersion']):
     if administration_entities:
         return ProgramManager.objects.filter(

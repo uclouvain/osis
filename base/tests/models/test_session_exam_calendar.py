@@ -37,7 +37,6 @@ from base.models.session_exam_calendar import get_number_session_by_academic_cal
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 

@@ -27,7 +27,6 @@
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
@@ -38,7 +37,6 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.structure import StructureFactory
@@ -97,7 +95,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm1 = ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_yaer2.education_group)
         response = self.client.get(
-            reverse('delete_manager', args=[pgm1.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager', args=[pgm1.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_yaer2.education_group_id
             )
@@ -106,7 +104,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         self.client.post(
             reverse('delete_manager', args=[pgm1.pk])
-            + "?offer_year={},{}".format(educ_group_year1.education_group_id, educ_group_yaer2.education_group_id)
+            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_yaer2.education_group_id)
         )
         self.assertFalse(ProgramManager.objects.filter(pk=pgm1.pk).exists())
         self.assertTrue(ProgramManager.objects.filter(pk=pgm2.pk).exists())
@@ -118,7 +116,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -126,7 +124,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -149,7 +147,7 @@ class PgmManagerAdministrationTest(TestCase):
         )
 
         self.client.post(
-            reverse('update_main_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('update_main_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'true'}
@@ -160,7 +158,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertTrue(pgm2.is_main)
 
         self.client.post(
-            reverse('update_main', args=[pgm1.pk]) + "?offer_year={},{}".format(
+            reverse('update_main', args=[pgm1.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'false'}
@@ -178,7 +176,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         response = self.client.get(
             reverse('manager_list'),
-            data={'offer_year': [educ_group_year1.education_group, educ_group_year2.education_group]}
+            data={'education_groups': [educ_group_year1.education_group, educ_group_year2.education_group]}
         )
         self.assertEqual(
             response.context['by_person'], {self.person: [pgm1, pgm2]}
@@ -318,7 +316,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         self.client.post(
             reverse("create_manager_person")
-            + "?offer_year={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id),
+            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id),
             data={'person': self.person.pk}
         )
         self.assertEqual(ProgramManager.objects.filter(person=self.person).count(), 2)
@@ -348,25 +346,3 @@ def set_post_request(mock_decorators, data_dict, url):
     request = request_factory.post(url, data_dict)
     request.user = mock.Mock()
     return request
-
-
-class TestAddSaveProgramManager(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        ProgramManagerGroupFactory()
-        cls.person = PersonFactory()
-
-        acronym = "Acronym"
-        cls.education_group_year = EducationGroupYearFactory(acronym=acronym)
-        cls.offer_year = OfferYearFactory(
-            acronym=acronym,
-            corresponding_education_group_year=cls.education_group_year
-        )
-
-    def test_when_offer_year_has_an_equivalent_education_group_year(self):
-        pgm_manager = ProgramManager(offer_year=self.offer_year, person=self.person)
-        pgm_manager.save()
-        self.assertTrue(pgm_manager.pk)
-        self.assertEqual(pgm_manager.person, self.person)
-        self.assertEqual(pgm_manager.offer_year, self.offer_year)
-        self.assertEqual(pgm_manager.education_group, self.education_group_year.education_group)

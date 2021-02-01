@@ -30,10 +30,8 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.structure import StructureFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -41,11 +39,11 @@ class TestIsProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+        cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
 
     def test_is_program_manager(self):
         user = UserFactory(username="PGRM_1")
-        ProgramManagerFactory(offer_year=self.offer_year, person=PersonFactory(user=user))
+        ProgramManagerFactory(education_group=self.educ_group_year.education_group, person=PersonFactory(user=user))
         self.assertTrue(program_manager.is_program_manager(user=user))
 
     def test_is_program_manager_of_education_group(self):
@@ -63,7 +61,6 @@ class TestFindProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
 
     def test_find_by_requirement_entity(self):
         a_management_entity = EntityVersionFactory()

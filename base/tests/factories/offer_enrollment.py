@@ -43,7 +43,7 @@ class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                                        datetime.datetime(2017, 3, 1))
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    offer_year = factory.SubFactory(OfferYearFactory)
+    offer_year = factory.SubFactory(OfferYearFactory)  # TODO :: to remove
     student = factory.SubFactory(StudentFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     enrollment_state = offer_enrollment_state.SUBSCRIBED

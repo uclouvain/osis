@@ -49,6 +49,8 @@ class TestCreateExternalLearningUnitView(TestCase):
         cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
 
+        AcademicYearFactory.produce_in_future(current_year=YEAR_LIMIT_LUE_MODIFICATION-1)
+
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=get_current_year())
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years

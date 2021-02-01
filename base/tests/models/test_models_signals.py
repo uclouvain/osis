@@ -33,7 +33,6 @@ from base.models.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import TutorGroupFactory, ProgramManagerGroupFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 
 
@@ -150,8 +149,7 @@ class AddToGroupsSignalsTest(TestCase):
 
     def create_test_pgm_manager(self):
         egy = EducationGroupYearFactory(academic_year__current=True)
-        offer_year = OfferYearFactory(corresponding_education_group_year=egy)
-        return ProgramManagerFactory(offer_year=offer_year, education_group=egy.education_group, person=self.person_foo)
+        return ProgramManagerFactory(education_group=egy.education_group, person=self.person_foo)
 
     def create_test_entity_manager(self):
         return EntityManagerFactory(person=self.person_foo, structure=Structure.objects.create(acronym="TEST"))

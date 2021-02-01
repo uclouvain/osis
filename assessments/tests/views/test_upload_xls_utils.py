@@ -84,17 +84,17 @@ def generate_exam_enrollments(year, with_different_offer=False):
 
     if with_different_offer:
         session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
-                                            offer_year__academic_year=academic_year)
+                                            education_group_year__academic_year=academic_year)
                          for _ in range(0, number_enrollments)]
     else:
         session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
-                                            offer_year__academic_year=academic_year)] * number_enrollments
-    offer_years = [session_exam.offer_year for session_exam in session_exams]
+                                            education_group_year__academic_year=academic_year)] * number_enrollments
+    education_group_years = [session_exam.education_group_year for session_exam in session_exams]
 
     exam_enrollments = list()
     for i in range(0, number_enrollments):
         student = StudentFactory()
-        offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
+        offer_enrollment = OfferEnrollmentFactory(education_group_year=education_group_years[i], student=student)
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
                                                                  offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
@@ -114,7 +114,7 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
         cls.exam_enrollments = data["exam_enrollments"]
         cls.attribution = data["attribution"]
         cls.learning_unit_year = data["learning_unit_year"]
-        cls.offer_year = data["offer_years"][0]
+        cls.offer_year = data["education_group_years"][0]
         cls.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
                         in cls.exam_enrollments]
 
