@@ -69,6 +69,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
             'prerequisites_string',
@@ -128,6 +129,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
         ]
