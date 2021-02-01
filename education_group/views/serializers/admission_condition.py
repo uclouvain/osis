@@ -98,7 +98,7 @@ def __default_admission_condition():
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
@@ -264,7 +264,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
