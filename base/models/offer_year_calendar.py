@@ -108,7 +108,7 @@ def search(**kwargs):
     if 'number_session' in kwargs:
         queryset = queryset.filter(academic_calendar__sessionexamcalendar__number_session=kwargs['number_session'])
 
-    if 'offer_year' in kwargs:
+    if 'offer_year' in kwargs:  # TODO :: to remove
         queryset = queryset.filter(offer_year=kwargs['offer_year'])
 
     return queryset
