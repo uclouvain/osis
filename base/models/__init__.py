@@ -19,7 +19,6 @@ from base.models import entity_version_address
 from base.models import exam_enrollment
 from base.models import external_learning_unit_year
 from base.models import external_learning_unit_year
-from base.models import external_offer
 from base.models import group_element_year
 from base.models import hops
 from base.models import learning_achievement
@@ -31,13 +30,8 @@ from base.models import learning_unit_enrollment
 from base.models import learning_unit_year
 from base.models import mandatary
 from base.models import mandate
-from base.models import offer
 from base.models import offer_enrollment
-from base.models import offer_type
-from base.models import offer_year
 from base.models import offer_year_calendar
-from base.models import offer_year_domain
-from base.models import offer_year_entity
 from base.models import organization
 from base.models import person
 from base.models import person_address

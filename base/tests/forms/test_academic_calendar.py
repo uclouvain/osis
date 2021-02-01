@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 
@@ -64,9 +64,9 @@ class TestAcademicCalendarForm(TestCase):
     @override_settings(USE_TZ=False)
     def test_with_end_date_inferior_to_offer_year_calendar_end_date(self):
         an_academic_calendar = AcademicCalendarFactory(academic_year=self.an_academic_year)
-        an_offer_year = OfferYearFactory(academic_year=self.an_academic_year)
+        educ_group_year = EducationGroupYearFactory(academic_year=self.an_academic_year)
         an_offer_year_calendar = OfferYearCalendarFactory(academic_calendar=an_academic_calendar,
-                                                          offer_year=an_offer_year)
+                                                          education_group_year=educ_group_year)
 
         form = AcademicCalendarForm(data={
             "academic_year": self.an_academic_year.pk,
@@ -83,7 +83,7 @@ class TestAcademicCalendarForm(TestCase):
             % (an_academic_calendar.title,
                an_offer_year_calendar.end_date.strftime(date_format),
                an_academic_calendar.title,
-               an_offer_year_calendar.offer_year.acronym)
+               an_offer_year_calendar.education_group_year.acronym)
         )
 
     def test_with_correct_form(self):

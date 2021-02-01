@@ -25,15 +25,14 @@
 ##############################################################################
 from decimal import *
 
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery, ManyToManyField
+from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery
 from django.utils.translation import gettext as _
 
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
-    academic_year as academic_yr, offer_year, tutor, education_group_year
+    academic_year as academic_yr, tutor, education_group_year
 from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
@@ -55,7 +54,7 @@ class ExamEnrollmentAdmin(OsisModelAdmin):
                      'learning_unit_enrollment__offer_enrollment__student__person__last_name',
                      'learning_unit_enrollment__offer_enrollment__student__registration_id',
                      'learning_unit_enrollment__learning_unit_year__acronym',
-                     'learning_unit_enrollment__offer_enrollment__offer_year__acronym']
+                     'learning_unit_enrollment__offer_enrollment__education_group_year__acronym']
 
 
 class ExamEnrollment(models.Model):
@@ -356,7 +355,6 @@ def find_for_score_encodings(session_exam_number,
     :param learning_unit_year_id: Filter OfferEnrollments by learning_unit_year.
     :param learning_unit_year_ids: Filter OfferEnrollments by a list of learning_unit_year.
     :param tutor: Filter OfferEnrollments by Tutor.
-    :param offers_year: Filter OfferEnrollments by OfferYear.
     :param with_justification_or_score_final: If True, only examEnrollments with a score_final or a justification_final
                                               are returned.
     :param with_justification_or_score_draft: If True, only examEnrollments with a score_draft or a justification_draft
@@ -423,8 +421,7 @@ def find_for_score_encodings(session_exam_number,
                             to_attr="session_exam_deadlines")
         )
 
-    return queryset.select_related('learning_unit_enrollment__offer_enrollment__offer_year') \
-        .select_related('learning_unit_enrollment__offer_enrollment__education_group_year') \
+    return queryset.select_related('learning_unit_enrollment__offer_enrollment__education_group_year') \
         .select_related('session_exam') \
         .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
         .select_related('learning_unit_enrollment__learning_unit_year')

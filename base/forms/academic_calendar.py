@@ -79,7 +79,7 @@ class AcademicCalendarForm(forms.ModelForm):
                                            self.instance.title,
                                            off_year_calendar_max.end_date.date().strftime(date_format),
                                            self.instance.title,
-                                           off_year_calendar_max.offer_year.acronym
+                                           off_year_calendar_max.education_group_year.acronym
                                        )
             return False
         return True

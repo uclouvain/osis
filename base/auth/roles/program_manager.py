@@ -26,7 +26,7 @@
 from typing import List
 
 import rules
-from django.db import models, IntegrityError
+from django.db import models
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy
 from django.utils.translation import gettext_lazy as _
@@ -46,8 +46,8 @@ from osis_role.contrib import predicates as osis_role_predicates
 
 
 class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
-    list_display = ('person', 'offer_year', 'changed', 'education_group_most_recent_acronym')
-    raw_id_fields = ('person', 'offer_year', 'education_group')
+    list_display = ('person', 'education_group_most_recent_acronym', 'changed',)
+    raw_id_fields = ('person', 'education_group')
     list_filter = ('education_group__educationgroupyear__academic_year',)
 
 
@@ -55,7 +55,6 @@ class ProgramManager(EducationGroupRoleModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
-    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE, blank=True, null=True)  # TODO : to remove at the end of the refactoring
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
 
@@ -68,24 +67,13 @@ class ProgramManager(EducationGroupRoleModel):
         return self.education_group.most_recent_acronym
 
     def __str__(self):
-        return "{} - {}".format(self.person, self.offer_year)
+        return "{} - {}".format(self.person, self.education_group)
 
     class Meta:
         verbose_name = _("Program manager")
         verbose_name_plural = _("Program managers")
         group_name = "program_managers"
-        unique_together = ('person', 'offer_year',)
-
-    def save(self, **kwargs):
-        if not hasattr(self, "education_group"):
-            corresponding_education_group = EducationGroup.objects.filter(
-                educationgroupyear__acronym=self.offer_year.acronym
-            ).first()
-            if not corresponding_education_group:
-                raise IntegrityError("The program manager has no education group.")
-            self.education_group = corresponding_education_group
-
-        super().save(**kwargs)
+        unique_together = ('person', 'education_group',)
 
     @classmethod
     def rule_set(cls):
@@ -132,29 +120,25 @@ class ProgramManager(EducationGroupRoleModel):
 
 def find_by_person(a_person):
     return ProgramManager.objects.filter(person=a_person).select_related(
-        'education_group', 'person', 'offer_year'
+        'education_group', 'person',
     )
 
 
-def is_program_manager(user, offer_year=None, learning_unit_year=None, education_group=None):
+def is_program_manager(user, learning_unit_year=None, education_group=None):
     """
     Args:
         user: an instance of auth.User
-        offer_year: an annual offer to check whether the user is its program manager.
         learning_unit_year: an annual learning unit to check whether it is in the managed offers of the user.
-        education_group: equals to offer_year (will replace it)  # TODO :: update description
+        education_group: an annual offer to check whether the user is its program manager.
 
     Returns: True if the user manage an offer. False otherwise.
     """
     if user.has_perm('base.is_administrator'):
         return True
-
-    if offer_year:
-        result = ProgramManager.objects.filter(person__user=user, offer_year=offer_year).exists()
     elif learning_unit_year:
-        offers_user = ProgramManager.objects.filter(person__user=user).values('offer_year')
+        offers_user = ProgramManager.objects.filter(person__user=user).values('education_group_id', flat=True)
         result = LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
-            .filter(offer_enrollment__offer_year__in=offers_user).exists()
+            .filter(offer_enrollment__education_group_year__education_group_id__in=offers_user).exists()
     elif education_group:
         result = ProgramManager.objects.filter(person__user=user, education_group=education_group).exists()
     else:

@@ -30,7 +30,6 @@ import factory.fuzzy
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 
 
 def generate_start_date(abstract_calendar):
@@ -59,7 +58,6 @@ class OfferYearCalendarFactory(factory.django.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 
     academic_calendar = factory.SubFactory(AcademicCalendarFactory)
-    offer_year = factory.SubFactory(OfferYearFactory)
     start_date = factory.LazyAttribute(generate_start_date)
     end_date = factory.LazyAttribute(generate_end_date)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)

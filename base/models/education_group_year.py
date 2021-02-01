@@ -813,7 +813,7 @@ def find_by_user(user, academic_yr=None):
     """
     :param user: User from which we get the offerYears.
     :param academic_yr: The academic year (takes the current academic year by default).
-    :return: All OfferYears where the user is a program manager for a given year.
+    :return: All EducationGroupYear where the user is a program manager for a given year.
     """
     if not academic_yr:
         academic_yr = academic_year.current_academic_year()

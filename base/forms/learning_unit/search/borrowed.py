@@ -38,7 +38,6 @@ from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.offer_year_entity import OfferYearEntity
 from base.views.learning_units.search.common import SearchTypes
 from education_group.models.group_year import GroupYear
 from program_management.models.element import Element

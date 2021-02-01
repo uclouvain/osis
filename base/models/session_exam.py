@@ -30,10 +30,9 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class SessionExamAdmin(OsisModelAdmin):
-    list_display = ('offer_year', 'learning_unit_year', 'number_session', 'changed')
-    list_filter = ('learning_unit_year__academic_year', 'number_session', 'offer_year__academic_year')
-    raw_id_fields = ('learning_unit_year', 'offer_year')
-    search_fields = ['learning_unit_year__acronym', 'offer_year__acronym']
+    list_display = ('education_group_year', 'learning_unit_year', 'number_session', 'changed')
+    list_filter = ('learning_unit_year__academic_year', 'number_session',)
+    search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym']
 
 
 class SessionExam(models.Model):
@@ -41,8 +40,7 @@ class SessionExam(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
     learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
-    offer_year = models.ForeignKey('OfferYear', blank=True, null=True, on_delete=models.CASCADE)  # TODO :: to remove
-    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True, on_delete=models.CASCADE)
+    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True, on_delete=models.CASCADE)  # TODO :: make this null=False
     progress = None
 
     def __str__(self):

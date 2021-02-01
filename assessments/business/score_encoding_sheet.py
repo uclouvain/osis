@@ -175,7 +175,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             else:
                 enrollments_by_program[key].append(exam_enroll)
 
-        for list_enrollments in enrollments_by_program.values():  # exam_enrollments by OfferYear
+        for list_enrollments in enrollments_by_program.values():  # exam_enrollments by EducationGroupYear
             exam_enrollment = list_enrollments[0]
             educ_group_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
             number_session = exam_enrollment.session_exam.number_session
