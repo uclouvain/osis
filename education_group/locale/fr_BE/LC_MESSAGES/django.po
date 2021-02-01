@@ -173,7 +173,7 @@ msgstr "Procédures d'admission et d'inscription"
 msgid "Admission exam"
 msgstr "Concours"
 
-msgid "Adults taking up their university training"
+msgid "Access on validation of professional experience"
 msgstr "Accès par valorisation des acquis de l'expérience"
 
 msgid "Alert Message"
