@@ -47,8 +47,10 @@ from osis_common.decorators.ajax import ajax_required
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd import command
-from program_management.ddd.service.read.search_indirect_parents import search_indirect_parents
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -179,16 +181,24 @@ def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
 
 
 def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, request):
-    formations_using_ue = _find_root_trainings_using_ue(learning_unit_year.acronym,
-                                                        learning_unit_year.academic_year.year)
+    formations_using_ue = _find_root_trainings_using_ue(learning_unit_year)
     if len(formations_using_ue) > 1:
         for formation in formations_using_ue:
             messages.add_message(request, 50, formation)
 
 
-def _find_root_trainings_using_ue(acronym: str, year: int) -> List['str']:
-    parents_root = search_indirect_parents(command.SearchIndirectParentCommand(year=year, code=acronym))
-    formations_using_ue = ["{} - {}".format(parent.full_acronym(), parent.full_title())for parent in parents_root]
+def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List['str']:
+    node_identity = NodeIdentity(code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year)
+    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+    node_pks = []
+    formations_using_ue = []
+
+    for direct_link in direct_parents:
+        for indirect_parent in direct_link.get('indirect_parents'):
+            if indirect_parent.get('node').pk not in node_pks:
+                node_pks.append(indirect_parent.get('node').pk)
+                formations_using_ue.append("{} - {}".format(indirect_parent.get('node').full_acronym(),
+                                                            indirect_parent.get('node').full_title()))
     return sorted(formations_using_ue)
 
 
