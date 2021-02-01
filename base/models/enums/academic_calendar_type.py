@@ -53,7 +53,7 @@ ACADEMIC_CALENDAR_TYPES = (
     (DELIBERATION, _("Deliberation")),
     (DISSERTATION_SUBMISSION, _("Dissertation submission")),
     (EXAM_ENROLLMENTS, _("Exam enrollments")),
-    (SCORES_EXAM_DIFFUSION, _("Scores exam diffusion")),
+    (SCORES_EXAM_DIFFUSION, _("Scores diffusion")),
     (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
     (TEACHING_CHARGE_APPLICATION, _("Application for vacant courses")),
     (COURSE_ENROLLMENT, _("Course enrollment")),
