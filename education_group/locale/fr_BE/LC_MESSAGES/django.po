@@ -97,7 +97,7 @@ msgstr "Accès"
 msgid "Access condition"
 msgstr "Condition d'accès"
 
-msgid "Access on validation of professional experience"
+msgid "Access based on validation of professional experience"
 msgstr "Accès par valorisation des acquis de l'expérience"
 
 msgid "Achievement has been created (with postpone)"
