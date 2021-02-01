@@ -817,9 +817,6 @@ def find_by_user(user, academic_yr=None):
     """
     if not academic_yr:
         academic_yr = academic_year.current_academic_year()
-        # education_group_id__in=Subquery(
-        #     ProgramManager.objects.filter(person__user=user).values_list('education_group_id', flat=True)
-        # )
     return EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         education_group__programmanager__person__user=user,
