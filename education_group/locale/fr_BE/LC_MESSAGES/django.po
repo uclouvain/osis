@@ -699,7 +699,7 @@ msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
 msgid "Personalized access"
-msgstr "Accès personnalisé"
+msgstr "Accès sur dossier"
 
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
