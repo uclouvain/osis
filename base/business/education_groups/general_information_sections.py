@@ -133,7 +133,7 @@ COMMON_TYPE_ADMISSION_CONDITIONS = {
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
          'ca_allegement', 'ca_ouv_adultes',),
     TrainingType.PGRM_MASTER_120.name:
-        ('alert_message', 'non_university_bachelors', 'adults_taking_up_university_training',
+        ('alert_message', 'ca_cond_generales', 'non_university_bachelors', 'adults_taking_up_university_training',
          'personalized_access', 'admission_enrollment_procedures',),
     TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales',)
 }
