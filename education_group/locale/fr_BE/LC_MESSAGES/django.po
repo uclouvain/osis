@@ -174,7 +174,7 @@ msgid "Admission exam"
 msgstr "Concours"
 
 msgid "Adults taking up their university training"
-msgstr "Adultes en reprise d'études"
+msgstr "Accès par valorisation des acquis de l'expérience"
 
 msgid "Alert Message"
 msgstr "Message d'alerte"
