@@ -698,7 +698,7 @@ msgstr "Intitulé partiel en anglais"
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
-msgid "Personalized access"
+msgid "Access based on application"
 msgstr "Accès sur dossier"
 
 msgid "Please enter an academic year greater or equal to group start year."

@@ -663,7 +663,7 @@ msgstr ""
 msgid "Partial title in French"
 msgstr ""
 
-msgid "Personalized access"
+msgid "Access based on application"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
