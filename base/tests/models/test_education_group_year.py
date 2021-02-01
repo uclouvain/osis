@@ -422,6 +422,4 @@ class TestFindByUser(TestCase):
         ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_1.education_group)
         ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_2.education_group)
         managed_programs = find_by_user(self.person_with_user.user)
-        self.assertTrue(len(managed_programs) == 2)
-        self.assertTrue(educ_group_year_1 in managed_programs)
-        self.assertTrue(educ_group_year_2 in managed_programs)
+        self.assertCountEqual(managed_programs, [educ_group_year_1, educ_group_year_2])

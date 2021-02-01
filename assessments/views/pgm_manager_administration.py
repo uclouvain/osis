@@ -66,7 +66,7 @@ class ProgramManagerListView(ListView):
 
     @cached_property
     def education_group_ids(self) -> List[int]:
-        return self.request.GET.getlist('offer_year')
+        return self.request.GET.getlist('education_groups')
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -92,7 +92,7 @@ class ProgramManagerListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['offer_years'] = self.education_group_ids
+        context['education_groups'] = self.education_group_ids
 
         result = OrderedDict()
         for i in self.object_list:
@@ -110,12 +110,12 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
 
     @property
     def education_group_ids(self) -> list:
-        return self.request.GET['offer_year'].split(',')
+        return self.request.GET['education_groups'].split(',')
 
     def get_success_url(self):
         url = reverse_lazy('manager_list') + "?"
         for education_group_id in self.education_group_ids:
-            url += "offer_year={}&".format(education_group_id)
+            url += "education_groups={}&".format(education_group_id)
         return url
 
 
@@ -164,7 +164,7 @@ class MainProgramManagerPersonUpdateView(ProgramManagerMixin, ListView):
         )
 
     def post(self, *args, **kwargs):
-        """ Update column is_main for selected offer_years"""
+        """ Update column is_main for selected education_groups"""
         val = json.loads(self.request.POST.get('is_main'))
         self.get_queryset().update(is_main=val)
         return super()._ajax_response() or HttpResponseRedirect(self.get_success_url())
@@ -194,7 +194,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['offer_years'] = self.request.GET['offer_year']
+        context['education_groups'] = self.request.GET['education_groups']
         return context
 
     def form_valid(self, form):
