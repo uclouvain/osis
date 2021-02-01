@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 09:29+0100\n"
+"POT-Creation-Date: 2021-02-01 15:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,6 +83,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Access"
+msgstr ""
+
+msgid "Access based on application"
 msgstr ""
 
 msgid "Access condition"
@@ -661,9 +664,6 @@ msgid "Partial title in English"
 msgstr ""
 
 msgid "Partial title in French"
-msgstr ""
-
-msgid "Access based on application"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
