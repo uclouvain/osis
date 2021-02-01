@@ -21,8 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import Optional
 
-import osis_common.ddd.interface
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
@@ -35,17 +35,25 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             path: 'Path',
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
+            link_type: Optional[LinkTypes]
     ) -> None:
         super().__init__()
         self.tree = tree
         self.node_to_paste = node_to_paste
         self.path = path
         self.tree_repository = tree_repository
+        self.link_type = link_type
 
     def validate(self, *args, **kwargs):
         node_to_paste_to = self.tree.get_node(self.path)
-        trees = self.tree_repository.search_from_children([node_to_paste_to.entity_id], link_type=LinkTypes.REFERENCE)
+        trees = self.tree_repository.search_from_children([node_to_paste_to.entity_id])
+        trees.append(self.tree)
         for tree in trees:
-            for parent_from_reference_link in tree.get_parents_using_node_with_respect_to_reference(node_to_paste_to):
-                PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link).validate()
+            for parent_node in tree.get_parents_node_with_respect_to_reference(node_to_paste_to):
+                PasteAuthorizedRelationshipValidator(
+                    tree,
+                    self.node_to_paste,
+                    parent_node,
+                    link_type=self.link_type
+                ).validate()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:36+0100\n"
+"POT-Creation-Date: 2021-01-20 13:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,12 +148,6 @@ msgid "Block"
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
-
-#, python-format
-msgid ""
-"Cannot add \"%(child)s\" because the number of children of type(s) "
-"\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
 msgstr ""
 
 #, python-format
@@ -741,6 +735,12 @@ msgstr ""
 
 #, python-format
 msgid "The link \"%(node)s\" has been updated."
+msgstr ""
+
+#, python-format
+msgid ""
+"The parent \"%(parent)s\" has reached the maximum number of children allowed "
+"for the type(s) : \"%(child_types)s\"."
 msgstr ""
 
 #, python-format

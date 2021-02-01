@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:36+0100\n"
+"POT-Creation-Date: 2021-01-20 13:29+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -166,14 +166,6 @@ msgstr "Bloc"
 
 msgid "Cancel"
 msgstr "Annuler"
-
-#, python-format
-msgid ""
-"Cannot add \"%(child)s\" because the number of children of type(s) "
-"\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
-msgstr ""
-"Ne peut pas attacher \"%(child)s\" car le nombre d'enfants de type(s) "
-"\"%(child_types)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
@@ -792,6 +784,12 @@ msgstr "L'UE est un prérequis"
 #, python-format
 msgid "The link \"%(node)s\" has been updated."
 msgstr "Le lien \"%(node)s\" a été mis à jour."
+
+msgid ""
+"The parent \"%(parent)s\" has reached the maximum number of children allowed "
+"for the type(s) : \"%(child_types)s\"."
+msgstr ""
+"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de type(s) : \"%(child_types)s\"."
 
 #, python-format
 msgid ""
