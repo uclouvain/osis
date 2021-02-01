@@ -90,6 +90,8 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
         """
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         LinkFactory(parent=self.authorized_parent, child=unauthorized_child)
+        LinkFactory(parent=self.authorized_parent, child=self.authorized_child)
+
         validator = DetachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
         self.assertValidatorNotRaises(validator)
 
@@ -120,6 +122,7 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
         """
         LinkFactory(parent=self.authorized_parent, child=self.authorized_child)
         link = LinkFactory(parent=self.authorized_child, child__node_type=NodeType.LEARNING_UNIT)
+        LinkFactory(parent=self.authorized_child, child__node_type=GroupType.SUB_GROUP)
 
         node_to_detach = link.child
         detach_from = link.parent
