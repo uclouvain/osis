@@ -53,6 +53,7 @@ from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
@@ -317,7 +318,7 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
-class TestGetParentsUsingNodeAsReference(SimpleTestCase):
+class TestGetParentsNodeWithRespectToReference(SimpleTestCase):
     def setUp(self):
         self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
         self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
@@ -330,11 +331,11 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
     def test_when_node_is_not_used_as_reference(self):
         link_without_ref = LinkFactory(parent=self.link_with_root.child, link_type=None)
-        result = self.tree.get_parents_using_node_with_respect_to_reference(link_without_ref.child)
-        self.assertListEqual(result, [])
+        result = self.tree.get_parents_node_with_respect_to_reference(link_without_ref.child)
+        self.assertListEqual(result, [link_without_ref.child])
 
     def test_when_node_is_used_as_reference(self):
-        result = self.tree.get_parents_using_node_with_respect_to_reference(self.link_with_ref.child)
+        result = self.tree.get_parents_node_with_respect_to_reference(self.link_with_ref.child)
         self.assertListEqual(
             result,
             [self.link_with_ref.parent]
@@ -350,7 +351,7 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
             link_type=LinkTypes.REFERENCE
         )
 
-        result = self.tree.get_parents_using_node_with_respect_to_reference(child_used_twice)
+        result = self.tree.get_parents_node_with_respect_to_reference(child_used_twice)
 
         self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
@@ -955,7 +956,7 @@ class TestIsEmpty(SimpleTestCase):
 class TestGetIndirectParents(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.program_tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        self.program_tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
@@ -980,7 +981,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_has_one_indirect_parent_which_has_one_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
@@ -997,13 +998,13 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_used_twice_in_tree_with_2_different_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)  # Indirect parent is finality
-        common_core = next(n for n in tree.get_all_nodes() if n.is_common_core())
+        common_core = tree.get_node("1|21")
         common_core.add_child(child_node)  # Indirect parent is master 2M
 
         result = tree.search_indirect_parents(child_node)
