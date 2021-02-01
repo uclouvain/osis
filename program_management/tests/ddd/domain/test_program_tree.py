@@ -981,7 +981,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_has_one_indirect_parent_which_has_one_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2m_tree(
+        tree = ProgramTree2MFactory(
             current_year=2020,
             end_year=2020
         )
