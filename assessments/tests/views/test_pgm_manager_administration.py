@@ -95,7 +95,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm1 = ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_yaer2.education_group)
         response = self.client.get(
-            reverse('delete_manager', args=[pgm1.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager', args=[pgm1.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_yaer2.education_group_id
             )
@@ -104,7 +104,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         self.client.post(
             reverse('delete_manager', args=[pgm1.pk])
-            + "?offer_year={},{}".format(educ_group_year1.education_group_id, educ_group_yaer2.education_group_id)
+            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_yaer2.education_group_id)
         )
         self.assertFalse(ProgramManager.objects.filter(pk=pgm1.pk).exists())
         self.assertTrue(ProgramManager.objects.filter(pk=pgm2.pk).exists())
@@ -116,7 +116,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -124,7 +124,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -147,7 +147,7 @@ class PgmManagerAdministrationTest(TestCase):
         )
 
         self.client.post(
-            reverse('update_main_person', args=[self.person.pk]) + "?offer_year={},{}".format(
+            reverse('update_main_person', args=[self.person.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'true'}
@@ -158,7 +158,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertTrue(pgm2.is_main)
 
         self.client.post(
-            reverse('update_main', args=[pgm1.pk]) + "?offer_year={},{}".format(
+            reverse('update_main', args=[pgm1.pk]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'false'}
@@ -176,7 +176,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         response = self.client.get(
             reverse('manager_list'),
-            data={'offer_year': [educ_group_year1.education_group, educ_group_year2.education_group]}
+            data={'education_groups': [educ_group_year1.education_group, educ_group_year2.education_group]}
         )
         self.assertEqual(
             response.context['by_person'], {self.person: [pgm1, pgm2]}
@@ -316,7 +316,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         self.client.post(
             reverse("create_manager_person")
-            + "?offer_year={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id),
+            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id),
             data={'person': self.person.pk}
         )
         self.assertEqual(ProgramManager.objects.filter(person=self.person).count(), 2)

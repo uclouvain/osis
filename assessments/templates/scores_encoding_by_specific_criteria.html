@@ -124,7 +124,7 @@
                                     <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                                 {% endif %}
                             </td>
-                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym }}</td>
                             <td data-container="body" data-toggle="tooltip" title="{{ enrollment.learning_unit_enrollment.learning_unit_year.complete_title}}" >
                                 {{ enrollment.learning_unit_enrollment.learning_unit_year.acronym |add:" - " |add:enrollment.learning_unit_enrollment.learning_unit_year.complete_title| truncatechars:22}}
                             </td>
