@@ -164,7 +164,7 @@ msgstr ""
 msgid "Admission exam"
 msgstr ""
 
-msgid "Adults taking up their university training"
+msgid "Access on validation of professional experience"
 msgstr ""
 
 msgid "Alert Message"
