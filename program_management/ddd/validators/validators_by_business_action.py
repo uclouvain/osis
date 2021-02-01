@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
 
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._end_date_between_finalities_and_masters import \
@@ -67,7 +69,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
-            link_type,
+            link_type: Optional[LinkTypes],
             tree_repository: 'ProgramTreeRepository',
             version_repository: 'ProgramTreeVersionRepository'
     ):
@@ -79,13 +81,12 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
                 CreateLinkValidatorList(parent_node, node_to_paste),
-                PasteAuthorizedRelationshipValidator(tree, node_to_paste, parent_node, link_type=link_type),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository, link_type),
                 MatchVersionValidator(parent_node, node_to_paste, tree_repository, version_repository),
                 RelativeCreditsValidator(relative_credits),
             ]
@@ -98,7 +99,6 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
                 RelativeCreditsValidator(relative_credits),
             ]
 
