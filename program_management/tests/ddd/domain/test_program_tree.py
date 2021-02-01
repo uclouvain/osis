@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 import inspect
 from unittest import mock
 from unittest.mock import patch
@@ -46,16 +47,17 @@ from program_management.ddd.domain.service.generate_node_abbreviated_title impor
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
-from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
-    UpdatePrerequisiteValidatorList
+from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -249,45 +251,17 @@ class TestGetNodePath(SimpleTestCase):
         )
 
 
-class TestGetCNodesByType(SimpleTestCase):
+class TestGetAllLearningUnitNodes(SimpleTestCase):
     def setUp(self):
         link = LinkFactory(child=NodeGroupYearFactory())
         self.root_node = link.parent
-        self.subgroup_node = link.child
-
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_empty_list_if_no_matching_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_all_learning_unit_nodes()
         self.assertCountEqual(
             result,
             []
-        )
-
-    def test_should_return_all_nodes_with_specific_node_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.GROUP)
-        self.assertCountEqual(
-            result,
-            [self.subgroup_node, self.root_node]
-        )
-
-
-class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
-    def setUp(self):
-        link = LinkFactory(child=NodeGroupYearFactory())
-        self.root_node = link.parent
-        self.subgroup_node = link.child
-
-        self.tree = ProgramTreeFactory(root_node=self.root_node)
-
-    def test_should_return_codes_of_all_learning_unit_nodes(self):
-        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
-        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
-
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        self.assertCountEqual(
-            result,
-            ["LOSIS452", "LT"]
         )
 
 
@@ -317,7 +291,7 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
-class TestGetParentsUsingNodeAsReference(SimpleTestCase):
+class TestGetParentsNodeWithRespectToReference(SimpleTestCase):
     def setUp(self):
         self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
         self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
@@ -330,11 +304,11 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
     def test_when_node_is_not_used_as_reference(self):
         link_without_ref = LinkFactory(parent=self.link_with_root.child, link_type=None)
-        result = self.tree.get_parents_using_node_with_respect_to_reference(link_without_ref.child)
-        self.assertListEqual(result, [])
+        result = self.tree.get_parents_node_with_respect_to_reference(link_without_ref.child)
+        self.assertListEqual(result, [link_without_ref.child])
 
     def test_when_node_is_used_as_reference(self):
-        result = self.tree.get_parents_using_node_with_respect_to_reference(self.link_with_ref.child)
+        result = self.tree.get_parents_node_with_respect_to_reference(self.link_with_ref.child)
         self.assertListEqual(
             result,
             [self.link_with_ref.parent]
@@ -350,7 +324,7 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
             link_type=LinkTypes.REFERENCE
         )
 
-        result = self.tree.get_parents_using_node_with_respect_to_reference(child_used_twice)
+        result = self.tree.get_parents_node_with_respect_to_reference(child_used_twice)
 
         self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
@@ -509,7 +483,7 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertNotEqual(original_link.block, 123456)
 
     def test_when_change_tree_signature(self):
-        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id']
+        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id', 'prerequisites']
         current_signature = list(inspect.signature(ProgramTree.__init__).parameters.keys())
         error_msg = "Please update the {} function to fit with new object signature.".format(ProgramTree.prune)
         self.assertEqual(original_signature, current_signature, error_msg)
@@ -594,15 +568,15 @@ class TestGetNodesThatHavePrerequisites(SimpleTestCase):
         self.assertEqual(self.tree.get_nodes_that_have_prerequisites(), [])
 
     def test_when_tree_has_node_that_have_prerequisites(self):
-        p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        p_group.add_prerequisite_item('BLA', self.link_with_child.child.year)
-
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        p_req.add_prerequisite_item_group(p_group)
-        self.link_with_child.child.set_prerequisite(p_req)
-
-        result = self.tree.get_nodes_that_have_prerequisites()
-        self.assertEqual(result, [self.link_with_child.child])
+        tree = copy.deepcopy(self.tree)
+        node_having_prerequisite = self.link_with_child.child
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=tree,
+            node_having_prerequisite=node_having_prerequisite.entity_id,
+            nodes_that_are_prequisites=[NodeLearningUnitYearFactory()]
+        )
+        result = tree.get_nodes_that_have_prerequisites()
+        self.assertEqual(result, [node_having_prerequisite])
 
 
 class TestGetLink(SimpleTestCase):
@@ -634,15 +608,15 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
     def test_when_tree_contains_learning_units(self):
         link_with_learn_unit = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
         link_with_group = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        expected_result = [link_with_learn_unit.child.code]
+        result = self.tree.get_nodes_permitted_as_prerequisite()
+        expected_result = [link_with_learn_unit.child]
         self.assertListEqual(result, expected_result)
-        self.assertNotIn(link_with_group.child.code, result)
+        self.assertNotIn(link_with_group.child, result)
 
     def test_when_tree_contains_only_groups(self):
         link_with_group1 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
         link_with_group2 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
-        result = self.tree.get_codes_permitted_as_prerequisite()
+        result = self.tree.get_nodes_permitted_as_prerequisite()
         expected_result = []
         self.assertListEqual(result, expected_result)
 
@@ -650,9 +624,27 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         link_with_learn_unit1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c2'))
         link_with_learn_unit2 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c1'))
         link_with_learn_unit3 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c3'))
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        expected_result_order = ['c1', 'c2', 'c3']
+        result = self.tree.get_nodes_permitted_as_prerequisite()
+        expected_result_order = [link_with_learn_unit2.child, link_with_learn_unit1.child, link_with_learn_unit3.child]
         self.assertListEqual(result, expected_result_order)
+
+    def test_when_node_is_used_inside_minor_and_inside_the_bachelor(self):
+        tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
+        minor = NodeGroupYearFactory()
+        ue = NodeLearningUnitYearFactory()
+
+        LinkFactory(
+            parent=tree.root_node,
+            child=LinkFactory(
+                parent=minor,
+                child=ue
+            ).parent
+        )
+        LinkFactory(parent=tree.root_node, child=ue)
+
+        result = tree.get_nodes_permitted_as_prerequisite()
+        expected_result = [ue]
+        self.assertListEqual(result, expected_result)
 
 
 class TestGetAllFinalities(SimpleTestCase):
@@ -770,7 +762,7 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
-            tree.detach_node(path_to_detach, mock.Mock())
+            tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
 
     @patch.object(DetachNodeValidatorList, 'validate')
     def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
@@ -781,7 +773,7 @@ class TestDetachNode(SimpleTestCase):
         path_to_detach = build_path(link.parent, link.child)
 
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
-            tree.detach_node(path_to_detach, mock.Mock())
+            tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
 
         self.assertListEqual(
             exception_context.exception.messages,
@@ -819,18 +811,29 @@ class TestGet2mOptionList(SimpleTestCase):
 
 class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+        self.year = 2020
+        self.tree = ProgramTreeFactory(root_node__year=self.year)
+        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(year=self.year))
+        LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='LOSIS1452', year=self.year))
+        LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='MARC2589', year=self.year))
 
     def test_should_not_set_prerequisites_when_clean_is_not_valid(self):
-        self.mock_validator(UpdatePrerequisiteValidatorList, ["error_message_text"], level=MessageLevel.ERROR)
+        self.mock_validator(
+            validators_by_business_action.UpdatePrerequisiteValidatorList,
+            ["error_message_text"],
+            level=MessageLevel.ERROR
+        )
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
-        self.assertFalse(self.link1.child.prerequisite)
+        self.assertTrue(len(self.tree.get_all_prerequisites()) == 0)
 
     def test_should_set_prerequisites_when_clean_is_valid(self):
-        self.mock_validator(UpdatePrerequisiteValidatorList, ["success_message_text"], level=MessageLevel.SUCCESS)
+        self.mock_validator(
+            validators_by_business_action.UpdatePrerequisiteValidatorList,
+            ["success_message_text"],
+            level=MessageLevel.SUCCESS
+        )
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
-        self.assertTrue(self.link1.child.prerequisite)
+        self.assertTrue(len(self.tree.get_all_prerequisites()) == 1)
 
 
 class TestUpdateLink(SimpleTestCase):
@@ -955,10 +958,7 @@ class TestIsEmpty(SimpleTestCase):
 class TestGetIndirectParents(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.program_tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        self.program_tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
 
     def test_when_child_node_not_in_tree(self):
         child_node = NodeLearningUnitYearFactory()
@@ -980,10 +980,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_has_one_indirect_parent_which_has_one_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)
         result = tree.search_indirect_parents(child_node)
@@ -997,13 +994,10 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_used_twice_in_tree_with_2_different_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
-            current_year=2020,
-            end_year=2020
-        )
+        tree = ProgramTree2MFactory(current_year=2020, end_year=2020)
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)  # Indirect parent is finality
-        common_core = next(n for n in tree.get_all_nodes() if n.is_common_core())
+        common_core = tree.get_node("1|21")
         common_core.add_child(child_node)  # Indirect parent is master 2M
 
         result = tree.search_indirect_parents(child_node)

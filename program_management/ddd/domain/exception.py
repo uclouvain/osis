@@ -290,11 +290,10 @@ class ChildTypeNotAuthorizedException(BusinessException):
 
 
 class MaximumChildTypesReachedException(BusinessException):
-    def __init__(self, parent_node: 'Node', child_node: 'Node', node_types):
+    def __init__(self, parent_node: 'Node', node_types):
         message = _(
-            "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
-            "for \"%(parent)s\" has already reached the limit.") % {
-            'child': child_node,
+            "The parent \"%(parent)s\" has reached the maximum number of children "
+            "allowed for the type(s) : \"%(child_types)s\".") % {
             'child_types': ','.join([str(node_type.value) for node_type in node_types]),
             'parent': parent_node
         }
@@ -325,24 +324,24 @@ class CannotDetachRootException(BusinessException):
 
 
 class CannotDetachLearningUnitsWhoArePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units are prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
             "learning_units": ", ".join([n.code for n in nodes]),
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
         }
         super().__init__(message)
 
 
 class CannotDetachLearningUnitsWhoHavePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units have prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
             "learning_units": ", ".join([n.code for n in nodes])
         }
         super().__init__(message)

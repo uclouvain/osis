@@ -25,6 +25,7 @@
 ##############################################################################
 import re
 
+from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
 from django.db import models, connection
 from django.utils.translation import gettext_lazy as _
@@ -329,12 +330,12 @@ class GroupElementYear(OrderedModel):
         verbose_name=_('Access condition')
     )
 
-    comment = models.TextField(
+    comment = RichTextField(
         max_length=500,
         blank=True, null=True,
         verbose_name=_("comment"),
     )
-    comment_english = models.TextField(
+    comment_english = RichTextField(
         max_length=500,
         blank=True, null=True,
         verbose_name=_("english comment"),

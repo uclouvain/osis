@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         }
 
     @functools.lru_cache()
-    def get_group_year(self):
+    def get_group_year(self) -> 'GroupYear':
         return get_object_or_404(
             GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
             academic_year__year=self.kwargs['year'],

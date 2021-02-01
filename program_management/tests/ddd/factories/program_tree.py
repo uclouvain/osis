@@ -30,21 +30,13 @@ import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import GroupType, TrainingType
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-
-
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'CODE%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class ProgramTreeFactory(factory.Factory):
@@ -59,6 +51,10 @@ class ProgramTreeFactory(factory.Factory):
         ProgramTreeIdentityFactory,
         code=factory.SelfAttribute("..root_node.code"),
         year=factory.SelfAttribute("..root_node.year")
+    )
+    prerequisites = factory.SubFactory(
+        PrerequisitesFactory,
+        context_tree=factory.SelfAttribute("..entity_id")
     )
 
     @staticmethod
@@ -91,14 +87,6 @@ class ProgramTreeFactory(factory.Factory):
         tree_standard.root_node.children = [link1, link2, link3]
 
         return tree_standard
-
-    @staticmethod
-    def produce_standard_2M_program_tree_with_one_finality(current_year: int, end_year: int) -> 'ProgramTree':
-        program_tree = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
-        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
-        finality_list_node = next(n for n in program_tree.get_all_nodes() if n.is_finality_list_choice())
-        finality_list_node.add_child(finality)
-        return program_tree
 
 
 def _tree_builder(data: Dict) -> 'Node':
@@ -140,4 +128,3 @@ def tree_builder(data: Dict) -> 'ProgramTree':
     root_node = _tree_builder(data)
     authorized_relationships = _build_authorized_relationships(root_node)
     return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
-
