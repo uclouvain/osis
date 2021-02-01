@@ -25,34 +25,22 @@
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import exception
 from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
-from program_management.tests.ddd.factories.program_tree import tree_builder
+from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.program_tree import tree_builder, ProgramTreeFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
 from testing.mocks import MockPatcherMixin
 
 
 class TestUpdateLink(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
-        tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "end_year": 2018,
-            "children": [
-                {"node_type": GroupType.COMMON_CORE},
-                {
-                    "node_type": GroupType.MINOR_LIST_CHOICE,
-                    "children": [
-                        {"node_type": MiniTrainingType.ACCESS_MINOR}
-                    ]
-                },
-                {"node_type": NodeType.LEARNING_UNIT}
-            ]
-        }
-        self.tree = tree_builder(tree_data)
+        self.tree = ProgramTreeBachelorFactory(2016, 2018)
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
         self.mock_repo(
             "program_management.ddd.service.write.update_link_service.ProgramTreeRepository",
@@ -284,4 +272,36 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.assertIsInstance(
             next(iter(e.exception.exceptions)),
             exception.MaximumChildTypesReachedException
+        )
+
+    def test_cannot_convert_mandatory_child_link_to_reference(self):
+        self.tree.authorized_relationships.update(
+            TrainingType.BACHELOR,
+            GroupType.COMMON_CORE,
+            max_count_authorized=1,
+            min_count_authorized=1,
+        )
+        self.tree.authorized_relationships.authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                parent_type=TrainingType.BACHELOR,
+                child_type=GroupType.SUB_GROUP,
+                min_count_authorized=0,
+                max_count_authorized=None
+            )
+        )
+
+        cmd = UpdateLinkCommandFactory(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[0].code,
+            child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            link_type=LinkTypes.REFERENCE.name,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd)
+
+        self.assertIsInstance(
+            next(iter(e.exception.exceptions)),
+            exception.MinimumChildTypesNotRespectedException
         )
