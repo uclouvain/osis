@@ -29,8 +29,10 @@ from typing import Dict
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -92,14 +94,6 @@ class ProgramTreeFactory(factory.Factory):
 
         return tree_standard
 
-    @staticmethod
-    def produce_standard_2M_program_tree_with_one_finality(current_year: int, end_year: int) -> 'ProgramTree':
-        program_tree = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
-        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
-        finality_list_node = next(n for n in program_tree.get_all_nodes() if n.is_finality_list_choice())
-        finality_list_node.add_child(finality)
-        return program_tree
-
 
 def _tree_builder(data: Dict) -> 'Node':
     _data = data.copy()
@@ -140,4 +134,3 @@ def tree_builder(data: Dict) -> 'ProgramTree':
     root_node = _tree_builder(data)
     authorized_relationships = _build_authorized_relationships(root_node)
     return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
-
