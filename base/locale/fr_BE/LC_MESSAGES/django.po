@@ -2188,7 +2188,7 @@ msgid "Scores exam diffusion"
 msgstr "Diffusion des feuilles de note"
 
 msgid "Scores exam submission"
-msgstr "Soumission des notes d'examen"
+msgstr "Encodage de notes"
 
 msgid "Scores must be between 0 and 20"
 msgstr "Les scores doivent être compris entre 0 et 20"
