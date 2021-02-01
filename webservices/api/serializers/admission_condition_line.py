@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils import translation
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
@@ -44,7 +43,6 @@ class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
 
 
 class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
-    access = serializers.SerializerMethodField()
 
     class Meta:
         model = AdmissionConditionLine
@@ -55,7 +53,3 @@ class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
             'diploma',
             'remarks'
         )
-
-    def get_access(self, obj):
-        with translation.override(self.context.get('language')):
-            return obj.get_access_display()

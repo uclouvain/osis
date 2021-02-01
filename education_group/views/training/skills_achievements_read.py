@@ -60,15 +60,12 @@ class TrainingReadSkillsAchievements(TrainingRead):
                 'training_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
             ) + '?path={}&tab={}'.format(self.path, Tab.SKILLS_ACHIEVEMENTS),
-            "publish_url": self.get_publish_url()
         }
 
     def get_program_aims_update_url(self):
-        training_id = self.education_group_version.offer_id
         return reverse(
-            'education_group_achievement_program_aim',
-            args=[training_id, training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.path, Tab.SKILLS_ACHIEVEMENTS)
+            'training_general_information_update', args=[self.training.year, self.training.code]
+        ) + "?path={}&label={}".format(self.path, general_information_sections.CMS_LABEL_PROGRAM_AIM)
 
     def get_program_aims_label(self):
         return next(
@@ -77,11 +74,9 @@ class TrainingReadSkillsAchievements(TrainingRead):
         )
 
     def get_additional_information_skills_update_url(self):
-        training_id = self.education_group_version.offer_id
         return reverse(
-            'education_group_achievement_additional_information',
-            args=[training_id, training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.path, Tab.SKILLS_ACHIEVEMENTS)
+            'training_general_information_update', args=[self.training.year, self.training.code]
+        ) + "?path={}&label={}".format(self.path, general_information_sections.CMS_LABEL_ADDITIONAL_INFORMATION)
 
     def get_additional_information_skills_label(self):
         return next(
@@ -96,9 +91,3 @@ class TrainingReadSkillsAchievements(TrainingRead):
     @cached_property
     def training(self):
         return TrainingRepository.get(self.training_identity)
-
-    def get_publish_url(self):
-        return reverse('publish_general_information', args=[
-            self.node_identity.year,
-            self.node_identity.code
-        ]) + "?path={}".format(self.path)

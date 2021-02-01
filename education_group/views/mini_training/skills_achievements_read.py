@@ -58,15 +58,13 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
                 'minitraining_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
             ) + '?path={}&tab={}'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS),
-            "publish_url": self.get_publish_url()
         }
 
     def get_program_aims_update_url(self):
-        mini_training_id = self.get_education_group_version().offer_id
         return reverse(
-            'education_group_achievement_program_aim',
-            args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
+            'mini_training_general_information_update',
+            args=[self.get_mini_training().year, self.get_mini_training().code]
+        ) + "?path={}&label={}".format(self.get_path(), general_information_sections.CMS_LABEL_PROGRAM_AIM)
 
     def get_program_aims_label(self):
         return next(
@@ -75,11 +73,10 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         )
 
     def get_additional_information_skills_update_url(self):
-        mini_training_id = self.get_education_group_version().offer_id
         return reverse(
-            'education_group_achievement_additional_information',
-            args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
+            'mini_training_general_information_update',
+            args=[self.get_mini_training().year, self.get_mini_training().code]
+        ) + "?path={}&label={}".format(self.get_path(), general_information_sections.CMS_LABEL_ADDITIONAL_INFORMATION)
 
     def get_additional_information_skills_label(self):
         return next(
@@ -90,9 +87,3 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
     @functools.lru_cache()
     def get_translated_labels(self):
         return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
-
-    def get_publish_url(self):
-        return reverse('publish_general_information', args=[
-            self.node_identity.year,
-            self.node_identity.code
-        ]) + "?path={}".format(self.get_path())

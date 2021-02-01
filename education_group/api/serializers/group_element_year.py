@@ -178,7 +178,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
     remark_en = serializers.CharField(source='child.other_remark_english', read_only=True)
-    lecturing_volume = serializers.DecimalField(
+    lecturing_volume = VolumeField(
         source='child.volume_total_lecturing',
         max_digits=6,
         decimal_places=2,

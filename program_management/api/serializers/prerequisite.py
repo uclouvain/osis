@@ -58,13 +58,14 @@ class NodeBaseSerializer(serializers.Serializer):
 
 
 class ProgramTreePrerequisitesSerializer(NodeBaseSerializer):
-    prerequisites_string = serializers.SerializerMethodField(read_only=True)
+    prerequisites_string = serializers.SerializerMethodField()
     prerequisites = serializers.SerializerMethodField()
 
-    def get_prerequisites_string(self, obj: 'Node') -> 'PrerequisiteExpression':
-        return str(self.context['tree'].get_prerequisite(obj))
+    def get_prerequisites_string(self, obj: 'NodeLearningUnitYear'):
+        prerequisites = self.context['tree'].get_prerequisite(obj)
+        return prerequisites.get_prerequisite_expression(translate=False)
 
-    def get_prerequisites(self, obj: 'Node'):
+    def get_prerequisites(self, obj: 'NodeLearningUnitYear'):
         list_nodes = []
         for prig in self.context['tree'].get_prerequisite(obj).prerequisite_item_groups:
             for prerequisite in prig.prerequisite_items:
