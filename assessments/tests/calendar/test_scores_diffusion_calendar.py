@@ -28,21 +28,21 @@ import datetime
 from django.forms import model_to_dict
 from django.test import TestCase
 
-from assessments.calendar.scores_exam_diffusion_calendar import ScoreExamDiffusionCalendar
+from assessments.calendar.scores_diffusion_calendar import ScoresDiffusionCalendar
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 
 
-class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
+class TestScoresDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
 
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
-        ScoreExamDiffusionCalendar.ensure_consistency_until_n_plus_6()
+        ScoresDiffusionCalendar.ensure_consistency_until_n_plus_6()
 
         qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.SCORES_EXAM_DIFFUSION)
 
@@ -55,7 +55,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
                 fields=('title', 'reference', 'data_year', 'start_date', 'end_date')
             ),
             {
-                "title": "Diffusion des feuilles de note - Session 1",
+                "title": "Diffusion des notes - Session 1",
                 "reference": academic_calendar_type.SCORES_EXAM_DIFFUSION,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year + 1, 1, 5),
@@ -68,7 +68,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
     def test_ensure_consistency_until_n_plus_6_assert_idempotent(self):
         for _ in range(5):
-            ScoreExamDiffusionCalendar.ensure_consistency_until_n_plus_6()
+            ScoresDiffusionCalendar.ensure_consistency_until_n_plus_6()
 
         self.assertEqual(
             AcademicCalendar.objects.filter(

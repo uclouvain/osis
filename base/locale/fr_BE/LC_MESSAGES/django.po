@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 08:30+0100\n"
+"POT-Creation-Date: 2021-02-01 10:50+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2183,9 +2183,6 @@ msgstr "Note"
 
 msgid "Scores diffusion"
 msgstr "Diffusion des notes"
-
-msgid "Scores exam diffusion"
-msgstr "Diffusion des feuilles de note"
 
 msgid "Scores exam submission"
 msgstr "Encodage de notes"

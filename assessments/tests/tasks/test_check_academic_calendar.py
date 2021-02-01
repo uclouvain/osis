@@ -30,7 +30,7 @@ from assessments.tasks import check_academic_calendar
 class TestCheckAcademicCalendar(TestCase):
 
     @mock.patch("assessments.tasks.check_academic_calendar."
-                "ScoreExamDiffusionCalendar.ensure_consistency_until_n_plus_6")
+                "ScoresDiffusionCalendar.ensure_consistency_until_n_plus_6")
     @mock.patch("assessments.tasks.check_academic_calendar."
                 "ScoresExamSubmissionCalendar.ensure_consistency_until_n_plus_6")
     def test_check_academic_calendar_ensure_call_all_academic_calendar(self, *mocks_calendar):

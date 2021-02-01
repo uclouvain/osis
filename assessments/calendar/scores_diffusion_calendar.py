@@ -32,7 +32,7 @@ from base.models.enums import academic_calendar_type
 from base.models.session_exam_calendar import SessionExamCalendar
 
 
-class ScoreExamDiffusionCalendar(AcademicEventSessionCalendarHelper):
+class ScoresDiffusionCalendar(AcademicEventSessionCalendarHelper):
     event_reference = academic_calendar_type.SCORES_EXAM_DIFFUSION
 
     @classmethod
@@ -57,7 +57,7 @@ class ScoreExamDiffusionCalendar(AcademicEventSessionCalendarHelper):
             academic_calendar = AcademicCalendar.objects.create(
                 reference=cls.event_reference,
                 data_year=academic_year,
-                title="Diffusion des feuilles de note - Session 1",
+                title="Diffusion des notes - Session 1",
                 start_date=datetime.date(academic_year.year + 1, 1, 5),
                 end_date=datetime.date(academic_year.year + 1, 2, 28),
                 academic_year=academic_year  # To remove after refactoring
@@ -76,7 +76,7 @@ class ScoreExamDiffusionCalendar(AcademicEventSessionCalendarHelper):
             academic_calendar = AcademicCalendar.objects.create(
                 reference=cls.event_reference,
                 data_year=academic_year,
-                title="Diffusion des feuilles de note - Session 2",
+                title="Diffusion des notes - Session 2",
                 start_date=datetime.date(academic_year.year + 1, 6, 15),
                 end_date=datetime.date(academic_year.year + 1, 7, 15),
                 academic_year=academic_year  # To remove after refactoring
@@ -95,7 +95,7 @@ class ScoreExamDiffusionCalendar(AcademicEventSessionCalendarHelper):
             academic_calendar = AcademicCalendar.objects.create(
                 reference=cls.event_reference,
                 data_year=academic_year,
-                title="Diffusion des feuilles de note - Session 3",
+                title="Diffusion des notes - Session 3",
                 start_date=datetime.date(academic_year.year + 1, 8, 15),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
                 academic_year=academic_year  # To remove after refactoring

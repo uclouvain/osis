@@ -29,8 +29,6 @@ from typing import List, Dict
 import attr
 from django.utils.translation import gettext as _
 
-from django.utils.translation import gettext as _
-
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND

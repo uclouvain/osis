@@ -223,7 +223,7 @@ class ProgramTree(interface.RootEntity):
         except AttributeError:
             return False
 
-    def get_parents_using_node_with_respect_to_reference(self, child_node: 'Node') -> List['Node']:
+    def get_parents_node_with_respect_to_reference(self, parent_node: 'Node') -> List['Node']:
         links = _links_from_root(self.root_node)
 
         def _get_parents(child_node: 'Node') -> List['Node']:
@@ -238,7 +238,11 @@ class ProgramTree(interface.RootEntity):
                     result.append(link_obj.parent)
             return result
 
-        return _get_parents(child_node)
+        non_reference_links = [link_obj for link_obj in links
+                               if link_obj.child == parent_node and not link_obj.is_reference()]
+        if non_reference_links or self.root_node == parent_node:
+            return [parent_node] + _get_parents(parent_node)
+        return _get_parents(parent_node)
 
     def get_all_parents(self, child_node: 'Node') -> Set['Node']:
         paths_using_node = self.search_paths_using_node(child_node)
