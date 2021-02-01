@@ -1,8 +1,8 @@
-from assessments.calendar.scores_exam_diffusion_calendar import ScoreExamDiffusionCalendar
+from assessments.calendar.scores_diffusion_calendar import ScoresDiffusionCalendar
 from backoffice.celery import app as celery_app
 
 
 @celery_app.task
 def run() -> dict:
-    ScoreExamDiffusionCalendar.ensure_consistency_until_n_plus_6()
+    ScoresDiffusionCalendar.ensure_consistency_until_n_plus_6()
     return {}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 08:30+0100\n"
+"POT-Creation-Date: 2021-02-01 10:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2119,9 +2119,6 @@ msgid "Score"
 msgstr ""
 
 msgid "Scores diffusion"
-msgstr ""
-
-msgid "Scores exam diffusion"
 msgstr ""
 
 msgid "Scores exam submission"
