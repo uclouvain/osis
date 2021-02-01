@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingType
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.views.learning_units.common import _find_root_trainings_using_ue
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -53,8 +53,7 @@ class TestLearningUnitCommonView(TestCase):
     def test_ue_used_in_one_training(self):
         self.build_training_tree('DROI2M', 'Bachelier droit', self.element_learning_unit_year,
                                  TrainingType.BACHELOR, Categories.TRAINING)
-        res = _find_root_trainings_using_ue(LUY_ACRONYM,
-                                            self.academic_year.year)
+        res = _find_root_trainings_using_ue(self.element_learning_unit_year.learning_unit_year)
         expected = ['DROI2M - Bachelier droit']
         self.assertListEqual(res, expected)
 
@@ -63,34 +62,9 @@ class TestLearningUnitCommonView(TestCase):
                                  TrainingType.BACHELOR, Categories.TRAINING)
         self.build_training_tree('ARK1BA', 'Bachelier archi', self.element_learning_unit_year,
                                  TrainingType.BACHELOR, Categories.TRAINING)
-        res = _find_root_trainings_using_ue(LUY_ACRONYM,
-                                            self.academic_year.year)
+        res = _find_root_trainings_using_ue(self.element_learning_unit_year.learning_unit_year)
         expected = ['ARK1BA - Bachelier archi',
                     'DROI2M - Bachelier droit']
-        self.assertListEqual(res, expected)
-
-    def test_ue_used_in_a_finality(self):
-        training_root = self.build_training_tree('EDPH2M', 'Bachelier droit', None, TrainingType.BACHELOR,
-                                                 Categories.TRAINING)
-        finality_root = self.build_training_tree('EDPH2MD', 'Bachelier droit', self.element_learning_unit_year,
-                                                 TrainingType.MASTER_MA_120, Categories.TRAINING)
-        GroupElementYearChildLeafFactory(parent_element=training_root,
-                                         child_element=finality_root)
-        res = _find_root_trainings_using_ue(LUY_ACRONYM,
-                                            self.academic_year.year)
-        expected = ['EDPH2M - Bachelier droit']
-        self.assertListEqual(res, expected)
-
-    def test_ue_used_in_a_minor_or_deepening(self):
-        training_root = self.build_training_tree('EDPH2M', 'Bachelier droit', None, TrainingType.BACHELOR,
-                                                 Categories.TRAINING)
-        minor_root = self.build_training_tree('MINEDPH', 'Mineure en droit', self.element_learning_unit_year,
-                                              MiniTrainingType.SOCIETY_MINOR, Categories.MINI_TRAINING)
-        GroupElementYearChildLeafFactory(parent_element=training_root,
-                                         child_element=minor_root)
-        res = _find_root_trainings_using_ue(LUY_ACRONYM,
-                                            self.academic_year.year)
-        expected = ['MINEDPH - Mineure en droit']
         self.assertListEqual(res, expected)
 
     def build_training_tree(self, acronym, title, element_learning_unit_year, education_group_type, category):
