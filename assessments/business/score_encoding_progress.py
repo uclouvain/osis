@@ -55,7 +55,7 @@ def get_scores_encoding_progress(user, education_group_year_id, number_session, 
     return _sort_by_acronym([ScoreEncodingProgress(obj) for obj in queryset])
 
 
-def find_related_education_group_years(score_encoding_progress_list):  # TODO :: fix unit test
+def find_related_education_group_years(score_encoding_progress_list):
     educ_group_year_ids = [
         score_encoding_progress.education_group_year_id for score_encoding_progress in score_encoding_progress_list
     ]

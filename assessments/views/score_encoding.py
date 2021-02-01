@@ -111,7 +111,7 @@ def scores_encoding(request):
                'number_session': number_session,
                'active_tab': request.GET.get('active_tab')}
 
-    education_group_year_id = request.GET.get('offer', None)  # TODO :: rename param to education_group_year_id
+    education_group_year_id = request.GET.get('offer', None)
     if education_group_year_id:
         education_group_year_id = int(education_group_year_id)
 
@@ -506,7 +506,7 @@ def __send_message_for_education_group_year(
     return sent_error_message
 
 
-def filter_enrollments_by_education_group_year(enrollments, education_group_year):  # TODO :: fix unit test
+def filter_enrollments_by_education_group_year(enrollments, education_group_year):
     filtered_enrollments = filter(
         lambda enrol: enrol.learning_unit_enrollment.offer_enrollment.education_group_year == education_group_year,
         enrollments
