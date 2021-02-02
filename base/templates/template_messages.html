@@ -43,10 +43,11 @@
         </div>
     {% endif %}
 
+    {% as_messages_special_warning as special_warning_messages %}
     {% if special_warning_messages %}
-        <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
+         <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
             {{ special_warning_messages|safe }}
-        </div>
+         </div>
     {% endif %}
 
     {% as_messages_error as messages_error %}

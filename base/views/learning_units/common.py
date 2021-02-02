@@ -92,7 +92,7 @@ def check_acronym(request, subtype):
 
 
 def get_learning_unit_identification_context(learning_unit_year_id, person, messages):
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=messages)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
 
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
@@ -134,8 +134,7 @@ def get_learning_unit_identification_context(learning_unit_year_id, person, mess
 def get_common_context_learning_unit_year(person,
                                           learning_unit_year_id: Optional[int] = None,
                                           code: Optional[str] = None,
-                                          year: Optional[int] = None,
-                                          messages: List = []):
+                                          year: Optional[int] = None):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -149,14 +148,12 @@ def get_common_context_learning_unit_year(person,
         learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
-    context = {
+
+    return {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
-
-    context['special_warning_messages'] = update_context_with_messages_update_warnings(messages)
-    return context
 
 
 def get_text_label_translated(text_lb, user_language):
@@ -190,24 +187,21 @@ def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, re
 def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List['str']:
     node_identity = NodeIdentity(code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year)
     direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
-    node_pks = []
-    formations_using_ue = []
-
+    formations_using_ue = set()
     for direct_link in direct_parents:
         for indirect_parent in direct_link.get('indirect_parents'):
-            if indirect_parent.get('node').pk not in node_pks:
-                node_pks.append(indirect_parent.get('node').pk)
-                formations_using_ue.append("{} - {}".format(indirect_parent.get('node').full_acronym(),
-                                                            indirect_parent.get('node').full_title()))
+            formations_using_ue.add("{} - {}".format(indirect_parent.get('node').full_acronym(),
+                                                     indirect_parent.get('node').full_title()))
     return sorted(formations_using_ue)
 
 
 def update_context_with_messages_update_warnings(all_messages):
-    messages_update_warning = [m.message for m in all_messages if m.tags == '']
-    if messages_update_warning:
-        html = "{}<ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
-        for message in messages_update_warning:
-            html += "<li>{}</li>".format(message)
-        html += "</ul>"
-        return mark_safe(html)
+    if all_messages:
+        messages_update_warning = [m.message for m in all_messages if m.tags == '']
+        if messages_update_warning:
+            html = "{}<ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
+            for message in messages_update_warning:
+                html += "<li>{}</li>".format(message)
+            html += "</ul>"
+            return mark_safe(html)
     return None

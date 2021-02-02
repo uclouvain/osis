@@ -42,12 +42,13 @@ LUY_ACRONYM = 'LECRI1508'
 
 class TestLearningUnitCommonView(TestCase):
 
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(current=True)
-        self.element_learning_unit_year = ElementLearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__acronym=LUY_ACRONYM,
-            learning_unit_year__academic_year=self.academic_year,
-            learning_unit_year__learning_container_year__academic_year=self.academic_year,
+            learning_unit_year__academic_year=cls.academic_year,
+            learning_unit_year__learning_container_year__academic_year=cls.academic_year,
         )
 
     def test_ue_used_in_one_training(self):

@@ -135,7 +135,7 @@ def update_learning_unit(request, learning_unit_year_id):
 @permission_required('base.can_edit_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, messages=get_messages(request))
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
 
     context['learning_units'] = _get_learning_units_for_context(luy=context['learning_unit_year'],
                                                                 with_family=form_type == "full")

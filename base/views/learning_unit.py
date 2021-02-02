@@ -104,8 +104,7 @@ def learning_unit_components(request, learning_unit_year_id=None, code=None, yea
         person,
         learning_unit_year_id,
         code,
-        year,
-        messages=get_messages(request)
+        year
     )
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings

@@ -25,6 +25,8 @@
 ##############################################################################
 from django import template
 from django.contrib import messages
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 register = template.Library()
 
@@ -71,3 +73,18 @@ def as_messages_success(context):
         if 'success' in m.tags:
             return True
     return False
+
+
+@register.simple_tag(takes_context=True)
+def as_messages_special_warning(context):
+    request = context['request']
+    all_messages = messages.get_messages(request)
+
+    messages_update_warning = [m.message for m in all_messages if m.tags == '']
+    if messages_update_warning:
+        html = "{}<ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
+        for message in messages_update_warning:
+            html += "<li>{}</li>".format(message)
+        html += "</ul>"
+        return mark_safe(html)
+    return None
