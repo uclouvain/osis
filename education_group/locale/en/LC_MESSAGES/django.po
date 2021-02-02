@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 09:29+0100\n"
+"POT-Creation-Date: 2021-02-01 14:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,6 +88,9 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
+msgid "Access based on validation of professional experience"
+msgstr ""
+
 msgid "Achievement has been created (with postpone)"
 msgstr ""
 
@@ -162,9 +165,6 @@ msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
 
 msgid "Admission exam"
-msgstr ""
-
-msgid "Adults taking up their university training"
 msgstr ""
 
 msgid "Alert Message"
