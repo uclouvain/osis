@@ -132,10 +132,8 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
         self.luy_current_year = self.learning_unit_year.academic_year.year
 
         applications = TutorApplication.objects.filter(
-            learning_container_year__learning_container=
-            self.learning_unit_year.learning_container_year.learning_container,
-            learning_container_year__academic_year__year__gte=
-            self.learning_unit_year.learning_container_year.academic_year.year
+            learning_container_year__learning_container=self.learning_unit_year.learning_container_year.learning_container,
+            learning_container_year__academic_year__year__gte=self.learning_unit_year.learning_container_year.academic_year.year
         ).order_by('learning_container_year__academic_year__year')
         if not max_year and applications:
             max_year = applications.first().learning_container_year.academic_year.year
