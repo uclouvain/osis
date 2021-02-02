@@ -77,61 +77,52 @@
                             </ul>
                         </td>
                         <td>
-                            <ul>{% for entity in object.entitymanager_set.all %}
-                                <li>{{ entity.entity_recent_acronym }}</li>
-                            {% endfor %}
+                            <ul>
+                                {% for entity in object.base_entitymanager_set.all %}
+                                    <li>{{ entity.entity_recent_acronym }}</li>
+                                {% endfor %}
                             </ul>
                         </td>
                         {% if 'learning_unit' in installed_apps %}
-                            {% with entities_managed=central_managers_for_ue|get_item:object.pk %}
-                                <td>
-                                    <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            {% endwith %}
-                            {% with entities_managed=faculty_managers_for_ue|get_item:object.pk %}
-                                <td>
-                                    <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            {% endwith %}
+                            <td>
+                                <ul>
+                                    {% for entity in object.learning_unit_centralmanager_set.all %}
+                                        <li>{{ entity.entity_recent_acronym }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    {% for entity in object.learning_unit_facultymanager_set.all %}
+                                        <li>{{ entity.entity_recent_acronym }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
                         {% endif %}
                         {% if 'education_group' in installed_apps %}
-                             {% with entities_managed=central_managers_for_of|get_item:object.pk %}
-                                <td>
-                                    <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            {% endwith %}
-                            {% with entities_managed=faculty_managers_for_of|get_item:object.pk %}
-                                <td>
-                                    <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            {% endwith %}
+                            <td>
+                                <ul>
+                                    {% for entity in object.education_group_centralmanager_set.all %}
+                                        <li>{{ entity.entity_recent_acronym }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    {% for entity in object.education_group_facultymanager_set.all %}
+                                        <li>{{ entity.entity_recent_acronym }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
                         {% endif %}
                         {% if 'partnership' in installed_apps %}
-                            {% with entities_managed=partnership_entity_managers|get_item:object.pk %}
-                                <td>
-                                    <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            {% endwith %}
+                            <td>
+                                <ul>
+                                    {% for entity in object.partnership_partnershipentitymanager_set.all %}
+                                        <li>{{ entity.entity_recent_acronym }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
                         {% endif %}
                         <td>
                             <ul>

@@ -26,11 +26,11 @@
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
 from django.views.generic import ListView
 
+from base.auth.roles.entity_manager import EntityManager
 from base.auth.roles.program_manager import ProgramManager
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
@@ -58,83 +58,80 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             ).order_by('most_recent_acronym')
         )
 
+        prefetch_entity_mgr = Prefetch(
+            "base_entitymanager_set",
+            queryset=EntityManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
+        )
+
+        prefetches = [prefetch_pgm_mgr, prefetch_entity_mgr]
+        if 'learning_unit' in settings.INSTALLED_APPS:
+            prefetches.append(self.get_central_manager_for_ue())
+            prefetches.append(self.get_faculty_manager_for_ue())
+
+        if 'education_group' in settings.INSTALLED_APPS:
+            prefetches.append(self.get_central_manager_for_of())
+            prefetches.append(self.get_faculty_manager_for_of())
+
+        if 'partnership' in settings.INSTALLED_APPS:
+            prefetches.append(self.get_partnership_entity_managers())
+
         return super().get_queryset().select_related(
                 'user'
             ).prefetch_related(
                 'user__groups'
             ).prefetch_related(
-                prefetch_pgm_mgr,
+                *prefetches
             ).filter(
                 user__is_active=True,
                 user__groups__in=Group.objects.exclude(name=TUTOR)
             ).distinct()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'learning_unit' in settings.INSTALLED_APPS:
-            context['faculty_managers_for_ue'] = self.get_faculty_manager_for_ue()
-            context['central_managers_for_ue'] = self.get_central_manager_for_ue()
-        if 'education_group' in settings.INSTALLED_APPS:
-            context['faculty_managers_for_of'] = self.get_faculty_manager_for_of()
-            context['central_managers_for_of'] = self.get_central_manager_for_of()
-        if 'partnership' in settings.INSTALLED_APPS:
-            context['partnership_entity_managers'] = self.get_partnership_entity_managers()
-        return context
-
     def get_partnership_entity_managers(self):
         from partnership.auth.roles.partnership_manager import PartnershipEntityManager
-        qs = PartnershipEntityManager.objects.annotate(
-            entity_recent_acronym=self._get_most_recent_acronym_subquery()
-        ).values(
-            'person_id'
-        ).annotate(
-            entities=ArrayAgg('entity_recent_acronym')
+        return Prefetch(
+            "partnership_partnershipentitymanager_set",
+            queryset=PartnershipEntityManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
         )
-        return dict(qs.values_list('person_id', 'entities'))
 
     def get_faculty_manager_for_ue(self):
         from learning_unit.auth.roles.faculty_manager import FacultyManager
-        qs = FacultyManager.objects.annotate(
-            entity_recent_acronym=self._get_most_recent_acronym_subquery()
-        ).values(
-            'person_id'
-        ).annotate(
-            entities=ArrayAgg('entity_recent_acronym')
+        return Prefetch(
+            "learning_unit_facultymanager_set",
+            queryset=FacultyManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
         )
-        return dict(qs.values_list('person_id', 'entities'))
 
     def get_central_manager_for_ue(self):
         from learning_unit.auth.roles.central_manager import CentralManager
-        qs = CentralManager.objects.annotate(
-            entity_recent_acronym=self._get_most_recent_acronym_subquery()
-        ).values(
-            'person_id'
-        ).annotate(
-            entities=ArrayAgg('entity_recent_acronym')
+        return Prefetch(
+            "learning_unit_centralmanager_set",
+            queryset=CentralManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
         )
-        return dict(qs.values_list('person_id', 'entities'))
 
     def get_faculty_manager_for_of(self):
         from education_group.auth.roles.faculty_manager import FacultyManager
-        qs = FacultyManager.objects.annotate(
-            entity_recent_acronym=self._get_most_recent_acronym_subquery()
-        ).values(
-            'person_id'
-        ).annotate(
-            entities=ArrayAgg('entity_recent_acronym')
+        return Prefetch(
+            "education_group_facultymanager_set",
+            queryset=FacultyManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
         )
-        return dict(qs.values_list('person_id', 'entities'))
 
     def get_central_manager_for_of(self):
         from education_group.auth.roles.central_manager import CentralManager
-        qs = CentralManager.objects.annotate(
-            entity_recent_acronym=self._get_most_recent_acronym_subquery()
-        ).values(
-            'person_id'
-        ).annotate(
-            entities=ArrayAgg('entity_recent_acronym')
+        return Prefetch(
+            "education_group_centralmanager_set",
+            queryset=CentralManager.objects.all().annotate(
+                entity_recent_acronym=self._get_most_recent_acronym_subquery()
+            ).order_by('entity_recent_acronym')
         )
-        return dict(qs.values_list('person_id', 'entities'))
 
     def _get_most_recent_acronym_subquery(self):
         return Subquery(
