@@ -405,3 +405,13 @@ def is_learning_unit_with_container(self, user, learning_unit_year):
     if learning_unit_year:
         return learning_unit_year.learning_container_year
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is of type creation"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_not_proposal_of_type_creation_or_modification(self, user, learning_unit_year):
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type != ProposalType.CREATION.name and \
+               learning_unit_year.proposallearningunit.type != ProposalType.MODIFICATION.name
+    return None

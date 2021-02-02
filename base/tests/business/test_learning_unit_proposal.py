@@ -266,7 +266,7 @@ class TestConsolidateProposals(TestCase):
         self.assertTrue(mock_mail.called)
 
     def test_apply_action_on_proposals_with_tutor_application(self):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, state=ProposalState.ACCEPTED.name)
+        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name, state=ProposalState.ACCEPTED.name)
         learning_container_year = proposal.learning_unit_year.learning_container_year
         TutorApplicationFactory(learning_container_year=learning_container_year)
         manager = FacultyManagerFactory(entity=learning_container_year.requirement_entity)
