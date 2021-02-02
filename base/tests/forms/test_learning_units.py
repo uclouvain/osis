@@ -201,7 +201,7 @@ class TestLearningUnitForm(TestCase):
         service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(
-            [self.list_learning_unit_year[0], self.list_learning_unit_year[1]],
+            [self.list_learning_unit_year[0], self.list_learning_unit_year[1], self.list_learning_unit_year[3]],
             list(service_course_filter.qs)
         )
 
@@ -222,7 +222,7 @@ class TestLearningUnitForm(TestCase):
 
         service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
-        self.assertEqual(list(service_course_filter.qs), [])
+        self.assertEqual(list(service_course_filter.qs), [self.list_learning_unit_year[3]])
 
     def test_get_service_courses_by_requirement_acronym(self):
         form_data = {

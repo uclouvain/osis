@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 from base.models import learning_unit_year
+from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.learning_component_year import LearningComponentYear
 
@@ -136,7 +138,10 @@ def volume_learning_component_year(learning_component_year):
     }
 
 
-def is_service_course(academic_year, requirement_entity_version, allocation_entity_version):
+def is_service_course(academic_year: AcademicYear,
+                      requirement_entity_version: EntityVersion,
+                      allocation_entity_version: EntityVersion) \
+        -> bool:
     if not requirement_entity_version or not allocation_entity_version \
             or requirement_entity_version == allocation_entity_version:
         return False
@@ -144,12 +149,13 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
     requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
 
     if not requirement_parent_faculty:
-        return False
+        return requirement_entity_version != allocation_entity_version
 
     allocation_parent_faculty = allocation_entity_version.find_faculty_version(academic_year)
     if not allocation_parent_faculty:
-        return False
-    return requirement_parent_faculty != allocation_parent_faculty
+        return True
+    else:
+        return requirement_parent_faculty != allocation_parent_faculty
 
 
 def get_learning_component_prefetch():

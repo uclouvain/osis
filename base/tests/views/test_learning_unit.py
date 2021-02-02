@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -564,7 +564,7 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_units_search_with_service_course_no_result(self):
         filter_data = {
             'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'AGRO',
+            'requirement_entity': 'ESPO',
             'with_entity_subordinated': True
         }
         number_of_results = 0
