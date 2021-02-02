@@ -1,3 +1,29 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from ckeditor.widgets import CKEditorWidget
 from typing import List
 
 from django import forms
@@ -21,8 +47,10 @@ class LinkForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     block = forms.IntegerField(required=False)
-    comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
-    comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    comment_fr = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
+                                 required=False)
+    comment_en = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
+                                 required=False)
 
     def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):
         self.parent_obj = parent_obj
@@ -100,7 +128,8 @@ class LinkForm(forms.Form):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
                     isinstance(e, exception.ChildTypeNotAuthorizedException) or\
-                    isinstance(e, exception.MaximumChildTypesReachedException):
+                    isinstance(e, exception.MaximumChildTypesReachedException) or \
+                    isinstance(e, exception.MinimumChildTypesNotRespectedException):
                 self.add_error("link_type", e.message)
             elif isinstance(e, exception.InvalidBlockException):
                 self.add_error("block", e.message)

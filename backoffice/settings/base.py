@@ -320,6 +320,19 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False
     },
+    'link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+    },
+    'comment_link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+        'height': 75
+    },
 }
 
 CKEDITOR_CONFIGS['education_group_pedagogy'] = dict(CKEDITOR_CONFIGS['minimal'])
@@ -500,4 +513,6 @@ MAPBOX = {
     ).split(' '),
 }
 
-INTERNSHIP_PORTAL_ACCOUNT_CREATION_URL = os.environ.get("INTERNSHIP_PORTAL_ACCOUNT_CREATION_URL", "")
+LDAP_ACCOUNT_CREATION_URL = os.environ.get("LDAP_ACCOUNT_CREATION_URL", "")
+LDAP_ACCOUNT_CONFIGURATION_URL = os.environ.get("LDAP_ACCOUNT_CONFIGURATION_URL", "")
+INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", "")
